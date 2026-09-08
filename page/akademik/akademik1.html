@@ -1,0 +1,2036 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Akademik | FIKES</title>
+
+    <meta
+      name="description"
+      content="Dokumen Akademik Fakultas Ilmu Kesehatan"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* =========================================================
+           GLOBAL
+        ========================================================= */
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        color: #263238;
+        background: #f7f9fc;
+        line-height: 1.6;
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      ul {
+        list-style: none;
+      }
+
+      button,
+      input,
+      select {
+        font-family: inherit;
+      }
+
+      .container {
+        width: min(1180px, calc(100% - 40px));
+        margin: auto;
+      }
+
+      /* =========================================================
+           TOPBAR
+        ========================================================= */
+
+      .topbar {
+        background: #075e54;
+        color: #fff;
+        font-size: 13px;
+      }
+
+      .topbar-inner {
+        min-height: 42px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .topbar-left,
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .topbar span {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .topbar a {
+        transition: 0.2s;
+      }
+
+      .topbar a:hover {
+        color: #b2dfdb;
+      }
+
+      /* =========================================================
+           NAVBAR
+        ========================================================= */
+
+      .navbar {
+        background: #fff;
+        border-bottom: 1px solid #edf0f3;
+        position: sticky;
+        top: 0;
+        z-index: 999;
+      }
+
+      .nav-inner {
+        min-height: 78px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+
+      .brand-logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #00897b, #00695c);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Plus Jakarta Sans";
+        font-weight: 800;
+        font-size: 18px;
+      }
+
+      .brand-text strong {
+        display: block;
+        color: #075e54;
+        font-family: "Plus Jakarta Sans";
+        font-size: 16px;
+      }
+
+      .brand-text small {
+        color: #78909c;
+        font-size: 11px;
+      }
+
+      .nav-menu {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .nav-item {
+        position: relative;
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 28px 13px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #455a64;
+        transition: 0.25s;
+      }
+
+      .nav-link:hover,
+      .nav-link.active {
+        color: #00897b;
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        left: 0;
+        top: calc(100% - 5px);
+        width: 230px;
+        background: #fff;
+        border-radius: 0 0 12px 12px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        padding: 8px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(8px);
+        transition: 0.2s;
+      }
+
+      .nav-item:hover > .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .dropdown-link {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 7px;
+        color: #455a64;
+        font-size: 13px;
+      }
+
+      .dropdown-link:hover {
+        background: #e8f5f3;
+        color: #00796b;
+      }
+
+      .menu-toggle {
+        display: none;
+        border: 0;
+        background: #e8f5f3;
+        color: #00796b;
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        font-size: 20px;
+        cursor: pointer;
+      }
+
+      /* =========================================================
+           HERO
+        ========================================================= */
+
+      .page-hero {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(
+          135deg,
+          rgba(0, 77, 64, 0.97),
+          rgba(0, 121, 107, 0.92)
+        );
+        color: #fff;
+        padding: 75px 0 85px;
+      }
+
+      .page-hero::before {
+        content: "";
+        position: absolute;
+        width: 450px;
+        height: 450px;
+        border-radius: 50%;
+        border: 70px solid rgba(255, 255, 255, 0.05);
+        right: -150px;
+        top: -200px;
+      }
+
+      .page-hero::after {
+        content: "";
+        position: absolute;
+        width: 280px;
+        height: 280px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.04);
+        left: -130px;
+        bottom: -160px;
+      }
+
+      .breadcrumb {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        gap: 9px;
+        align-items: center;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.75);
+        margin-bottom: 22px;
+      }
+
+      .breadcrumb a:hover {
+        color: #fff;
+      }
+
+      .hero-label {
+        position: relative;
+        z-index: 1;
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.13);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 7px 13px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        margin-bottom: 16px;
+      }
+
+      .page-hero h1 {
+        position: relative;
+        z-index: 1;
+        font-family: "Plus Jakarta Sans";
+        font-size: clamp(32px, 5vw, 52px);
+        line-height: 1.15;
+        margin-bottom: 18px;
+      }
+
+      .page-hero p {
+        position: relative;
+        z-index: 1;
+        max-width: 700px;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 16px;
+      }
+
+      /* =========================================================
+           CONTENT
+        ========================================================= */
+
+      .academic-section {
+        padding: 70px 0;
+      }
+
+      .section-heading {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .section-heading span {
+        color: #00897b;
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 1.7px;
+        text-transform: uppercase;
+      }
+
+      .section-heading h2 {
+        font-family: "Plus Jakarta Sans";
+        color: #263238;
+        font-size: 30px;
+        margin: 8px 0 10px;
+      }
+
+      .section-heading p {
+        color: #78909c;
+        max-width: 680px;
+        margin: auto;
+        font-size: 14px;
+      }
+
+      /* =========================================================
+           STATISTICS
+        ========================================================= */
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 35px;
+      }
+
+      .stat-card {
+        background: #fff;
+        border: 1px solid #edf0f3;
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        gap: 17px;
+        box-shadow: 0 7px 25px rgba(28, 39, 49, 0.04);
+      }
+
+      .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 13px;
+        background: #e8f5f3;
+        color: #00897b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+      }
+
+      .stat-card strong {
+        display: block;
+        font-family: "Plus Jakarta Sans";
+        font-size: 25px;
+        color: #263238;
+      }
+
+      .stat-card span {
+        font-size: 12px;
+        color: #90a4ae;
+      }
+
+      /* =========================================================
+           DOCUMENT PANEL
+        ========================================================= */
+
+      .document-panel {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid #edf0f3;
+        box-shadow: 0 10px 35px rgba(28, 39, 49, 0.05);
+        overflow: hidden;
+      }
+
+      .document-toolbar {
+        padding: 22px;
+        border-bottom: 1px solid #edf0f3;
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        gap: 12px;
+      }
+
+      .search-box {
+        position: relative;
+      }
+
+      .search-box input,
+      .document-toolbar select {
+        width: 100%;
+        height: 46px;
+        border: 1px solid #dfe5e8;
+        background: #fafbfc;
+        border-radius: 9px;
+        outline: none;
+        padding: 0 14px;
+        color: #455a64;
+        font-size: 13px;
+        transition: 0.2s;
+      }
+
+      .search-box input {
+        padding-left: 40px;
+      }
+
+      .search-box span {
+        position: absolute;
+        left: 14px;
+        top: 12px;
+        color: #90a4ae;
+      }
+
+      .search-box input:focus,
+      .document-toolbar select:focus {
+        border-color: #26a69a;
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(38, 166, 154, 0.1);
+      }
+
+      /* =========================================================
+           TABLE
+        ========================================================= */
+
+      .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .document-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 850px;
+      }
+
+      .document-table th {
+        background: #f8fafb;
+        color: #607d8b;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 16px 18px;
+        text-align: left;
+        white-space: nowrap;
+      }
+
+      .document-table td {
+        padding: 17px 18px;
+        border-top: 1px solid #edf0f3;
+        font-size: 13px;
+        color: #546e7a;
+        vertical-align: middle;
+      }
+
+      .document-table tbody tr {
+        transition: 0.2s;
+      }
+
+      .document-table tbody tr:hover {
+        background: #f9fcfb;
+      }
+
+      .number {
+        width: 50px;
+        color: #90a4ae !important;
+      }
+
+      .program-name {
+        color: #263238 !important;
+        font-weight: 700;
+      }
+
+      .document-name {
+        color: #455a64 !important;
+        font-weight: 600;
+        max-width: 300px;
+      }
+
+      .semester-badge,
+      .year-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+        padding: 5px 10px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .semester-badge {
+        background: #e8f5f3;
+        color: #00796b;
+      }
+
+      .year-badge {
+        background: #eef2f5;
+        color: #607d8b;
+      }
+
+      .download-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        background: #00897b;
+        color: #fff;
+        border-radius: 8px;
+        padding: 9px 13px;
+        font-size: 12px;
+        font-weight: 700;
+        transition: 0.2s;
+        white-space: nowrap;
+      }
+
+      .download-btn:hover {
+        background: #00695c;
+        transform: translateY(-1px);
+      }
+
+      /* =========================================================
+   PAGINATION
+========================================================= */
+
+      .pagination {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .pagination button,
+      .page-number {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 10px;
+        border: 1px solid #e0e6e9;
+        background: #fff;
+        border-radius: 8px;
+        color: #607d8b;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: 0.2s;
+      }
+
+      .pagination button:hover,
+      .page-number:hover {
+        background: #e8f5f3;
+        border-color: #80cbc4;
+        color: #00796b;
+      }
+
+      .pagination button.active,
+      .page-number.active {
+        background: #00897b;
+        border-color: #00897b;
+        color: #fff;
+      }
+
+      .pagination button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      #pageNumbers {
+        display: flex;
+        gap: 5px;
+      }
+
+      .pagination-dots {
+        min-width: 30px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #90a4ae;
+      }
+
+      @media (max-width: 650px) {
+        .table-footer {
+          align-items: center;
+        }
+
+        .pagination {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      /* =========================================================
+           EMPTY STATE
+        ========================================================= */
+
+      .empty-state {
+        display: none;
+        text-align: center;
+        padding: 55px 20px;
+      }
+
+      .empty-icon {
+        width: 65px;
+        height: 65px;
+        margin: 0 auto 15px;
+        border-radius: 50%;
+        background: #f1f5f6;
+        color: #90a4ae;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+      }
+
+      .empty-state h3 {
+        font-family: "Plus Jakarta Sans";
+        font-size: 18px;
+        margin-bottom: 5px;
+      }
+
+      .empty-state p {
+        font-size: 13px;
+        color: #90a4ae;
+      }
+
+      /* =========================================================
+           RESULT + PAGINATION
+        ========================================================= */
+
+      .table-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 22px;
+        border-top: 1px solid #edf0f3;
+      }
+
+      .result-info {
+        font-size: 12px;
+        color: #90a4ae;
+      }
+
+      .pagination {
+        display: flex;
+        gap: 5px;
+      }
+
+      .pagination button {
+        min-width: 34px;
+        height: 34px;
+        padding: 0 9px;
+        border: 1px solid #e0e6e9;
+        background: #fff;
+        border-radius: 7px;
+        color: #607d8b;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .pagination button:hover,
+      .pagination button.active {
+        background: #00897b;
+        border-color: #00897b;
+        color: #fff;
+      }
+
+      /* =========================================================
+           CTA
+        ========================================================= */
+
+      .cta {
+        margin-top: 70px;
+        background: linear-gradient(135deg, #004d40, #00897b);
+        border-radius: 20px;
+        padding: 42px;
+        color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 30px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .cta::after {
+        content: "";
+        position: absolute;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        border: 35px solid rgba(255, 255, 255, 0.05);
+        right: -70px;
+        top: -100px;
+      }
+
+      .cta h2 {
+        position: relative;
+        z-index: 1;
+        font-family: "Plus Jakarta Sans";
+        font-size: 25px;
+        margin-bottom: 8px;
+      }
+
+      .cta p {
+        position: relative;
+        z-index: 1;
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 13px;
+      }
+
+      .cta-btn {
+        position: relative;
+        z-index: 1;
+        flex-shrink: 0;
+        background: #fff;
+        color: #00796b;
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      /* =========================================================
+           FOOTER
+        ========================================================= */
+
+      .footer {
+        background: #102a27;
+        color: #fff;
+        padding: 55px 0 0;
+        margin-top: 0;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr 1fr;
+        gap: 40px;
+        padding-bottom: 45px;
+      }
+
+      .footer-brand p {
+        color: #90a4ae;
+        font-size: 13px;
+        margin-top: 15px;
+        max-width: 330px;
+      }
+
+      .footer h4 {
+        font-family: "Plus Jakarta Sans";
+        font-size: 14px;
+        margin-bottom: 18px;
+      }
+
+      .footer ul li {
+        margin-bottom: 9px;
+      }
+
+      .footer ul li a {
+        color: #90a4ae;
+        font-size: 12px;
+        transition: 0.2s;
+      }
+
+      .footer ul li a:hover {
+        color: #fff;
+      }
+
+      .footer-bottom {
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 20px 0;
+        color: #78909c;
+        font-size: 11px;
+        text-align: center;
+      }
+
+      /* =========================================================
+           BACK TO TOP
+        ========================================================= */
+
+      .back-top {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        width: 42px;
+        height: 42px;
+        border: 0;
+        border-radius: 10px;
+        background: #00897b;
+        color: #fff;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+      }
+
+      .back-top.show {
+        display: flex;
+      }
+
+      /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+      @media (max-width: 1000px) {
+        .nav-menu {
+          position: absolute;
+          left: 20px;
+          right: 20px;
+          top: 72px;
+          background: #fff;
+          border-radius: 12px;
+          box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+          display: none;
+          flex-direction: column;
+          align-items: stretch;
+          padding: 8px;
+        }
+
+        .nav-menu.show {
+          display: flex;
+        }
+
+        .nav-link {
+          padding: 12px;
+        }
+
+        .dropdown-menu {
+          position: static;
+          width: 100%;
+          box-shadow: none;
+          display: none;
+          opacity: 1;
+          visibility: visible;
+          transform: none;
+          padding-left: 15px;
+        }
+
+        .nav-item.open > .dropdown-menu {
+          display: block;
+        }
+
+        .menu-toggle {
+          display: block;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .document-toolbar {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .footer-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 650px) {
+        .container {
+          width: min(100% - 28px, 1180px);
+        }
+
+        .topbar-left {
+          display: none;
+        }
+
+        .topbar-inner {
+          justify-content: center;
+        }
+
+        .page-hero {
+          padding: 55px 0 65px;
+        }
+
+        .page-hero h1 {
+          font-size: 34px;
+        }
+
+        .academic-section {
+          padding: 50px 0;
+        }
+
+        .document-toolbar {
+          grid-template-columns: 1fr;
+          padding: 15px;
+        }
+
+        .table-footer {
+          flex-direction: column;
+          gap: 15px;
+          align-items: flex-start;
+        }
+
+        .cta {
+          padding: 30px 24px;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .footer-grid {
+          grid-template-columns: 1fr;
+          gap: 28px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- =========================================================
+     TOPBAR
+========================================================= -->
+
+    <div class="topbar">
+      <div class="container topbar-inner">
+        <div class="topbar-left">
+          <span>🏫 Kampus FIKES</span>
+          <span>✉ info@fikes.ac.id</span>
+          <span>☎ +62 812-0000-0000</span>
+        </div>
+
+        <div class="topbar-right">
+          <a href="#">Facebook</a>
+          <a href="#">Instagram</a>
+          <a href="#">YouTube</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+     NAVBAR
+========================================================= -->
+
+    <header class="navbar">
+      <div class="container nav-inner">
+        <a href="index.html" class="brand">
+          <div class="brand-logo">FK</div>
+
+          <div class="brand-text">
+            <strong>FIKES</strong>
+            <small>Fakultas Ilmu Kesehatan</small>
+          </div>
+        </a>
+
+        <button class="menu-toggle" id="menuToggle">☰</button>
+
+        <nav class="nav-menu" id="navMenu">
+          <div class="nav-item">
+            <a href="index.html" class="nav-link"> Beranda </a>
+          </div>
+
+          <!-- TENTANG FIKES -->
+
+          <div class="nav-item">
+            <a href="#" class="nav-link"> Tentang FIKES ▾ </a>
+
+            <div class="dropdown-menu">
+              <a href="visi-misi.html" class="dropdown-link"> Visi Misi </a>
+
+              <a href="struktur.html" class="dropdown-link">
+                Struktur Organisasi
+              </a>
+
+              <a href="akreditasi.html" class="dropdown-link">
+                Sertifikat Akreditasi
+              </a>
+
+              <a href="unduh.html" class="dropdown-link"> Unduh Logo </a>
+
+              <a href="#" class="dropdown-link"> Daftar Dosen </a>
+
+              <a href="#" class="dropdown-link"> └ Dosen Keperawatan </a>
+
+              <a href="#" class="dropdown-link"> └ Dosen Kebidanan </a>
+
+              <a href="#" class="dropdown-link"> └ Dosen Farmasi </a>
+
+              <a href="#" class="dropdown-link"> └ Dosen K3 </a>
+            </div>
+          </div>
+
+          <!-- KEMAHASISWAAN -->
+
+          <div class="nav-item">
+            <a href="#" class="nav-link"> Kemahasiswaan ▾ </a>
+
+            <div class="dropdown-menu">
+              <a href="#" class="dropdown-link"> Himpunan Mahasiswa </a>
+
+              <a href="#" class="dropdown-link"> Unit Kegiatan Mahasiswa </a>
+            </div>
+          </div>
+
+          <!-- PROGRAM VOKASI -->
+
+          <div class="nav-item">
+            <a href="#" class="nav-link"> Program Vokasi ▾ </a>
+
+            <div class="dropdown-menu">
+              <a href="#" class="dropdown-link"> Program Profesi Ners </a>
+
+              <a href="#" class="dropdown-link"> Program Sarjana </a>
+
+              <a href="#" class="dropdown-link"> └ Keperawatan </a>
+
+              <a href="#" class="dropdown-link"> └ Farmasi </a>
+
+              <a href="#" class="dropdown-link"> Program Diploma </a>
+
+              <a href="#" class="dropdown-link"> └ Keperawatan </a>
+
+              <a href="#" class="dropdown-link"> └ Kebidanan </a>
+
+              <a href="#" class="dropdown-link"> └ K3 </a>
+            </div>
+          </div>
+
+          <!-- AKADEMIK -->
+
+          <div class="nav-item">
+            <a href="akademik.html" class="nav-link active"> Akademik </a>
+          </div>
+
+          <!-- PELAYANAN -->
+
+          <div class="nav-item">
+            <a href="#" class="nav-link"> Pelayanan FIKES </a>
+          </div>
+
+          <!-- SURVEY -->
+
+          <div class="nav-item">
+            <a href="#" class="nav-link"> Survey </a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <!-- =========================================================
+     HERO
+========================================================= -->
+
+    <section class="page-hero">
+      <div class="container">
+        <div class="breadcrumb">
+          <a href="index.html"> Beranda </a>
+
+          <span>›</span>
+
+          <span> Akademik </span>
+        </div>
+
+        <div class="hero-label">AKADEMIK</div>
+
+        <h1>Dokumen Akademik FIKES</h1>
+
+        <p>
+          Pusat informasi dan dokumen akademik Fakultas Ilmu Kesehatan. Temukan
+          berbagai dokumen berdasarkan program studi, semester, dan tahun
+          dokumen.
+        </p>
+      </div>
+    </section>
+
+    <!-- =========================================================
+     ACADEMIC CONTENT
+========================================================= -->
+
+    <main>
+      <section class="academic-section">
+        <div class="container">
+          <div class="section-heading">
+            <span> Pusat Dokumen </span>
+
+            <h2>Dokumen Akademik</h2>
+
+            <p>
+              Akses dan unduh dokumen akademik FIKES dengan mudah. Gunakan fitur
+              pencarian dan filter untuk menemukan dokumen yang dibutuhkan.
+            </p>
+          </div>
+
+          <!-- =====================================================
+         STATISTICS
+    ====================================================== -->
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">📄</div>
+
+              <div>
+                <strong id="totalDocuments"> 10 </strong>
+
+                <span> Total Dokumen </span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">🎓</div>
+
+              <div>
+                <strong id="totalPrograms"> 6 </strong>
+
+                <span> Program Studi </span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">📅</div>
+
+              <div>
+                <strong id="totalYears"> 3 </strong>
+
+                <span> Tahun Dokumen </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- =====================================================
+         DOCUMENT PANEL
+    ====================================================== -->
+
+          <div class="document-panel">
+            <!-- FILTER -->
+
+            <div class="document-toolbar">
+              <div class="search-box">
+                <span> 🔍 </span>
+
+                <input
+                  type="text"
+                  id="documentSearch"
+                  placeholder="Cari nama dokumen..."
+                />
+              </div>
+
+              <select id="programFilter">
+                <option value="">Semua Program Studi</option>
+
+                <option value="S1 Keperawatan">S1 Keperawatan</option>
+
+                <option value="S1 Farmasi">S1 Farmasi</option>
+
+                <option value="D3 Keperawatan">D3 Keperawatan</option>
+
+                <option value="D3 Kebidanan">D3 Kebidanan</option>
+
+                <option value="S1 K3">S1 K3</option>
+
+                <option value="Profesi Ners">Profesi Ners</option>
+              </select>
+
+              <select id="semesterFilter">
+                <option value="">Semua Semester</option>
+
+                <option value="1">Semester 1</option>
+
+                <option value="2">Semester 2</option>
+
+                <option value="3">Semester 3</option>
+
+                <option value="4">Semester 4</option>
+
+                <option value="5">Semester 5</option>
+
+                <option value="6">Semester 6</option>
+
+                <option value="7">Semester 7</option>
+
+                <option value="8">Semester 8</option>
+              </select>
+
+              <select id="yearFilter">
+                <option value="">Semua Tahun</option>
+
+                <option value="2026">2026</option>
+
+                <option value="2025">2025</option>
+
+                <option value="2024">2024</option>
+              </select>
+            </div>
+
+            <!-- TABLE -->
+
+            <div class="table-wrapper">
+              <table class="document-table">
+                <thead>
+                  <tr>
+                    <th>No.</th>
+
+                    <th>Nama Prodi</th>
+
+                    <th>Semester</th>
+
+                    <th>Nama Dokumen</th>
+
+                    <th>Tahun Dokumen</th>
+
+                    <th>Tanggal Publikasi</th>
+
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+
+                <tbody id="documentTableBody">
+                  <tr
+                    data-program="S1 Keperawatan"
+                    data-semester="1"
+                    data-year="2026"
+                  >
+                    <td class="number">1</td>
+                    <td class="program-name">S1 Keperawatan</td>
+                    <td>
+                      <span class="semester-badge">Semester 1</span>
+                    </td>
+                    <td class="document-name">Kalender Akademik</td>
+                    <td>
+                      <span class="year-badge">2026</span>
+                    </td>
+                    <td>10 Januari 2026</td>
+                    <td>
+                      <a
+                        href="assets/documents/kalender-akademik-2026.pdf"
+                        class="download-btn"
+                        download
+                      >
+                        ↓ Download
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr
+                    data-program="S1 Farmasi"
+                    data-semester="2"
+                    data-year="2026"
+                  >
+                    <td class="number">2</td>
+                    <td class="program-name">S1 Farmasi</td>
+                    <td>
+                      <span class="semester-badge">Semester 2</span>
+                    </td>
+                    <td class="document-name">
+                      Jadwal Perkuliahan Semester Genap
+                    </td>
+                    <td>
+                      <span class="year-badge">2026</span>
+                    </td>
+                    <td>15 Januari 2026</td>
+                    <td>
+                      <a
+                        href="assets/documents/jadwal-kuliah-genap-2026.pdf"
+                        class="download-btn"
+                        download
+                      >
+                        ↓ Download
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr
+                    data-program="D3 Keperawatan"
+                    data-semester="3"
+                    data-year="2025"
+                  >
+                    <td class="number">3</td>
+                    <td class="program-name">D3 Keperawatan</td>
+                    <td>
+                      <span class="semester-badge">Semester 3</span>
+                    </td>
+                    <td class="document-name">Panduan Akademik Mahasiswa</td>
+                    <td>
+                      <span class="year-badge">2025</span>
+                    </td>
+                    <td>20 Agustus 2025</td>
+                    <td>
+                      <a
+                        href="assets/documents/panduan-akademik-mahasiswa.pdf"
+                        class="download-btn"
+                        download
+                      >
+                        ↓ Download
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr
+                    data-program="D3 Kebidanan"
+                    data-semester="4"
+                    data-year="2025"
+                  >
+                    <td class="number">4</td>
+                    <td class="program-name">D3 Kebidanan</td>
+                    <td>
+                      <span class="semester-badge">Semester 4</span>
+                    </td>
+                    <td class="document-name">Pedoman Praktik Klinik</td>
+                    <td>
+                      <span class="year-badge">2025</span>
+                    </td>
+                    <td>25 Agustus 2025</td>
+                    <td>
+                      <a
+                        href="assets/documents/pedoman-praktik-klinik.pdf"
+                        class="download-btn"
+                        download
+                      >
+                        ↓ Download
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr data-program="S1 K3" data-semester="5" data-year="2025">
+                    <td class="number">5</td>
+                    <td class="program-name">S1 K3</td>
+                    <td>
+                      <span class="semester-badge">Semester 5</span>
+                    </td>
+                    <td class="document-name">Panduan Kegiatan Akademik</td>
+                    <td>
+                      <span class="year-badge">2025</span>
+                    </td>
+                    <td>1 September 2025</td>
+                    <td>
+                      <a
+                        href="assets/documents/panduan-kegiatan-akademik.pdf"
+                        class="download-btn"
+                        download
+                      >
+                        ↓ Download
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr
+                    data-program="Profesi Ners"
+                    data-semester="1"
+                    data-year="2024"
+                  >
+                    <td class="number">6</td>
+                    <td class="program-name">Profesi Ners</td>
+                    <td>
+                      <span class="semester-badge">Semester 1</span>
+                    </td>
+                    <td class="document-name">
+                      Buku Panduan Program Profesi Ners
+                    </td>
+                    <td>
+                      <span class="year-badge">2024</span>
+                    </td>
+                    <td>12 September 2024</td>
+                    <td>
+                      <a
+                        href="assets/documents/panduan-profesi-ners.pdf"
+                        class="download-btn"
+                        download
+                      >
+                        ↓ Download
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr
+                    data-program="S1 Keperawatan"
+                    data-semester="7"
+                    data-year="2024"
+                  >
+                    <td class="number">7</td>
+                    <td class="program-name">S1 Keperawatan</td>
+                    <td>
+                      <span class="semester-badge">Semester 7</span>
+                    </td>
+                    <td class="document-name">Pedoman Skripsi</td>
+                    <td>
+                      <span class="year-badge">2024</span>
+                    </td>
+                    <td>5 Oktober 2024</td>
+                    <td>
+                      <a
+                        href="assets/documents/pedoman-skripsi.pdf"
+                        class="download-btn"
+                        download
+                      >
+                        ↓ Download
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr
+                    data-program="S1 Farmasi"
+                    data-semester="6"
+                    data-year="2024"
+                  >
+                    <td class="number">8</td>
+                    <td class="program-name">S1 Farmasi</td>
+                    <td>
+                      <span class="semester-badge">Semester 6</span>
+                    </td>
+                    <td class="document-name">
+                      Pedoman Praktikum Laboratorium
+                    </td>
+                    <td>
+                      <span class="year-badge">2024</span>
+                    </td>
+                    <td>10 Oktober 2024</td>
+                    <td>
+                      <a
+                        href="assets/documents/pedoman-praktikum.pdf"
+                        class="download-btn"
+                        download
+                      >
+                        ↓ Download
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr
+                    data-program="D3 Keperawatan"
+                    data-semester="2"
+                    data-year="2026"
+                  >
+                    <td class="number">9</td>
+                    <td class="program-name">D3 Keperawatan</td>
+                    <td>
+                      <span class="semester-badge">Semester 2</span>
+                    </td>
+                    <td class="document-name">Rencana Pembelajaran Semester</td>
+                    <td>
+                      <span class="year-badge">2026</span>
+                    </td>
+                    <td>18 Januari 2026</td>
+                    <td>
+                      <a
+                        href="assets/documents/rps-d3-keperawatan.pdf"
+                        class="download-btn"
+                        download
+                      >
+                        ↓ Download
+                      </a>
+                    </td>
+                  </tr>
+
+                  <tr
+                    data-program="D3 Kebidanan"
+                    data-semester="6"
+                    data-year="2026"
+                  >
+                    <td class="number">10</td>
+                    <td class="program-name">D3 Kebidanan</td>
+                    <td>
+                      <span class="semester-badge">Semester 6</span>
+                    </td>
+                    <td class="document-name">Pedoman Tugas Akhir</td>
+                    <td>
+                      <span class="year-badge">2026</span>
+                    </td>
+                    <td>20 Januari 2026</td>
+                    <td>
+                      <a
+                        href="assets/documents/pedoman-tugas-akhir.pdf"
+                        class="download-btn"
+                        download
+                      >
+                        ↓ Download
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <!-- EMPTY -->
+
+              <div class="empty-state" id="emptyState">
+                <div class="empty-icon">🔍</div>
+
+                <h3>Dokumen Tidak Ditemukan</h3>
+
+                <p>Coba ubah kata pencarian atau filter yang digunakan.</p>
+              </div>
+            </div>
+
+            <!-- FOOTER TABLE -->
+
+            <div class="table-footer">
+              <div class="result-info" id="resultInfo">
+                Menampilkan 1–5 dari 10 dokumen
+              </div>
+
+              <div class="pagination" id="pagination">
+                <button type="button" class="page-btn prev" id="prevPage">
+                  ‹
+                </button>
+
+                <div id="pageNumbers"></div>
+
+                <button type="button" class="page-btn next" id="nextPage">
+                  ›
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- =====================================================
+         CTA
+    ====================================================== -->
+
+          <div class="cta">
+            <div>
+              <h2>Membutuhkan informasi akademik lainnya?</h2>
+
+              <p>
+                Silakan hubungi bagian akademik FIKES untuk informasi lebih
+                lanjut mengenai dokumen dan layanan akademik.
+              </p>
+            </div>
+
+            <a href="#" class="cta-btn"> Hubungi Akademik → </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- =========================================================
+     FOOTER
+========================================================= -->
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <div class="brand">
+              <div class="brand-logo">FK</div>
+
+              <div class="brand-text">
+                <strong style="color: #fff"> FIKES </strong>
+
+                <small style="color: #90a4ae"> Fakultas Ilmu Kesehatan </small>
+              </div>
+            </div>
+
+            <p>
+              Fakultas Ilmu Kesehatan yang berkomitmen menghasilkan lulusan
+              berkualitas, profesional, berintegritas, dan berdaya saing.
+            </p>
+          </div>
+
+          <div>
+            <h4>Tentang FIKES</h4>
+
+            <ul>
+              <li>
+                <a href="visi-misi.html"> Visi Misi </a>
+              </li>
+
+              <li>
+                <a href="struktur.html"> Struktur Organisasi </a>
+              </li>
+
+              <li>
+                <a href="akreditasi.html"> Akreditasi </a>
+              </li>
+
+              <li>
+                <a href="unduh.html"> Unduh Logo </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4>Akademik</h4>
+
+            <ul>
+              <li>
+                <a href="akademik.html"> Dokumen Akademik </a>
+              </li>
+
+              <li>
+                <a href="#"> Kalender Akademik </a>
+              </li>
+
+              <li>
+                <a href="#"> Jadwal Perkuliahan </a>
+              </li>
+
+              <li>
+                <a href="#"> Informasi Akademik </a>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4>Kontak</h4>
+
+            <ul>
+              <li>
+                <a href="#"> 📍 Kampus FIKES </a>
+              </li>
+
+              <li>
+                <a href="#"> ✉ info@fikes.ac.id </a>
+              </li>
+
+              <li>
+                <a href="#"> ☎ +62 812-0000-0000 </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">© 2026 FIKES. All Rights Reserved.</div>
+      </div>
+    </footer>
+
+    <!-- =========================================================
+     BACK TO TOP
+========================================================= -->
+
+    <button class="back-top" id="backTop" aria-label="Kembali ke atas">
+      ↑
+    </button>
+
+    <!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        /* =====================================================
+       MOBILE MENU
+    ====================================================== */
+
+        const menuToggle = document.getElementById("menuToggle");
+
+        const navMenu = document.getElementById("navMenu");
+
+        if (menuToggle && navMenu) {
+          menuToggle.addEventListener("click", function () {
+            navMenu.classList.toggle("show");
+          });
+        }
+
+        /* =====================================================
+       MOBILE DROPDOWN
+    ====================================================== */
+
+        document
+          .querySelectorAll(".nav-item > .nav-link")
+          .forEach(function (link) {
+            link.addEventListener("click", function (event) {
+              const parent = link.parentElement;
+
+              const dropdown = parent.querySelector(".dropdown-menu");
+
+              if (window.innerWidth <= 1000 && dropdown) {
+                event.preventDefault();
+
+                parent.classList.toggle("open");
+              }
+            });
+          });
+
+        /* =====================================================
+       PAGINATION
+    ====================================================== */
+
+        const tableBody = document.getElementById("documentTableBody");
+
+        const allRows = Array.from(tableBody.querySelectorAll("tr"));
+
+        const search = document.getElementById("documentSearch");
+
+        const program = document.getElementById("programFilter");
+
+        const semester = document.getElementById("semesterFilter");
+
+        const year = document.getElementById("yearFilter");
+
+        const emptyState = document.getElementById("emptyState");
+
+        const resultInfo = document.getElementById("resultInfo");
+
+        const pagination = document.getElementById("pagination");
+
+        const pageNumbers = document.getElementById("pageNumbers");
+
+        const prevPage = document.getElementById("prevPage");
+
+        const nextPage = document.getElementById("nextPage");
+
+        let currentPage = 1;
+
+        const rowsPerPage = 5;
+
+        let filteredRows = [...allRows];
+
+        /* =====================================================
+       FILTER
+    ====================================================== */
+
+        function applyFilter() {
+          const searchValue = search ? search.value.toLowerCase().trim() : "";
+
+          const programValue = program ? program.value : "";
+
+          const semesterValue = semester ? semester.value : "";
+
+          const yearValue = year ? year.value : "";
+
+          filteredRows = allRows.filter(function (row) {
+            const text = row.innerText.toLowerCase();
+
+            const rowProgram = row.dataset.program || "";
+
+            const rowSemester = row.dataset.semester || "";
+
+            const rowYear = row.dataset.year || "";
+
+            const matchSearch = !searchValue || text.includes(searchValue);
+
+            const matchProgram = !programValue || rowProgram === programValue;
+
+            const matchSemester =
+              !semesterValue || rowSemester === semesterValue;
+
+            const matchYear = !yearValue || rowYear === yearValue;
+
+            return matchSearch && matchProgram && matchSemester && matchYear;
+          });
+
+          currentPage = 1;
+
+          renderTable();
+        }
+
+        /* =====================================================
+       RENDER TABLE
+    ====================================================== */
+
+        function renderTable() {
+          allRows.forEach(function (row) {
+            row.style.display = "none";
+          });
+
+          if (filteredRows.length === 0) {
+            if (emptyState) {
+              emptyState.style.display = "block";
+            }
+
+            if (pagination) {
+              pagination.style.display = "none";
+            }
+
+            if (resultInfo) {
+              resultInfo.textContent = "Tidak ada dokumen ditemukan";
+            }
+
+            return;
+          }
+
+          if (emptyState) {
+            emptyState.style.display = "none";
+          }
+
+          if (pagination) {
+            pagination.style.display = "flex";
+          }
+
+          const totalRows = filteredRows.length;
+
+          const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+          if (currentPage > totalPages) {
+            currentPage = totalPages;
+          }
+
+          const start = (currentPage - 1) * rowsPerPage;
+
+          const end = Math.min(start + rowsPerPage, totalRows);
+
+          const currentRows = filteredRows.slice(start, end);
+
+          currentRows.forEach(function (row) {
+            row.style.display = "";
+          });
+
+          /* =================================================
+           NOMOR URUT
+        ================================================== */
+
+          currentRows.forEach(function (row, index) {
+            const numberCell = row.querySelector(".number");
+
+            if (numberCell) {
+              numberCell.textContent = start + index + 1;
+            }
+          });
+
+          /* =================================================
+           RESULT INFO
+        ================================================== */
+
+          if (resultInfo) {
+            resultInfo.textContent = `Menampilkan ${start + 1}–${end} dari ${totalRows} dokumen`;
+          }
+
+          renderPagination(totalPages);
+        }
+
+        /* =====================================================
+       RENDER PAGINATION BUTTON
+    ====================================================== */
+
+        function renderPagination(totalPages) {
+          if (!pageNumbers) {
+            return;
+          }
+
+          pageNumbers.innerHTML = "";
+
+          /* PREVIOUS */
+
+          if (prevPage) {
+            prevPage.disabled = currentPage === 1;
+          }
+
+          /* =================================================
+           PAGE NUMBERS
+        ================================================== */
+
+          let pages = [];
+
+          if (totalPages <= 7) {
+            for (let i = 1; i <= totalPages; i++) {
+              pages.push(i);
+            }
+          } else {
+            pages.push(1);
+
+            if (currentPage > 4) {
+              pages.push("...");
+            }
+
+            const start = Math.max(2, currentPage - 1);
+
+            const end = Math.min(totalPages - 1, currentPage + 1);
+
+            for (let i = start; i <= end; i++) {
+              pages.push(i);
+            }
+
+            if (currentPage < totalPages - 3) {
+              pages.push("...");
+            }
+
+            pages.push(totalPages);
+          }
+
+          pages.forEach(function (page) {
+            if (page === "...") {
+              const dots = document.createElement("span");
+
+              dots.className = "pagination-dots";
+
+              dots.textContent = "...";
+
+              pageNumbers.appendChild(dots);
+
+              return;
+            }
+
+            const button = document.createElement("button");
+
+            button.type = "button";
+
+            button.className = "page-number";
+
+            button.textContent = page;
+
+            if (page === currentPage) {
+              button.classList.add("active");
+            }
+
+            button.addEventListener("click", function () {
+              currentPage = page;
+
+              renderTable();
+
+              scrollToTable();
+            });
+
+            pageNumbers.appendChild(button);
+          });
+
+          /* NEXT */
+
+          if (nextPage) {
+            nextPage.disabled = currentPage === totalPages;
+          }
+        }
+
+        /* =====================================================
+       PREVIOUS
+    ====================================================== */
+
+        if (prevPage) {
+          prevPage.addEventListener("click", function () {
+            if (currentPage > 1) {
+              currentPage--;
+
+              renderTable();
+
+              scrollToTable();
+            }
+          });
+        }
+
+        /* =====================================================
+       NEXT
+    ====================================================== */
+
+        if (nextPage) {
+          nextPage.addEventListener("click", function () {
+            const totalPages = Math.ceil(filteredRows.length / rowsPerPage);
+
+            if (currentPage < totalPages) {
+              currentPage++;
+
+              renderTable();
+
+              scrollToTable();
+            }
+          });
+        }
+
+        /* =====================================================
+       SCROLL TO TABLE
+    ====================================================== */
+
+        function scrollToTable() {
+          const panel = document.querySelector(".document-panel");
+
+          if (panel) {
+            const top =
+              panel.getBoundingClientRect().top + window.scrollY - 100;
+
+            window.scrollTo({
+              top: top,
+              behavior: "smooth",
+            });
+          }
+        }
+
+        /* =====================================================
+       FILTER EVENTS
+    ====================================================== */
+
+        if (search) {
+          search.addEventListener("input", applyFilter);
+        }
+
+        if (program) {
+          program.addEventListener("change", applyFilter);
+        }
+
+        if (semester) {
+          semester.addEventListener("change", applyFilter);
+        }
+
+        if (year) {
+          year.addEventListener("change", applyFilter);
+        }
+
+        /* =====================================================
+       BACK TO TOP
+    ====================================================== */
+
+        const backTop = document.getElementById("backTop");
+
+        window.addEventListener("scroll", function () {
+          if (!backTop) {
+            return;
+          }
+
+          if (window.scrollY > 400) {
+            backTop.classList.add("show");
+          } else {
+            backTop.classList.remove("show");
+          }
+        });
+
+        if (backTop) {
+          backTop.addEventListener("click", function () {
+            window.scrollTo({
+              top: 0,
+              behavior: "smooth",
+            });
+          });
+        }
+
+        /* =====================================================
+       INITIALIZE
+    ====================================================== */
+
+        renderTable();
+      });
+    </script>
+  </body>
+</html>

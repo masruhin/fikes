@@ -1,0 +1,3 @@
+<?php
+$page_title='Profil Admin'; require_once __DIR__.'/../../config/auth.php'; wajib_login(); require __DIR__.'/../../includes/header.php'; ?>
+<div class="page-head"><div><span class="eyebrow">ADMIN FIKES</span><h1>Profil Admin</h1><p>Kelola informasi akun administrator.</p></div></div><div class="panel"><div class="empty"><div class="empty-icon">◎</div><h2>Profil Admin</h2><p>Halaman ini sudah tersedia dan siap dikembangkan.</p></div></div><?php require __DIR__.'/../../includes/footer.php'; ?>
