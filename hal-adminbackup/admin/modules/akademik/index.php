@@ -1,3 +1,0 @@
-<?php
-$page_title='Akademik'; require_once __DIR__.'/../../config/auth.php'; wajib_login(); require __DIR__.'/../../includes/header.php'; ?>
-<div class="page-head"><div><span class="eyebrow">ADMIN FIKES</span><h1>Akademik</h1><p>Kelola informasi akademik FIKES.</p></div></div><div class="panel"><div class="empty"><div class="empty-icon">◎</div><h2>Akademik</h2><p>Halaman ini sudah tersedia dan siap dikembangkan.</p></div></div><?php require __DIR__.'/../../includes/footer.php'; ?>
