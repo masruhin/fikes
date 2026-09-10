@@ -31,7 +31,7 @@ $base_path = $base_path ?? '..';
       <!-- TENTANG FIKES -->
 
       <div class="nav-item has-dropdown">
-        <a href="#" class="dropdown-link">
+        <a href="<?= $base_path ?>/tentang-fikes/visi-misi.php" class="nav-link">
           Tentang FIKES
           <span class="arrow">▾</span>
         </a>
@@ -57,12 +57,9 @@ $base_path = $base_path ?? '..';
             <a href="<?= $base_path ?>/tentang-fikes/unduh-logo.php" class="dropdown-link"> Unduh Logo </a>
           </div>
 
-          <div class="dropdown-item">
-            <a href="<?= $base_path ?>/dosen/dosen.php" class="dropdown-link"> Daftar Dosen </a>
-          </div>
           <!-- DAFTAR DOSEN -->
 
-          <!-- <div class="dropdown-item has-dropdown">
+          <div class="dropdown-item has-dropdown">
             <a href="#" class="dropdown-link">
               Daftar Dosen
               <span>›</span>
@@ -70,7 +67,7 @@ $base_path = $base_path ?? '..';
 
             <div class="dropdown">
               <div class="dropdown-item">
-                <a href="<?= $base_path ?>/dosen/dosen.php" class="dropdown-link"> Keperawatan </a>
+                <a href="<?= $base_path ?>/page/tentang-fikes/dosen.php" class="dropdown-link"> Keperawatan </a>
               </div>
 
               <div class="dropdown-item">
@@ -85,7 +82,7 @@ $base_path = $base_path ?? '..';
                 <a href="#" class="dropdown-link"> K3 </a>
               </div>
             </div>
-          </div> -->
+          </div>
         </div>
       </div>
 
@@ -114,7 +111,6 @@ $base_path = $base_path ?? '..';
 
       <!-- PROGRAM VOKASI -->
 
-
       <div class="nav-item has-dropdown">
         <a href="#" class="nav-link">
           Program Vokasi
@@ -132,7 +128,7 @@ $base_path = $base_path ?? '..';
 
             <div class="dropdown">
               <div class="dropdown-item">
-                <a href="<?= $base_path ?>/program-studi/program-studi.php" class="dropdown-link">
+                <a href="<?= $base_path ?>/page/tentang-fikes/profesi-ners.php" class="dropdown-link">
                   Profesi Ners
                 </a>
               </div>

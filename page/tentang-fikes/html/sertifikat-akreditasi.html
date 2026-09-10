@@ -1,0 +1,3207 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Sertifikat Akreditasi | FIKES</title>
+
+    <meta
+      name="description"
+      content="Sertifikat Akreditasi Fakultas Ilmu Kesehatan"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* =========================================================
+   ROOT
+========================================================= */
+
+      :root {
+        --primary: #087f5b;
+        --primary-dark: #056044;
+        --primary-light: #e7f7f1;
+
+        --secondary: #f4b942;
+
+        --dark: #12372a;
+        --text: #52635d;
+
+        --white: #ffffff;
+        --light: #f7faf9;
+
+        --border: #e5ece9;
+
+        --danger: #d9534f;
+
+        --shadow: 0 20px 60px rgba(18, 55, 42, 0.1);
+
+        --shadow-hover: 0 25px 70px rgba(18, 55, 42, 0.16);
+
+        --radius: 20px;
+
+        --transition: 0.3s ease;
+      }
+
+      /* =========================================================
+   RESET
+========================================================= */
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+
+        color: var(--text);
+
+        background: var(--white);
+
+        line-height: 1.7;
+
+        overflow-x: hidden;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Plus Jakarta Sans", sans-serif;
+
+        color: var(--dark);
+
+        line-height: 1.3;
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      button {
+        font-family: inherit;
+      }
+
+      img {
+        max-width: 100%;
+        display: block;
+      }
+
+      ul {
+        list-style: none;
+      }
+
+      .container {
+        width: min(1180px, calc(100% - 40px));
+
+        margin: auto;
+      }
+
+      /* =========================================================
+   TOPBAR
+========================================================= */
+
+      .topbar {
+        background: var(--dark);
+
+        color: #d9e8e2;
+
+        font-size: 13px;
+      }
+
+      .topbar-inner {
+        min-height: 40px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+      }
+
+      .topbar-info {
+        display: flex;
+
+        align-items: center;
+
+        gap: 25px;
+      }
+
+      .topbar-info span {
+        display: flex;
+
+        align-items: center;
+
+        gap: 7px;
+      }
+
+      .topbar-social {
+        display: flex;
+
+        gap: 15px;
+      }
+
+      .topbar-social a {
+        transition: var(--transition);
+      }
+
+      .topbar-social a:hover {
+        color: var(--secondary);
+      }
+
+      /* =========================================================
+   NAVBAR
+========================================================= */
+
+      .navbar {
+        position: sticky;
+
+        top: 0;
+
+        z-index: 999;
+
+        background: rgba(255, 255, 255, 0.95);
+
+        backdrop-filter: blur(15px);
+
+        border-bottom: 1px solid var(--border);
+
+        transition: var(--transition);
+      }
+
+      .navbar.scrolled {
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+      }
+
+      .nav-inner {
+        min-height: 82px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 25px;
+      }
+
+      /* =========================================================
+   LOGO
+========================================================= */
+
+      .logo {
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+
+        flex-shrink: 0;
+      }
+
+      .logo-icon {
+        width: 48px;
+        height: 48px;
+
+        border-radius: 14px;
+
+        background: linear-gradient(135deg, var(--primary), #13a878);
+
+        color: white;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-weight: 800;
+
+        font-size: 17px;
+
+        box-shadow: 0 10px 25px rgba(8, 127, 91, 0.25);
+      }
+
+      .logo-text strong {
+        display: block;
+
+        color: var(--dark);
+
+        font-size: 17px;
+
+        line-height: 1.2;
+      }
+
+      .logo-text small {
+        display: block;
+
+        font-size: 10px;
+
+        color: var(--primary);
+
+        font-weight: 700;
+
+        letter-spacing: 0.5px;
+      }
+
+      /* =========================================================
+   NAVIGATION
+========================================================= */
+
+      .nav-menu {
+        display: flex;
+
+        align-items: center;
+
+        gap: 3px;
+      }
+
+      .nav-item {
+        position: relative;
+      }
+
+      .nav-link {
+        min-height: 82px;
+
+        padding: 0 12px;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 5px;
+
+        font-size: 13px;
+
+        font-weight: 600;
+
+        color: #344b43;
+
+        white-space: nowrap;
+
+        transition: var(--transition);
+      }
+
+      .nav-link:hover {
+        color: var(--primary);
+      }
+
+      .arrow {
+        font-size: 10px;
+
+        transition: var(--transition);
+      }
+
+      .nav-item:hover > .nav-link .arrow {
+        transform: rotate(180deg);
+      }
+
+      /* =========================================================
+   DROPDOWN
+========================================================= */
+
+      .dropdown {
+        position: absolute;
+
+        top: calc(100% + 5px);
+
+        left: 0;
+
+        width: 250px;
+
+        padding: 10px;
+
+        background: white;
+
+        border: 1px solid var(--border);
+
+        border-radius: 14px;
+
+        box-shadow: var(--shadow);
+
+        opacity: 0;
+
+        visibility: hidden;
+
+        transform: translateY(10px);
+
+        transition: var(--transition);
+      }
+
+      .nav-item:hover > .dropdown {
+        opacity: 1;
+
+        visibility: visible;
+
+        transform: translateY(0);
+      }
+
+      .dropdown-item {
+        position: relative;
+      }
+
+      .dropdown-link {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        padding: 10px 13px;
+
+        border-radius: 9px;
+
+        font-size: 13px;
+
+        color: #40544d;
+
+        transition: var(--transition);
+      }
+
+      .dropdown-link:hover {
+        color: var(--primary);
+
+        background: var(--primary-light);
+      }
+
+      .dropdown-item > .dropdown {
+        top: -10px;
+
+        left: calc(100% + 5px);
+      }
+
+      .dropdown-item:hover > .dropdown {
+        opacity: 1;
+
+        visibility: visible;
+
+        transform: translateY(0);
+      }
+
+      /* =========================================================
+   NAV CTA
+========================================================= */
+
+      .nav-cta {
+        padding: 12px 19px;
+
+        border-radius: 10px;
+
+        background: var(--primary);
+
+        color: white;
+
+        font-size: 13px;
+
+        font-weight: 700;
+
+        white-space: nowrap;
+
+        transition: var(--transition);
+      }
+
+      .nav-cta:hover {
+        background: var(--primary-dark);
+
+        transform: translateY(-2px);
+
+        box-shadow: 0 10px 25px rgba(8, 127, 91, 0.22);
+      }
+
+      /* =========================================================
+   MOBILE BUTTON
+========================================================= */
+
+      .menu-toggle {
+        display: none;
+
+        width: 44px;
+        height: 44px;
+
+        border: none;
+
+        border-radius: 10px;
+
+        background: var(--primary-light);
+
+        color: var(--primary);
+
+        font-size: 21px;
+
+        cursor: pointer;
+      }
+
+      /* =========================================================
+   HERO
+========================================================= */
+
+      .page-hero {
+        position: relative;
+
+        padding: 100px 0 105px;
+
+        overflow: hidden;
+
+        background:
+          radial-gradient(
+            circle at 85% 20%,
+            rgba(8, 127, 91, 0.14),
+            transparent 30%
+          ),
+          linear-gradient(135deg, #f5fcf9, #ffffff 60%, #edf8f4);
+      }
+
+      .page-hero::before {
+        content: "";
+
+        position: absolute;
+
+        width: 400px;
+        height: 400px;
+
+        border-radius: 50%;
+
+        border: 70px solid rgba(8, 127, 91, 0.04);
+
+        right: -130px;
+
+        top: -130px;
+      }
+
+      .hero-content {
+        position: relative;
+
+        z-index: 2;
+
+        max-width: 800px;
+      }
+
+      .breadcrumb {
+        display: flex;
+
+        align-items: center;
+
+        gap: 9px;
+
+        margin-bottom: 25px;
+
+        font-size: 13px;
+      }
+
+      .breadcrumb a {
+        color: var(--primary);
+
+        font-weight: 600;
+      }
+
+      .breadcrumb span {
+        color: #9aa9a3;
+      }
+
+      .hero-label {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        padding: 8px 15px;
+
+        border-radius: 50px;
+
+        background: var(--primary-light);
+
+        color: var(--primary);
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        margin-bottom: 18px;
+      }
+
+      .hero-label span {
+        width: 7px;
+        height: 7px;
+
+        border-radius: 50%;
+
+        background: var(--secondary);
+      }
+
+      .page-hero h1 {
+        font-size: clamp(40px, 5vw, 62px);
+
+        letter-spacing: -1.5px;
+
+        margin-bottom: 18px;
+      }
+
+      .page-hero h1 span {
+        color: var(--primary);
+      }
+
+      .page-hero p {
+        max-width: 720px;
+
+        font-size: 17px;
+      }
+
+      /* =========================================================
+   SECTION
+========================================================= */
+
+      .section {
+        padding: 95px 0;
+      }
+
+      .section-header {
+        max-width: 720px;
+
+        margin: 0 auto 50px;
+
+        text-align: center;
+      }
+
+      .section-label {
+        display: inline-flex;
+
+        align-items: center;
+
+        padding: 8px 15px;
+
+        border-radius: 50px;
+
+        background: var(--primary-light);
+
+        color: var(--primary);
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        margin-bottom: 15px;
+      }
+
+      .section-title {
+        font-size: clamp(30px, 4vw, 45px);
+
+        margin-bottom: 15px;
+      }
+
+      .section-description {
+        font-size: 15px;
+      }
+
+      /* =========================================================
+   FILTER
+========================================================= */
+
+      .filter-wrapper {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        flex-wrap: wrap;
+
+        gap: 10px;
+
+        margin-bottom: 40px;
+      }
+
+      .filter-button {
+        border: 1px solid var(--border);
+
+        background: white;
+
+        color: var(--text);
+
+        padding: 10px 18px;
+
+        border-radius: 50px;
+
+        cursor: pointer;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        transition: var(--transition);
+      }
+
+      .filter-button:hover {
+        border-color: var(--primary);
+
+        color: var(--primary);
+      }
+
+      .filter-button.active {
+        background: var(--primary);
+
+        color: white;
+
+        border-color: var(--primary);
+
+        box-shadow: 0 8px 20px rgba(8, 127, 91, 0.18);
+      }
+
+      /* =========================================================
+   CERTIFICATE GRID
+========================================================= */
+
+      .certificate-grid {
+        display: grid;
+
+        grid-template-columns: repeat(3, 1fr);
+
+        gap: 25px;
+      }
+
+      /* =========================================================
+   CERTIFICATE CARD
+========================================================= */
+
+      .certificate-card {
+        background: white;
+
+        border: 1px solid var(--border);
+
+        border-radius: 20px;
+
+        overflow: hidden;
+
+        box-shadow: 0 10px 35px rgba(18, 55, 42, 0.05);
+
+        transition: var(--transition);
+      }
+
+      .certificate-card:hover {
+        transform: translateY(-8px);
+
+        box-shadow: var(--shadow-hover);
+
+        border-color: transparent;
+      }
+
+      /* =========================================================
+   CERTIFICATE IMAGE
+========================================================= */
+
+      .certificate-preview {
+        position: relative;
+
+        height: 270px;
+
+        overflow: hidden;
+
+        background: #f1f5f3;
+
+        cursor: zoom-in;
+      }
+
+      .certificate-preview img {
+        width: 100%;
+        height: 100%;
+
+        object-fit: cover;
+
+        transition: transform 0.5s ease;
+      }
+
+      .certificate-card:hover .certificate-preview img {
+        transform: scale(1.05);
+      }
+
+      /* IMAGE OVERLAY */
+
+      .preview-overlay {
+        position: absolute;
+
+        inset: 0;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        background: rgba(8, 127, 91, 0.65);
+
+        opacity: 0;
+
+        transition: var(--transition);
+      }
+
+      .certificate-card:hover .preview-overlay {
+        opacity: 1;
+      }
+
+      .preview-button {
+        width: 52px;
+        height: 52px;
+
+        border-radius: 50%;
+
+        background: white;
+
+        color: var(--primary);
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 20px;
+
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      /* STATUS */
+
+      .certificate-status {
+        position: absolute;
+
+        top: 15px;
+
+        left: 15px;
+
+        z-index: 2;
+
+        padding: 6px 11px;
+
+        border-radius: 50px;
+
+        background: rgba(255, 255, 255, 0.94);
+
+        color: var(--primary);
+
+        font-size: 10px;
+
+        font-weight: 800;
+
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      /* =========================================================
+   CARD CONTENT
+========================================================= */
+
+      .certificate-content {
+        padding: 23px;
+      }
+
+      .certificate-category {
+        color: var(--primary);
+
+        font-size: 10px;
+
+        font-weight: 800;
+
+        text-transform: uppercase;
+
+        letter-spacing: 0.8px;
+
+        margin-bottom: 8px;
+      }
+
+      .certificate-content h3 {
+        font-size: 18px;
+
+        margin-bottom: 8px;
+      }
+
+      .certificate-content p {
+        font-size: 12px;
+
+        color: #75857f;
+
+        margin-bottom: 18px;
+      }
+
+      /* =========================================================
+   META
+========================================================= */
+
+      .certificate-meta {
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 10px;
+
+        margin-bottom: 20px;
+
+        padding: 14px;
+
+        border-radius: 12px;
+
+        background: var(--light);
+      }
+
+      .meta-item {
+        display: flex;
+
+        flex-direction: column;
+      }
+
+      .meta-label {
+        font-size: 9px;
+
+        color: #91a099;
+
+        text-transform: uppercase;
+
+        font-weight: 700;
+      }
+
+      .meta-value {
+        font-size: 11px;
+
+        color: var(--dark);
+
+        font-weight: 700;
+      }
+
+      /* =========================================================
+   BUTTONS
+========================================================= */
+
+      .card-buttons {
+        display: grid;
+
+        grid-template-columns: 1fr 1fr;
+
+        gap: 9px;
+      }
+
+      .btn {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 6px;
+
+        min-height: 42px;
+
+        border-radius: 10px;
+
+        font-size: 11px;
+
+        font-weight: 800;
+
+        transition: var(--transition);
+      }
+
+      .btn-preview {
+        border: 1px solid var(--primary);
+
+        color: var(--primary);
+
+        background: white;
+      }
+
+      .btn-preview:hover {
+        background: var(--primary);
+
+        color: white;
+      }
+
+      .btn-download {
+        background: var(--primary);
+
+        color: white;
+
+        border: 1px solid var(--primary);
+      }
+
+      .btn-download:hover {
+        background: var(--primary-dark);
+
+        transform: translateY(-2px);
+      }
+
+      /* =========================================================
+   EMPTY RESULT
+========================================================= */
+
+      .no-result {
+        display: none;
+
+        text-align: center;
+
+        padding: 50px 20px;
+
+        border: 1px dashed var(--border);
+
+        border-radius: 20px;
+
+        margin-top: 20px;
+      }
+
+      .no-result-icon {
+        font-size: 40px;
+
+        margin-bottom: 10px;
+      }
+
+      .no-result h3 {
+        margin-bottom: 5px;
+      }
+
+      /* =========================================================
+   INFO SECTION
+========================================================= */
+
+      .info-section {
+        background: var(--light);
+      }
+
+      .info-grid {
+        display: grid;
+
+        grid-template-columns: repeat(3, 1fr);
+
+        gap: 20px;
+      }
+
+      .info-card {
+        background: white;
+
+        border: 1px solid var(--border);
+
+        border-radius: 20px;
+
+        padding: 30px;
+
+        transition: var(--transition);
+      }
+
+      .info-card:hover {
+        transform: translateY(-5px);
+
+        box-shadow: var(--shadow);
+      }
+
+      .info-icon {
+        width: 55px;
+        height: 55px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 15px;
+
+        background: var(--primary-light);
+
+        color: var(--primary);
+
+        font-size: 23px;
+
+        margin-bottom: 17px;
+      }
+
+      .info-card h3 {
+        font-size: 17px;
+
+        margin-bottom: 8px;
+      }
+
+      .info-card p {
+        font-size: 13px;
+      }
+
+      /* =========================================================
+   CTA
+========================================================= */
+
+      .cta-section {
+        padding: 80px 0;
+      }
+
+      .cta {
+        position: relative;
+
+        overflow: hidden;
+
+        padding: 65px;
+
+        border-radius: 30px;
+
+        background: linear-gradient(135deg, var(--dark), var(--primary-dark));
+
+        text-align: center;
+      }
+
+      .cta::before {
+        content: "";
+
+        position: absolute;
+
+        width: 350px;
+        height: 350px;
+
+        border-radius: 50%;
+
+        border: 70px solid rgba(255, 255, 255, 0.03);
+
+        left: -130px;
+
+        bottom: -190px;
+      }
+
+      .cta::after {
+        content: "";
+
+        position: absolute;
+
+        width: 220px;
+        height: 220px;
+
+        border-radius: 50%;
+
+        border: 45px solid rgba(244, 185, 66, 0.05);
+
+        right: -80px;
+
+        top: -100px;
+      }
+
+      .cta-content {
+        position: relative;
+
+        z-index: 2;
+      }
+
+      .cta h2 {
+        color: white;
+
+        font-size: clamp(30px, 4vw, 42px);
+
+        margin-bottom: 12px;
+      }
+
+      .cta p {
+        max-width: 650px;
+
+        margin: 0 auto 25px;
+
+        color: #d6e9e2;
+      }
+
+      .cta-button {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        padding: 14px 23px;
+
+        border-radius: 11px;
+
+        background: var(--secondary);
+
+        color: var(--dark);
+
+        font-size: 13px;
+
+        font-weight: 800;
+
+        transition: var(--transition);
+      }
+
+      .cta-button:hover {
+        transform: translateY(-3px);
+
+        box-shadow: 0 12px 30px rgba(244, 185, 66, 0.2);
+      }
+
+      /* =========================================================
+   FOOTER
+========================================================= */
+
+      footer {
+        background: #0d2b21;
+
+        color: #b7cec5;
+      }
+
+      .footer-main {
+        padding: 70px 0 45px;
+
+        display: grid;
+
+        grid-template-columns: 1.4fr 1fr 1fr 1fr;
+
+        gap: 45px;
+      }
+
+      .footer-brand p {
+        max-width: 320px;
+
+        margin-top: 17px;
+
+        font-size: 13px;
+      }
+
+      .footer-title {
+        color: white;
+
+        font-size: 14px;
+
+        margin-bottom: 17px;
+      }
+
+      .footer-links {
+        display: grid;
+
+        gap: 10px;
+      }
+
+      .footer-links a {
+        font-size: 12px;
+
+        transition: var(--transition);
+      }
+
+      .footer-links a:hover {
+        color: var(--secondary);
+
+        transform: translateX(3px);
+      }
+
+      .footer-bottom {
+        padding: 20px 0;
+
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        font-size: 11px;
+      }
+
+      /* =========================================================
+   LIGHTBOX
+========================================================= */
+
+      .lightbox {
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 2000;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        padding: 30px;
+
+        background: rgba(8, 20, 15, 0.93);
+
+        opacity: 0;
+
+        visibility: hidden;
+
+        transition: var(--transition);
+      }
+
+      .lightbox.active {
+        opacity: 1;
+
+        visibility: visible;
+      }
+
+      .lightbox-content {
+        position: relative;
+
+        width: min(1100px, 100%);
+
+        max-height: 90vh;
+      }
+
+      .lightbox-image {
+        width: 100%;
+
+        max-height: 85vh;
+
+        object-fit: contain;
+
+        border-radius: 12px;
+
+        background: white;
+
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+      }
+
+      .lightbox-close {
+        position: absolute;
+
+        top: -48px;
+
+        right: 0;
+
+        width: 40px;
+
+        height: 40px;
+
+        border: none;
+
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, 0.12);
+
+        color: white;
+
+        font-size: 20px;
+
+        cursor: pointer;
+      }
+
+      .lightbox-close:hover {
+        background: var(--primary);
+      }
+
+      /* =========================================================
+   BACK TOP
+========================================================= */
+
+      .back-top {
+        position: fixed;
+
+        right: 25px;
+
+        bottom: 25px;
+
+        width: 45px;
+
+        height: 45px;
+
+        border: none;
+
+        border-radius: 12px;
+
+        background: var(--primary);
+
+        color: white;
+
+        cursor: pointer;
+
+        opacity: 0;
+
+        visibility: hidden;
+
+        transform: translateY(10px);
+
+        transition: var(--transition);
+
+        z-index: 900;
+      }
+
+      .back-top.show {
+        opacity: 1;
+
+        visibility: visible;
+
+        transform: translateY(0);
+      }
+
+      /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+      @media (max-width: 1100px) {
+        .nav-link {
+          padding: 0 8px;
+          font-size: 12px;
+        }
+
+        .nav-cta {
+          display: none;
+        }
+
+        .hero-grid {
+          gap: 40px;
+        }
+
+        .service-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 900px) {
+        .topbar {
+          display: none;
+        }
+
+        .nav-inner {
+          min-height: 72px;
+        }
+
+        .menu-toggle {
+          display: block;
+        }
+
+        .nav-menu {
+          position: absolute;
+
+          top: 100%;
+          left: 0;
+          right: 0;
+
+          display: none;
+
+          background: white;
+
+          border-top: 1px solid var(--border);
+
+          padding: 10px 20px 25px;
+
+          max-height: calc(100vh - 72px);
+          overflow-y: auto;
+
+          box-shadow: 0 20px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-menu.active {
+          display: block;
+        }
+
+        .nav-item {
+          border-bottom: 1px solid #edf2f0;
+        }
+
+        .nav-link {
+          min-height: 48px;
+          padding: 0;
+          justify-content: space-between;
+        }
+
+        .dropdown {
+          position: static;
+
+          width: 100%;
+
+          display: none;
+
+          opacity: 1;
+          visibility: visible;
+          transform: none;
+
+          box-shadow: none;
+          border: 0;
+
+          padding: 0 0 8px 15px;
+        }
+
+        .nav-item.open > .dropdown {
+          display: block;
+        }
+
+        .dropdown-item.open > .dropdown {
+          display: block;
+        }
+
+        .dropdown-link {
+          min-height: 42px;
+        }
+
+        .hero {
+          min-height: auto;
+          padding: 80px 0 100px;
+        }
+
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-visual {
+          min-height: 430px;
+        }
+
+        .about-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .program-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .footer-main {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 650px) {
+        .container {
+          width: min(100% - 28px, 1180px);
+        }
+
+        .section {
+          padding: 70px 0;
+        }
+
+        .hero {
+          padding: 60px 0 80px;
+        }
+
+        .hero h1 {
+          font-size: 40px;
+          letter-spacing: -1px;
+        }
+
+        .hero-description {
+          font-size: 15px;
+        }
+
+        .hero-visual {
+          min-height: 390px;
+        }
+
+        .hero-card-main {
+          height: 360px;
+        }
+
+        .floating-card.one {
+          right: -5px;
+          top: 35px;
+        }
+
+        .floating-card.two {
+          left: -5px;
+          bottom: 30px;
+        }
+
+        .stats {
+          margin-top: -30px;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .stat {
+          border-bottom: 1px solid var(--border);
+        }
+
+        .stat:nth-child(2) {
+          border-right: 0;
+        }
+
+        .stat:nth-child(3),
+        .stat:nth-child(4) {
+          border-bottom: 0;
+        }
+
+        .program-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .service-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .student-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .cta-box {
+          padding: 45px 25px;
+        }
+
+        .footer-main {
+          grid-template-columns: 1fr;
+          gap: 30px;
+        }
+
+        .footer-bottom {
+          flex-direction: column;
+          gap: 8px;
+          text-align: center;
+        }
+      }
+      /* ==========================================
+   BOTTOM
+========================================== */
+
+      .slider-bottom {
+        position: absolute;
+
+        left: 0;
+
+        right: 0;
+
+        bottom: 25px;
+
+        z-index: 10;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        padding: 0 35px;
+      }
+
+      /* ==========================================
+   DOTS
+========================================== */
+
+      .slider-dots {
+        display: flex;
+
+        align-items: center;
+
+        gap: 7px;
+      }
+
+      .slider-dot {
+        width: 7px;
+
+        height: 7px;
+
+        padding: 0;
+
+        border: 0;
+
+        border-radius: 20px;
+
+        background: rgba(255, 255, 255, 0.35);
+
+        cursor: pointer;
+
+        transition: 0.4s ease;
+      }
+
+      .slider-dot.active {
+        width: 30px;
+
+        background: white;
+      }
+
+      /* ==========================================
+   SCROLL
+========================================== */
+
+      .scroll-indicator {
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+
+        color: rgba(255, 255, 255, 0.65);
+
+        font-size: 7px;
+
+        font-weight: 700;
+
+        letter-spacing: 1.3px;
+      }
+
+      .scroll-line {
+        width: 45px;
+
+        height: 1px;
+
+        background: rgba(255, 255, 255, 0.5);
+      }
+
+      /* ==========================================
+   TABLET
+========================================== */
+
+      @media (max-width: 900px) {
+        .slider-container {
+          height: 620px;
+
+          min-height: 620px;
+        }
+
+        .slide-content {
+          bottom: 95px;
+        }
+
+        .slide-content h1 {
+          font-size: clamp(32px, 6vw, 48px);
+        }
+
+        .slider-btn {
+          width: 42px;
+
+          height: 42px;
+        }
+
+        .slider-prev {
+          left: 15px;
+        }
+
+        .slider-next {
+          right: 15px;
+        }
+
+        .scroll-indicator {
+          display: none;
+        }
+      }
+
+      /* ==========================================
+   MOBILE
+========================================== */
+
+      @media (max-width: 600px) {
+        .slider-container {
+          height: 620px;
+
+          min-height: 620px;
+        }
+
+        .slide img {
+          object-position: center center;
+        }
+
+        .slide-content {
+          bottom: 90px;
+
+          width: calc(100% - 35px);
+        }
+
+        .slide-label {
+          margin-bottom: 13px;
+
+          padding: 7px 12px;
+
+          font-size: 8px;
+        }
+
+        .slide-content h1 {
+          margin-bottom: 12px;
+
+          font-size: 29px;
+
+          line-height: 1.16;
+
+          letter-spacing: -0.8px;
+        }
+
+        .slide-content p {
+          font-size: 11px;
+
+          line-height: 1.65;
+        }
+
+        .slide-actions {
+          flex-direction: column;
+
+          width: 100%;
+
+          margin-top: 20px;
+        }
+
+        .slide-btn {
+          width: 100%;
+
+          max-width: 240px;
+
+          min-height: 45px;
+        }
+
+        .slider-btn {
+          top: 45%;
+
+          width: 36px;
+
+          height: 36px;
+
+          font-size: 13px;
+        }
+
+        .slider-prev {
+          left: 8px;
+        }
+
+        .slider-next {
+          right: 8px;
+        }
+
+        .slider-bottom {
+          justify-content: center;
+
+          padding: 0;
+
+          bottom: 25px;
+        }
+      }
+
+      .content {
+        max-width: 1170px;
+        margin: auto;
+        padding: 55px 18px 80px;
+      }
+
+      .section-heading {
+        margin-bottom: 28px;
+      }
+
+      .section-heading h2 {
+        margin: 8px 0 8px;
+        font-size: 28px;
+      }
+
+      .section-heading p {
+        margin: 0;
+        color: #7c8b91;
+        font-size: 13px;
+      }
+
+      /* =========================================================
+   CARD GRID
+========================================================= */
+
+      .certificate-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+      }
+
+      .certificate-card {
+        background: #fff;
+        border: 1px solid #e1e9e6;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(25, 50, 45, 0.05);
+        transition: 0.2s ease;
+      }
+
+      .certificate-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 40px rgba(25, 50, 45, 0.1);
+      }
+
+      .card-top {
+        padding: 20px 20px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .certificate-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eaf8f3;
+        color: #078b67;
+        font-size: 11px;
+        font-weight: 900;
+        border: 1px solid #d4eee5;
+      }
+
+      .status {
+        padding: 7px 12px;
+        border-radius: 30px;
+        background: #eaf8f3;
+        color: #078b67;
+        font-size: 10px;
+        font-weight: 800;
+      }
+
+      .card-body {
+        padding: 18px 20px 20px;
+      }
+
+      .program-label {
+        color: #078b67;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 1px;
+      }
+
+      .card-body h3 {
+        margin: 8px 0 6px;
+        font-size: 21px;
+      }
+
+      .institution {
+        margin: 0 0 18px;
+        color: #7a898f;
+        font-size: 12px;
+      }
+
+      /* =========================================================
+   DETAIL
+========================================================= */
+
+      .detail-box {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        background: #e6eeeb;
+        border: 1px solid #e6eeeb;
+        border-radius: 13px;
+        overflow: hidden;
+      }
+
+      .detail-item {
+        min-height: 64px;
+        padding: 11px 12px;
+        background: #f7faf9;
+      }
+
+      .detail-item.full {
+        grid-column: 1 / -1;
+      }
+
+      .detail-item span {
+        display: block;
+        color: #89979b;
+        font-size: 9px;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .detail-item strong {
+        display: block;
+        color: #1d302e;
+        font-size: 11px;
+        line-height: 1.4;
+        word-break: break-word;
+      }
+
+      .detail-item .peringkat {
+        color: #078b67;
+      }
+
+      /* =========================================================
+   BUTTON
+========================================================= */
+
+      .card-footer {
+        padding: 0 20px 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
+      }
+
+      .button {
+        min-height: 42px;
+        padding: 11px 12px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .button.secondary {
+        border: 1px solid #078b67;
+        color: #078b67;
+        background: #fff;
+      }
+
+      .button.primary {
+        border: 1px solid #078b67;
+        color: #fff;
+        background: #078b67;
+      }
+
+      .button:hover {
+        opacity: 0.88;
+      }
+
+      .no-file {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: #9aa7a9;
+        font-size: 11px;
+        padding: 12px;
+      }
+
+      /* =========================================================
+   EMPTY
+========================================================= */
+
+      .empty {
+        padding: 70px 30px;
+        text-align: center;
+        border: 1px solid #e4ece9;
+        border-radius: 18px;
+      }
+
+      .empty-icon {
+        width: 58px;
+        height: 58px;
+        margin: auto;
+        border-radius: 18px;
+        background: #eaf8f3;
+        color: #078b67;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+        font-weight: 800;
+      }
+
+      .empty h3 {
+        margin: 18px 0 7px;
+      }
+
+      .empty p {
+        margin: 0;
+        color: #8a9699;
+        font-size: 13px;
+      }
+
+      /* =========================================================
+   FOOTER
+========================================================= */
+
+      footer {
+        border-top: 1px solid #edf1f0;
+        max-width: 1170px;
+        margin: auto;
+        padding: 25px 18px;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        color: #8a9699;
+        font-size: 11px;
+      }
+
+      /*MAP PETA*/
+      /* =========================================================
+   FOOTER LOCATION
+========================================================== */
+
+      .footer-location {
+        grid-column: 1 / -1;
+      }
+
+      /* =========================================================
+   LOCATION HEADER
+========================================================== */
+
+      .location-header {
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+
+        margin-bottom: 18px;
+      }
+
+      .location-icon {
+        width: 42px;
+
+        height: 42px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 12px;
+
+        color: var(--dark);
+
+        background: var(--secondary);
+
+        font-size: 16px;
+      }
+
+      .location-header h3 {
+        margin: 0 0 3px;
+
+        color: white;
+
+        font-size: 13px;
+
+        font-weight: 800;
+      }
+
+      .location-header p {
+        margin: 0;
+
+        color: rgba(255, 255, 255, 0.5);
+
+        font-size: 9px;
+      }
+
+      /* =========================================================
+   MAP CARD
+========================================================== */
+
+      .map-card {
+        position: relative;
+
+        width: 100%;
+
+        height: 210px;
+
+        overflow: hidden;
+
+        margin-bottom: 20px;
+
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        border-radius: 16px;
+
+        background: rgba(255, 255, 255, 0.05);
+
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      /* =========================================================
+   GOOGLE MAP
+========================================================== */
+
+      .map-card iframe {
+        position: absolute;
+
+        inset: 0;
+
+        width: 100%;
+
+        height: 100%;
+
+        border: 0;
+
+        filter: saturate(0.85) contrast(1.02);
+      }
+
+      /* =========================================================
+   MAP GRADIENT
+========================================================== */
+
+      .map-card::after {
+        content: "";
+
+        position: absolute;
+
+        inset: 0;
+
+        pointer-events: none;
+
+        background: linear-gradient(
+          180deg,
+          rgba(3, 25, 18, 0.05) 35%,
+          rgba(3, 25, 18, 0.75) 100%
+        );
+      }
+
+      /* =========================================================
+   MAP INFO
+========================================================== */
+
+      .map-overlay {
+        position: absolute;
+
+        left: 12px;
+
+        right: 12px;
+
+        bottom: 12px;
+
+        z-index: 5;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 10px;
+      }
+
+      /* =========================================================
+   MAP INFO CARD
+========================================================== */
+
+      .map-info {
+        display: flex;
+
+        align-items: center;
+
+        gap: 9px;
+
+        min-width: 0;
+
+        padding: 9px 11px;
+
+        border: 1px solid rgba(255, 255, 255, 0.16);
+
+        border-radius: 10px;
+
+        background: rgba(5, 35, 26, 0.78);
+
+        backdrop-filter: blur(10px);
+      }
+
+      .map-info-icon {
+        width: 30px;
+
+        height: 30px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 8px;
+
+        color: var(--dark);
+
+        background: var(--secondary);
+
+        font-size: 11px;
+      }
+
+      .map-info strong {
+        display: block;
+
+        max-width: 150px;
+
+        overflow: hidden;
+
+        color: white;
+
+        font-size: 9px;
+
+        font-weight: 800;
+
+        white-space: nowrap;
+
+        text-overflow: ellipsis;
+      }
+
+      .map-info span {
+        display: block;
+
+        margin-top: 2px;
+
+        color: rgba(255, 255, 255, 0.55);
+
+        font-size: 7px;
+      }
+
+      /* =========================================================
+   MAP DIRECTION BUTTON
+========================================================== */
+
+      .map-direction {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 6px;
+
+        flex-shrink: 0;
+
+        padding: 10px 12px;
+
+        border-radius: 9px;
+
+        color: var(--dark);
+
+        background: white;
+
+        font-size: 8px;
+
+        font-weight: 800;
+
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+
+        transition: all 0.3s ease;
+      }
+
+      .map-direction:hover {
+        color: white;
+
+        background: var(--primary);
+
+        transform: translateY(-2px);
+      }
+
+      .map-direction i {
+        font-size: 9px;
+      }
+
+      /* =========================================================
+   LOCATION CONTACT
+========================================================== */
+
+      .location-contact {
+        margin-top: 5px;
+      }
+
+      .footer-container {
+        position: relative;
+        z-index: 2;
+
+        max-width: 1250px;
+        margin: auto;
+
+        padding: 60px 30px 50px;
+
+        display: grid;
+
+        grid-template-columns:
+          1.6fr
+          1fr
+          1fr
+          1fr
+          1.6fr;
+
+        gap: 30px;
+
+        align-items: start;
+      }
+      @media (max-width: 600px) {
+        .footer-container {
+          grid-template-columns:
+            1.5fr
+            1fr
+            1fr;
+
+          gap: 30px;
+        }
+
+        .map-card {
+          height: 240px;
+        }
+
+        .map-overlay {
+          flex-direction: column;
+
+          align-items: stretch;
+        }
+
+        .map-info {
+          width: 100%;
+        }
+
+        .map-direction {
+          width: 100%;
+        }
+      }
+      /*MAP PETA*/
+    </style>
+  </head>
+
+  <body>
+    <!-- =========================================================
+     TOP BAR
+========================================================= -->
+
+    <div class="topbar">
+      <div class="container topbar-inner">
+        <div class="topbar-info">
+          <span>📍 Kampus FIKES</span>
+
+          <span>✉️ info@fikes.ac.id</span>
+
+          <span>📞 (021) 1234567</span>
+        </div>
+
+        <div class="topbar-social">
+          <a href="#">Instagram</a>
+          <a href="#">Facebook</a>
+          <a href="#">YouTube</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================
+     NAVBAR
+========================================================= -->
+
+    <header class="navbar" id="navbar">
+      <div class="container nav-inner">
+        <!-- LOGO -->
+
+        <a href="#home" class="logo">
+          <div class="logo-icon">F</div>
+
+          <div class="logo-text">
+            <strong>FIKES</strong>
+            <small>FAKULTAS ILMU KESEHATAN</small>
+          </div>
+        </a>
+
+        <!-- MOBILE BUTTON -->
+
+        <button class="menu-toggle" id="menuToggle">☰</button>
+
+        <!-- NAVIGATION -->
+
+        <nav class="nav-menu" id="navMenu">
+          <!-- TENTANG FIKES -->
+
+          <div class="nav-item has-dropdown">
+            <a href="#" class="nav-link">
+              Tentang FIKES
+              <span class="arrow">▾</span>
+            </a>
+
+            <div class="dropdown">
+              <div class="dropdown-item">
+                <a href="visi-misi.html" class="dropdown-link"> Visi Misi </a>
+              </div>
+
+              <div class="dropdown-item">
+                <a href="struktur-organisasi.html" class="dropdown-link">
+                  Struktur Organisasi
+                </a>
+              </div>
+
+              <div class="dropdown-item">
+                <a href="sertifikat-akreditasi.html" class="dropdown-link">
+                  Sertifikat Akreditasi
+                </a>
+              </div>
+
+              <div class="dropdown-item">
+                <a href="unduh-logo.html" class="dropdown-link"> Unduh Logo </a>
+              </div>
+
+              <!-- DAFTAR DOSEN -->
+
+              <div class="dropdown-item has-dropdown">
+                <a href="#" class="dropdown-link">
+                  Daftar Dosen
+                  <span>›</span>
+                </a>
+
+                <div class="dropdown">
+                  <div class="dropdown-item">
+                    <a href="dosen.html" class="dropdown-link"> Keperawatan </a>
+                  </div>
+                  <div class="dropdown-item">
+                    <a href="dosen.html" class="dropdown-link"> Keperawatan </a>
+                  </div>
+
+                  <div class="dropdown-item">
+                    <a href="#" class="dropdown-link"> Kebidanan </a>
+                  </div>
+
+                  <div class="dropdown-item">
+                    <a href="#" class="dropdown-link"> Farmasi </a>
+                  </div>
+
+                  <div class="dropdown-item">
+                    <a href="#" class="dropdown-link"> K3 </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KEMAHASISWAAN -->
+
+          <div class="nav-item has-dropdown">
+            <a href="#" class="nav-link">
+              Kemahasiswaan
+              <span class="arrow">▾</span>
+            </a>
+
+            <div class="dropdown">
+              <div class="dropdown-item">
+                <a href="#" class="dropdown-link"> Himpunan Mahasiswa </a>
+              </div>
+
+              <div class="dropdown-item">
+                <a href="#" class="dropdown-link"> Unit Kegiatan Mahasiswa </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROGRAM VOKASI -->
+
+          <div class="nav-item has-dropdown">
+            <a href="#" class="nav-link">
+              Program Vokasi
+              <span class="arrow">▾</span>
+            </a>
+
+            <div class="dropdown">
+              <!-- PROGRAM PROFESI -->
+
+              <div class="dropdown-item has-dropdown">
+                <a href="#" class="dropdown-link">
+                  Program Profesi
+                  <span>›</span>
+                </a>
+
+                <div class="dropdown">
+                  <div class="dropdown-item">
+                    <a href="#" class="dropdown-link"> Profesi Ners </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PROGRAM SARJANA -->
+
+              <div class="dropdown-item has-dropdown">
+                <a href="#" class="dropdown-link">
+                  Program Sarjana
+                  <span>›</span>
+                </a>
+
+                <div class="dropdown">
+                  <div class="dropdown-item">
+                    <a href="#" class="dropdown-link">
+                      Ilmu Keperawatan (S.Kep)
+                    </a>
+                  </div>
+
+                  <div class="dropdown-item">
+                    <a href="#" class="dropdown-link"> Farmasi (S.Farm) </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PROGRAM DIPLOMA -->
+
+              <div class="dropdown-item has-dropdown">
+                <a href="#" class="dropdown-link">
+                  Program Diploma
+                  <span>›</span>
+                </a>
+
+                <div class="dropdown">
+                  <div class="dropdown-item">
+                    <a href="#" class="dropdown-link">
+                      Keperawatan (A.Md.Kep.)
+                    </a>
+                  </div>
+
+                  <div class="dropdown-item">
+                    <a href="#" class="dropdown-link">
+                      Kebidanan (A.Md.Keb.)
+                    </a>
+                  </div>
+
+                  <div class="dropdown-item">
+                    <a href="#" class="dropdown-link">
+                      Keselamatan dan Kesehatan Kerja (S.Tr.KKK.)
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AKADEMIK -->
+
+          <div class="nav-item">
+            <a href="#akademik" class="nav-link"> Akademik </a>
+          </div>
+
+          <!-- PELAYANAN -->
+
+          <div class="nav-item">
+            <a href="#pelayanan" class="nav-link"> Pelayanan FIKES </a>
+          </div>
+
+          <!-- SURVEY -->
+
+          <div class="nav-item">
+            <a href="#survey" class="nav-link"> Survey </a>
+          </div>
+        </nav>
+
+        <a href="#program" class="nav-cta"> Jelajahi Program </a>
+      </div>
+    </header>
+
+    <!-- =========================================================
+     HERO
+========================================================= -->
+    <main>
+      <section class="page-hero">
+        <div class="container">
+          <div class="hero-content">
+            <div class="breadcrumb">
+              <a href="index.html"> Beranda </a>
+
+              <span>›</span>
+
+              <span> Tentang FIKES </span>
+
+              <span>›</span>
+
+              <span> Sertifikat Akreditasi </span>
+            </div>
+
+            <div class="hero-label">
+              <span></span>
+
+              MUTU & AKREDITASI
+            </div>
+
+            <h1>
+              Sertifikat
+
+              <span>Akreditasi</span>
+            </h1>
+
+            <p>
+              Informasi dan dokumen sertifikat akreditasi program studi Fakultas
+              Ilmu Kesehatan sebagai bentuk komitmen terhadap mutu pendidikan
+              dan penyelenggaraan akademik.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+     GALLERY
+========================================================= -->
+
+      <section class="section">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-label"> DOKUMEN AKREDITASI </span>
+
+            <h2 class="section-title">Sertifikat Akreditasi FIKES</h2>
+
+            <p class="section-description">
+              Silakan pilih program studi untuk melihat sertifikat akreditasi
+              dan mengunduh dokumen dalam format PDF.
+            </p>
+          </div>
+
+          <!-- FILTER -->
+
+          <div class="filter-wrapper">
+            <button class="filter-button active" data-filter="all">
+              Semua
+            </button>
+
+            <button class="filter-button" data-filter="keperawatan">
+              Keperawatan
+            </button>
+
+            <button class="filter-button" data-filter="kebidanan">
+              Kebidanan
+            </button>
+
+            <button class="filter-button" data-filter="farmasi">Farmasi</button>
+
+            <button class="filter-button" data-filter="k3">K3</button>
+          </div>
+
+          <!-- CERTIFICATE GRID -->
+
+          <div class="certificate-grid" id="certificateGrid">
+            <!-- =================================================
+                 KEPERAWATAN
+            ================================================== -->
+
+            <article class="certificate-card" data-category="keperawatan">
+              <div
+                class="certificate-preview"
+                data-image="../assets/images-sertifikat/sertifikat1.jpg"
+              >
+                <span class="certificate-status"> TERAKREDITASI </span>
+
+                <img
+                  src="../assets/images-sertifikat/sertifikat1.jpg"
+                  alt="Sertifikat Akreditasi Program Studi Keperawatan"
+                />
+
+                <div class="preview-overlay">
+                  <div class="preview-button">🔍</div>
+                </div>
+              </div>
+
+              <div class="certificate-content">
+                <div class="certificate-category">Program Sarjana</div>
+
+                <h3>Ilmu Keperawatan</h3>
+
+                <p>Sertifikat akreditasi Program Studi Ilmu Keperawatan.</p>
+
+                <div class="certificate-meta">
+                  <div class="meta-item">
+                    <span class="meta-label"> Program </span>
+
+                    <span class="meta-value"> S.Kep. </span>
+                  </div>
+
+                  <div class="meta-item">
+                    <span class="meta-label"> Status </span>
+
+                    <span class="meta-value"> Aktif </span>
+                  </div>
+                </div>
+
+                <div class="card-buttons">
+                  <a
+                    href="assets/pdf/sertifikat1.pdf"
+                    target="_blank"
+                    class="btn btn-preview"
+                  >
+                    👁 Lihat PDF
+                  </a>
+                  <button
+                    type="button"
+                    class="btn btn-download"
+                    onclick="
+                      downloadPDF(
+                        'assets/pdf/sertifikat1.pdf',
+                        'sertifikat1.pdf',
+                      )
+                    "
+                  >
+                    ↓ Download PDF
+                  </button>
+                  <!-- <a
+                  href="assets/pdf/akreditasi-keperawatan.pdf"
+                  download
+                  class="btn btn-download"
+                >
+                  ↓ Download
+                </a> -->
+                </div>
+              </div>
+            </article>
+
+            <!-- =================================================
+                 KEBIDANAN
+            ================================================== -->
+
+            <article class="certificate-card" data-category="kebidanan">
+              <div
+                class="certificate-preview"
+                data-image="../assets/images-sertifikat/sertifikat1.jpg"
+              >
+                <span class="certificate-status"> TERAKREDITASI </span>
+
+                <img
+                  src="../assets/images-sertifikat/sertifikat1.jpg"
+                  alt="Sertifikat Akreditasi Program Studi Kebidanan"
+                />
+
+                <div class="preview-overlay">
+                  <div class="preview-button">🔍</div>
+                </div>
+              </div>
+
+              <div class="certificate-content">
+                <div class="certificate-category">Program Diploma</div>
+
+                <h3>Kebidanan</h3>
+
+                <p>Sertifikat akreditasi Program Studi Kebidanan.</p>
+
+                <div class="certificate-meta">
+                  <div class="meta-item">
+                    <span class="meta-label"> Program </span>
+
+                    <span class="meta-value"> A.Md.Keb. </span>
+                  </div>
+
+                  <div class="meta-item">
+                    <span class="meta-label"> Status </span>
+
+                    <span class="meta-value"> Aktif </span>
+                  </div>
+                </div>
+
+                <div class="card-buttons">
+                  <a
+                    href="assets/pdf/akreditasi-kebidanan.pdf"
+                    target="_blank"
+                    class="btn btn-preview"
+                  >
+                    👁 Lihat PDF
+                  </a>
+
+                  <a
+                    href="assets/pdf/akreditasi-kebidanan.pdf"
+                    download
+                    class="btn btn-download"
+                  >
+                    ↓ Download
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <!-- =================================================
+                 FARMASI
+            ================================================== -->
+
+            <article class="certificate-card" data-category="farmasi">
+              <div
+                class="certificate-preview"
+                data-image="../assets/images-sertifikat/sertifikat2.jpg"
+              >
+                <span class="certificate-status"> TERAKREDITASI </span>
+
+                <img
+                  src="../assets/images-sertifikat/sertifikat1.jpg"
+                  alt="Sertifikat Akreditasi Program Studi Farmasi"
+                />
+
+                <div class="preview-overlay">
+                  <div class="preview-button">🔍</div>
+                </div>
+              </div>
+
+              <div class="certificate-content">
+                <div class="certificate-category">Program Sarjana</div>
+
+                <h3>Farmasi</h3>
+
+                <p>Sertifikat akreditasi Program Studi Farmasi.</p>
+
+                <div class="certificate-meta">
+                  <div class="meta-item">
+                    <span class="meta-label"> Program </span>
+
+                    <span class="meta-value"> S.Farm. </span>
+                  </div>
+
+                  <div class="meta-item">
+                    <span class="meta-label"> Status </span>
+
+                    <span class="meta-value"> Aktif </span>
+                  </div>
+                </div>
+
+                <div class="card-buttons">
+                  <a
+                    href="assets/pdf/akreditasi-farmasi.pdf"
+                    target="_blank"
+                    class="btn btn-preview"
+                  >
+                    👁 Lihat PDF
+                  </a>
+
+                  <a
+                    href="assets/pdf/akreditasi-farmasi.pdf"
+                    download
+                    class="btn btn-download"
+                  >
+                    ↓ Download
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <!-- =================================================
+                 K3
+            ================================================== -->
+
+            <article class="certificate-card" data-category="k3">
+              <div
+                class="certificate-preview"
+                data-image="assets/images/struktur-organisasi.jpg"
+              >
+                <span class="certificate-status"> TERAKREDITASI </span>
+
+                <img
+                  src="../assets/images-sertifikat/sertifikat1.jpg"
+                  alt="Sertifikat Akreditasi Program Studi K3"
+                />
+
+                <div class="preview-overlay">
+                  <div class="preview-button">🔍</div>
+                </div>
+              </div>
+
+              <div class="certificate-content">
+                <div class="certificate-category">Program Diploma</div>
+
+                <h3>Keselamatan dan Kesehatan Kerja</h3>
+
+                <p>
+                  Sertifikat akreditasi Program Studi Keselamatan dan Kesehatan
+                  Kerja.
+                </p>
+
+                <div class="certificate-meta">
+                  <div class="meta-item">
+                    <span class="meta-label"> Program </span>
+
+                    <span class="meta-value"> S.Tr.KKK. </span>
+                  </div>
+
+                  <div class="meta-item">
+                    <span class="meta-label"> Status </span>
+
+                    <span class="meta-value"> Aktif </span>
+                  </div>
+                </div>
+
+                <div class="card-buttons">
+                  <a
+                    href="assets/pdf/akreditasi-k3.pdf"
+                    target="_blank"
+                    class="btn btn-preview"
+                  >
+                    👁 Lihat PDF
+                  </a>
+
+                  <a
+                    href="assets/pdf/akreditasi-k3.pdf"
+                    download
+                    class="btn btn-download"
+                  >
+                    ↓ Download
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- NO RESULT -->
+
+          <div class="no-result" id="noResult">
+            <div class="no-result-icon">📄</div>
+
+            <h3>Dokumen belum tersedia</h3>
+
+            <p>Belum terdapat dokumen untuk kategori yang dipilih.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+     INFORMATION
+========================================================= -->
+
+      <section class="section info-section">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-label"> INFORMASI </span>
+
+            <h2 class="section-title">Tentang Akreditasi</h2>
+
+            <p class="section-description">
+              Akreditasi merupakan bagian penting dalam memastikan
+              penyelenggaraan pendidikan memenuhi standar mutu yang telah
+              ditetapkan.
+            </p>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-card">
+              <div class="info-icon">🏆</div>
+
+              <h3>Penjaminan Mutu</h3>
+
+              <p>
+                Akreditasi menjadi salah satu instrumen penjaminan mutu
+                penyelenggaraan pendidikan pada setiap program studi.
+              </p>
+            </div>
+
+            <div class="info-card">
+              <div class="info-icon">📋</div>
+
+              <h3>Dokumen Resmi</h3>
+
+              <p>
+                Dokumen sertifikat akreditasi tersedia sebagai informasi publik
+                dan dapat digunakan sebagai referensi.
+              </p>
+            </div>
+
+            <div class="info-card">
+              <div class="info-icon">🔎</div>
+
+              <h3>Transparansi</h3>
+
+              <p>
+                Publikasi dokumen akreditasi merupakan bentuk transparansi FIKES
+                kepada mahasiswa, masyarakat, dan pemangku kepentingan.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+     CTA
+========================================================= -->
+
+      <section class="cta-section">
+        <div class="container">
+          <div class="cta">
+            <div class="cta-content">
+              <h2>Informasi FIKES</h2>
+
+              <p>
+                Jelajahi informasi lain mengenai Fakultas Ilmu Kesehatan, mulai
+                dari visi dan misi, struktur organisasi, program studi hingga
+                kemahasiswaan.
+              </p>
+
+              <a href="struktur-organisasi.html" class="cta-button">
+                Lihat Struktur Organisasi →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- =========================================================
+     FOOTER
+========================================================= -->
+
+    <footer>
+      <div class="container footer-main">
+        <div class="footer-brand">
+          <div class="logo footer-logo">
+            <div class="logo-icon">F</div>
+
+            <div class="logo-text">
+              <strong style="color: white"> FIKES </strong>
+
+              <small> FAKULTAS ILMU KESEHATAN </small>
+            </div>
+          </div>
+
+          <p>
+            Membangun generasi kesehatan yang profesional, berintegritas,
+            inovatif, dan berorientasi kepada masyarakat.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Tentang FIKES</h4>
+
+          <div class="footer-links">
+            <a href="#"> Visi Misi </a>
+
+            <a href="#"> Struktur Organisasi </a>
+
+            <a href="#"> Akreditasi </a>
+
+            <a href="#"> Daftar Dosen </a>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Program Studi</h4>
+
+          <div class="footer-links">
+            <a href="#"> Profesi Ners </a>
+
+            <a href="#"> Ilmu Keperawatan </a>
+
+            <a href="#"> Farmasi </a>
+
+            <a href="#"> Kebidanan </a>
+
+            <a href="#"> K3 </a>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Informasi</h4>
+
+          <div class="footer-links">
+            <a href="#"> Akademik </a>
+
+            <a href="#"> Kemahasiswaan </a>
+
+            <a href="#"> Pelayanan FIKES </a>
+
+            <a href="#"> Survey </a>
+          </div>
+        </div>
+        <!--MAP PETA-->
+        <!-- =========================================================
+     LOKASI & PETA
+========================================================== -->
+
+        <div class="footer-location">
+          <div class="location-header">
+            <div class="location-icon">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+          </div>
+        </div>
+        <!--MAP PETA-->
+      </div>
+
+      <div class="container footer-bottom">
+        <span>
+          © <span id="year"></span> Fakultas Ilmu Kesehatan. All Rights
+          Reserved.
+        </span>
+
+        <span> Website FIKES </span>
+      </div>
+    </footer>
+
+    <!-- =========================================================
+     LIGHTBOX
+========================================================= -->
+
+    <div class="lightbox" id="lightbox">
+      <div class="lightbox-content">
+        <button class="lightbox-close" id="lightboxClose">✕</button>
+
+        <img
+          src=""
+          alt="Preview Sertifikat"
+          class="lightbox-image"
+          id="lightboxImage"
+        />
+      </div>
+    </div>
+
+    <!-- =========================================================
+     BACK TOP
+========================================================= -->
+
+    <button class="back-top" id="backTop">↑</button>
+
+    <script>
+      /* =========================================================
+   NAVBAR SCROLL EFFECT
+========================================================= */
+
+      /* NAVBAR SCROLL */
+
+      const navbar = document.getElementById("navbar");
+
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 20) {
+          navbar.classList.add("scrolled");
+        } else {
+          navbar.classList.remove("scrolled");
+        }
+      });
+
+      /* MOBILE MENU */
+
+      const menuToggle = document.getElementById("menuToggle");
+
+      const navMenu = document.getElementById("navMenu");
+
+      menuToggle.addEventListener("click", () => {
+        navMenu.classList.toggle("active");
+
+        menuToggle.innerHTML = navMenu.classList.contains("active")
+          ? "✕"
+          : "☰";
+      });
+
+      /* MOBILE DROPDOWN */
+
+      document
+        .querySelectorAll(
+          ".has-dropdown > .nav-link, .has-dropdown > .dropdown-link",
+        )
+        .forEach((link) => {
+          link.addEventListener("click", function (e) {
+            if (window.innerWidth <= 900) {
+              e.preventDefault();
+
+              const parent = this.parentElement;
+
+              parent.classList.toggle("open");
+            }
+          });
+        });
+
+      /* CLOSE MOBILE MENU */
+
+      document.querySelectorAll(".nav-menu a").forEach((link) => {
+        link.addEventListener("click", function () {
+          if (
+            window.innerWidth <= 900 &&
+            !this.parentElement.classList.contains("has-dropdown")
+          ) {
+            navMenu.classList.remove("active");
+
+            menuToggle.innerHTML = "☰";
+          }
+        });
+      });
+
+      /* BACK TO TOP */
+
+      const backTop = document.getElementById("backTop");
+
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 500) {
+          backTop.classList.add("show");
+        } else {
+          backTop.classList.remove("show");
+        }
+      });
+
+      backTop.addEventListener("click", () => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      });
+
+      /* YEAR */
+
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      /* CLOSE DROPDOWN */
+
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest(".navbar")) {
+          document.querySelectorAll(".nav-item.open").forEach((item) => {
+            item.classList.remove("open");
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,3 @@
+const menuToggle=document.getElementById('menuToggle');const navMenu=document.getElementById('navMenu');if(menuToggle)menuToggle.addEventListener('click',()=>navMenu.classList.toggle('open'));
+document.querySelectorAll('.has-dropdown > .nav-link, .dropdown-item.has-dropdown > .dropdown-link').forEach(a=>a.addEventListener('click',e=>{if(window.innerWidth<=980){e.preventDefault();a.parentElement.classList.toggle('open');}}));
+const back=document.getElementById('backTop');window.addEventListener('scroll',()=>{if(back)back.classList.toggle('show',window.scrollY>400)});if(back)back.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});const year=document.getElementById('year');if(year)year.textContent=new Date().getFullYear();
