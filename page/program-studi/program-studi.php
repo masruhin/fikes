@@ -6,47 +6,29 @@ function e($value)
   return htmlspecialchars($value ?? '', ENT_QUOTES, 'UTF-8');
 }
 
-/* =====================================================
-   DAFTAR PROGRAM STUDI
-   ===================================================== */
-
-$prodiList = $pdo->query("
-    SELECT id, kode_prodi, nama, jenjang, gelar, akreditasi, gambar
-    FROM program_studi
-    WHERE status = 'aktif'
-    ORDER BY nama ASC
-")->fetchAll();
-
-
-/* =====================================================
+/* =========================================================
    FILTER & SEARCH
-   ===================================================== */
-
+   ========================================================= */
 $filter = trim($_GET['jenjang'] ?? '');
 $search = trim($_GET['search'] ?? '');
 
 $where = ["status = 'aktif'"];
 $params = [];
 
-
-/* Filter jenjang */
 if ($filter !== '') {
   $where[] = "jenjang = :jenjang";
   $params[':jenjang'] = $filter;
 }
 
-
-/* Pencarian */
 if ($search !== '') {
-  $where[] = "(nama LIKE :search OR kode_prodi LIKE :search)";
-  $params[':search'] = '%' . $search . '%';
+  $where[] = "(nama LIKE :search_nama OR kode_prodi LIKE :search_kode)";
+  $params[':search_nama'] = '%' . $search . '%';
+  $params[':search_kode'] = '%' . $search . '%';
 }
 
-
-/* =====================================================
+/* =========================================================
    QUERY PROGRAM STUDI
-   ===================================================== */
-
+   ========================================================= */
 $sql = "
     SELECT
         id,
@@ -56,7 +38,8 @@ $sql = "
         gelar,
         deskripsi,
         akreditasi,
-        gambar
+        foto,
+        brosur
     FROM program_studi
     WHERE " . implode(' AND ', $where) . "
     ORDER BY nama ASC
@@ -66,64 +49,101 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $programs = $stmt->fetchAll();
 
-
-/* =====================================================
+/* =========================================================
    DAFTAR JENJANG
-   ===================================================== */
-
+   ========================================================= */
 $jenjangList = $pdo->query("
     SELECT DISTINCT jenjang
     FROM program_studi
     WHERE status = 'aktif'
+      AND jenjang IS NOT NULL
+      AND jenjang <> ''
     ORDER BY jenjang
 ")->fetchAll(PDO::FETCH_COLUMN);
+
+/* Jumlah program */
+$totalProgram = count($programs);
 ?>
 <!doctype html>
 <html lang="id">
 
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Program Studi | FIKES</title>
-    <link rel="stylesheet" href="prodi.css">
-    <style>
-    /* =========================================================
-   DETAIL PROGRAM STUDI - MODERN FIKES
-   ========================================================= */
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>Program Studi | FIKES</title>
+
+  <meta name="description"
+    content="Daftar Program Studi Fakultas Ilmu Kesehatan. Temukan program pendidikan yang sesuai dengan minat dan tujuan karier Anda.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <style>
     :root {
-      --green: #008f72;
-      --green-dark: #006b59;
-      --green-soft: #eaf7f3;
-      --green-light: #f4fbf9;
-      --text: #173b36;
-      --text-soft: #607773;
-      --border: #dcebe7;
+      --primary: #087f5b;
+      --primary-dark: #056044;
+      --primary-light: #e7f7f1;
+      --secondary: #f4b942;
+      --dark: #12372a;
+      --text: #52635d;
+      --light: #f7faf9;
       --white: #ffffff;
-      --bg: #f7faf9;
-      --shadow: 0 15px 45px rgba(0, 80, 65, .08);
+      --border: #e5ece9;
+      --shadow: 0 20px 60px rgba(18, 55, 42, 0.1);
+      --radius: 18px;
+      --transition: 0.3s ease;
     }
 
-
-    /* =========================================================
-   GLOBAL
-   ========================================================= */
-
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      margin: 0;
-      background: var(--bg);
+      font-family: "Inter", sans-serif;
       color: var(--text);
-      font-family: "Poppins", "Segoe UI", Arial, sans-serif;
-      line-height: 1.6;
+      background: var(--white);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      color: var(--dark);
+      line-height: 1.3;
     }
 
     a {
-      text-decoration: none;
       color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    ul {
+      list-style: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
     }
 
     .container {
@@ -131,899 +151,1896 @@ $jenjangList = $pdo->query("
       margin: auto;
     }
 
-
     /* =========================================================
-   HERO
-   ========================================================= */
-
-    .prodi-hero {
-      position: relative;
-      overflow: hidden;
-      padding: 38px 0 60px;
-      background:
-        radial-gradient(circle at 90% 20%, rgba(255, 255, 255, .20), transparent 30%),
-        linear-gradient(120deg, #00685a 0%, #008f78 55%, #8ad0c1 150%);
-      color: #fff;
+           TOP BAR
+        ========================================================= */
+    .topbar {
+      background: var(--dark);
+      color: #d9e8e2;
+      font-size: 13px;
     }
 
-    .prodi-hero::after {
+    .topbar-inner {
+      min-height: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .topbar-info {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+
+    .topbar-info span {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .topbar-social {
+      display: flex;
+      gap: 15px;
+    }
+
+    .topbar-social a {
+      transition: var(--transition);
+    }
+
+    .topbar-social a:hover {
+      color: var(--secondary);
+    }
+
+    /* =========================================================
+           NAVBAR
+        ========================================================= */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid rgba(229, 236, 233, 0.8);
+      transition: var(--transition);
+    }
+
+    .navbar.scrolled {
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+    }
+
+    .nav-inner {
+      min-height: 82px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .logo-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary), #13a878);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 17px;
+      box-shadow: 0 10px 25px rgba(8, 127, 91, 0.25);
+    }
+
+    .logo-text strong {
+      display: block;
+      color: var(--dark);
+      font-size: 17px;
+      line-height: 1.2;
+    }
+
+    .logo-text small {
+      display: block;
+      font-size: 10px;
+      color: var(--primary);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .nav-item {
+      position: relative;
+    }
+
+    .nav-link {
+      min-height: 82px;
+      padding: 0 13px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #344b43;
+      transition: var(--transition);
+      white-space: nowrap;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+    }
+
+    .arrow {
+      font-size: 11px;
+      transition: var(--transition);
+    }
+
+    .nav-item:hover>.nav-link .arrow {
+      transform: rotate(180deg);
+    }
+
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0;
+      width: 250px;
+      padding: 10px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: var(--transition);
+    }
+
+    .nav-item:hover>.dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .dropdown-item {
+      position: relative;
+    }
+
+    .dropdown-link {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 13px;
+      border-radius: 9px;
+      color: #40544d;
+      font-size: 13px;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .dropdown-link:hover {
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .dropdown-item>.dropdown {
+      left: calc(100% + 5px);
+      top: -10px;
+    }
+
+    .dropdown-item:hover>.dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .nav-cta {
+      padding: 12px 19px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .nav-cta:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(8, 127, 91, 0.22);
+    }
+
+    .menu-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: 10px;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    /* =========================================================
+           PAGE HERO
+        ========================================================= */
+    .page-hero {
+      position: relative;
+      padding: 100px 0 105px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 85% 20%, rgba(8, 127, 91, 0.14), transparent 30%),
+        linear-gradient(135deg, #f5fcf9, #ffffff 60%, #edf8f4);
+    }
+
+    .page-hero::before {
       content: "";
       position: absolute;
-      width: 320px;
-      height: 320px;
-      right: -100px;
-      bottom: -180px;
+      width: 400px;
+      height: 400px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, .08);
+      border: 70px solid rgba(8, 127, 91, 0.04);
+      right: -130px;
+      top: -130px;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
     }
 
     .breadcrumb {
       display: flex;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 28px;
+      gap: 9px;
+      margin-bottom: 25px;
       font-size: 13px;
-      color: rgba(255, 255, 255, .82);
     }
 
-    .breadcrumb a:hover {
-      color: #fff;
+    .breadcrumb a {
+      color: var(--primary);
+      font-weight: 600;
     }
 
-    .hero-label {
+    .breadcrumb span {
+      color: #9aa9a3;
+    }
+
+    .hero-label,
+    .eyebrow {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 7px;
-      font-size: 13px;
+      padding: 8px 15px;
+      border-radius: 50px;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 12px;
       font-weight: 700;
-      letter-spacing: .8px;
-      text-transform: uppercase;
+      margin-bottom: 18px;
     }
 
-    .prodi-hero h1 {
-      margin: 0;
-      font-size: clamp(38px, 5vw, 58px);
-      line-height: 1.05;
-      font-weight: 800;
-      letter-spacing: -1px;
+    .hero-label::before,
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--secondary);
     }
 
-    .hero-description {
-      max-width: 680px;
-      margin: 15px 0 0;
-      color: rgba(255, 255, 255, .9);
+    .page-hero h1 {
+      font-size: clamp(40px, 5vw, 62px);
+      letter-spacing: -1.5px;
+      margin-bottom: 18px;
+    }
+
+    .page-hero h1 span {
+      color: var(--primary);
+    }
+
+    .page-hero p {
+      max-width: 690px;
+      font-size: 17px;
+    }
+
+    /* =========================================================
+           PROGRAM SECTION
+        ========================================================= */
+    .program-section {
+      padding: 95px 0;
+      background: white;
+    }
+
+    .section-heading {
+      max-width: 720px;
+      margin: 0 auto 40px;
+      text-align: center;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(32px, 4vw, 45px);
+      margin-bottom: 15px;
+    }
+
+    .section-heading p {
       font-size: 15px;
     }
 
-
     /* =========================================================
-   MAIN PROFILE CARD
-   ========================================================= */
-
-    .prodi-main {
-      position: relative;
-      z-index: 2;
-      margin-top: -28px;
-      padding-bottom: 65px;
-    }
-
-    .prodi-profile {
-      display: grid;
-      grid-template-columns: 280px minmax(0, 1fr) 285px;
-      gap: 28px;
-      padding: 24px;
-      background: var(--white);
+           FILTER
+        ========================================================= */
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 35px;
+      padding: 14px;
       border: 1px solid var(--border);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
+      border-radius: 18px;
+      background: var(--light);
     }
 
+    .filter-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-tabs a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 15px;
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      transition: var(--transition);
+    }
+
+    .filter-tabs a:hover {
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .filter-tabs a.active {
+      color: white;
+      background: var(--primary);
+      box-shadow: 0 8px 20px rgba(8, 127, 91, 0.18);
+    }
+
+    .search-box {
+      width: 280px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .search-box span {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary);
+      font-size: 18px;
+      pointer-events: none;
+    }
+
+    .search-box input {
+      width: 100%;
+      height: 42px;
+      padding: 0 14px 0 42px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      background: white;
+      color: var(--dark);
+      font-size: 12px;
+      transition: var(--transition);
+    }
+
+    .search-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(8, 127, 91, 0.08);
+    }
 
     /* =========================================================
-   PHOTO FRAME
-   ========================================================= */
-
-    .prodi-photo-wrap {
-      position: relative;
+           PROGRAM GRID / CARD
+        ========================================================= */
+    .program-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
     }
 
-    .prodi-photo {
+    /* =========================================================
+           PROGRAM CARD - MODERN / LEBIH HIDUP
+        ========================================================= */
+    .program-card {
       position: relative;
-      height: 330px;
       overflow: hidden;
-      border-radius: 20px;
-      background: linear-gradient(145deg, #e8f7f3, #d8efea);
-      border: 10px solid #eef8f5;
-      box-shadow: inset 0 0 0 1px #d3ebe5;
+      border: 1px solid rgba(229, 236, 233, .95);
+      border-radius: 24px;
+      background: #fff;
+      box-shadow: 0 12px 35px rgba(18, 55, 42, .055);
+      transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease;
     }
 
-    .prodi-photo::before {
+    .program-card::before {
       content: "";
       position: absolute;
-      width: 100px;
-      height: 100px;
-      left: -30px;
-      top: -30px;
-      border-radius: 50%;
-      background: var(--green);
-      opacity: .95;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), #21b887, var(--secondary));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .35s ease;
+      z-index: 8;
     }
 
-    .prodi-photo::after {
-      content: "";
-      position: absolute;
-      width: 90px;
-      height: 90px;
-      right: -40px;
-      bottom: -35px;
-      border-radius: 50%;
-      background: #009d80;
+    .program-card:hover {
+      transform: translateY(-10px);
+      border-color: rgba(8, 127, 91, .18);
+      box-shadow: 0 25px 60px rgba(18, 55, 42, .13);
     }
 
-    .prodi-photo img {
+    .program-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .program-image {
       position: relative;
+      height: 235px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(244, 185, 66, .25), transparent 25%),
+        radial-gradient(circle at 85% 90%, rgba(255, 255, 255, .13), transparent 30%),
+        linear-gradient(135deg, #087f5b, #056044);
+    }
+
+    .program-image::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg,
+          rgba(18, 55, 42, .02) 30%,
+          rgba(18, 55, 42, .72) 100%);
+      pointer-events: none;
+    }
+
+    .program-image::before {
+      content: "";
+      position: absolute;
+      width: 170px;
+      height: 170px;
+      border: 35px solid rgba(255, 255, 255, .055);
+      border-radius: 50%;
+      right: -70px;
+      top: -85px;
       z-index: 2;
-      display: block;
+      transition: transform .5s ease;
+    }
+
+    .program-card:hover .program-image::before {
+      transform: scale(1.15) rotate(12deg);
+    }
+
+    .program-image img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition: transform .6s ease, filter .4s ease;
     }
 
-    .prodi-photo-placeholder {
-      position: relative;
-      z-index: 2;
-      display: flex;
+    .program-card:hover .program-image img {
+      transform: scale(1.07);
+      filter: saturate(1.08);
+    }
+
+    .image-placeholder {
       width: 100%;
       height: 100%;
+      display: flex;
       align-items: center;
       justify-content: center;
-      flex-direction: column;
-      color: var(--green);
-    }
-
-    .prodi-photo-placeholder strong {
-      font-size: 62px;
-      line-height: 1;
+      color: rgba(255, 255, 255, .96);
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 74px;
       font-weight: 800;
+      text-shadow: 0 10px 30px rgba(0, 0, 0, .15);
     }
 
-    .prodi-photo-placeholder span {
-      margin-top: 12px;
-      font-size: 14px;
-      color: var(--text);
-    }
-
-    .status-badge {
+    .jenjang-badge {
       position: absolute;
-      left: 20px;
-      bottom: 18px;
+      top: 16px;
+      right: 16px;
       z-index: 5;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 7px 13px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, .2);
       border-radius: 999px;
-      background: var(--green);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 700;
-      box-shadow: 0 7px 20px rgba(0, 143, 114, .25);
-    }
-
-
-    /* =========================================================
-   PROFILE CONTENT
-   ========================================================= */
-
-    .prodi-content {
-      padding: 25px 4px;
-    }
-
-    .section-kicker {
-      margin-bottom: 7px;
-      color: var(--green);
-      font-size: 11px;
+      background: rgba(18, 55, 42, .84);
+      color: white;
+      font-size: 10px;
       font-weight: 800;
-      letter-spacing: 1.5px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+    }
+
+    .jenjang-badge::before {
+      content: "●";
+      color: var(--secondary);
+      font-size: 7px;
+    }
+
+    .program-body {
+      position: relative;
+      padding: 26px 25px 23px;
+    }
+
+    .program-body .code {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 9px;
+      color: var(--primary);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.35px;
       text-transform: uppercase;
     }
 
-    .prodi-content h2 {
-      margin: 0;
-      font-size: 30px;
-      line-height: 1.2;
-      font-weight: 800;
+    .program-body .code::before {
+      content: "";
+      width: 20px;
+      height: 2px;
+      border-radius: 99px;
+      background: var(--secondary);
+    }
+
+    .program-body h3 {
+      min-height: 50px;
+      font-size: 19px;
+      margin-bottom: 9px;
+      letter-spacing: -.25px;
+    }
+
+    .program-body>p {
+      min-height: 68px;
+      margin-bottom: 17px;
       color: var(--text);
+      font-size: 12px;
+      line-height: 1.75;
+      display: -webkit-box;
+      -webkit-line-clamp: 4;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
-    .prodi-degree {
-      margin-top: 6px;
-      color: var(--green);
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .prodi-description {
-      margin-top: 18px;
-      color: var(--text-soft);
-      font-size: 14px;
-    }
-
-
-    /* =========================================================
-   INFO GRID
-   ========================================================= */
-
-    .prodi-info-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 22px;
-    }
-
-    .info-item {
+    .meta-row {
       display: flex;
-      align-items: flex-start;
-      gap: 11px;
-      padding: 12px;
-      border-radius: 13px;
-      background: var(--green-light);
-      border: 1px solid #e3f1ed;
+      flex-wrap: wrap;
+      gap: 7px;
+      min-height: 30px;
+      margin-bottom: 20px;
     }
 
-    .info-icon {
-      flex: 0 0 34px;
-      width: 34px;
-      height: 34px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      background: var(--green-soft);
-      color: var(--green);
-      font-size: 14px;
-    }
-
-    .info-item small {
-      display: block;
-      margin-bottom: 2px;
-      color: #75908b;
-      font-size: 10px;
-    }
-
-    .info-item strong {
-      display: block;
-      color: var(--text);
-      font-size: 13px;
-    }
-
-
-    /* =========================================================
-   RIGHT INFORMATION PANEL
-   ========================================================= */
-
-    .short-info {
-      align-self: stretch;
-      padding: 22px 20px;
-      border-radius: 18px;
-      background: #eff9f6;
-      border: 1px solid #e0efeb;
-    }
-
-    .short-info-title {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      margin-bottom: 18px;
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .short-info-title i {
-      color: var(--green);
-    }
-
-    .short-item {
-      padding: 12px 0;
-      border-bottom: 1px solid #d6e9e4;
-    }
-
-    .short-item:last-child {
-      border-bottom: 0;
-    }
-
-    .short-item small {
-      display: block;
-      margin-bottom: 3px;
-      color: #76908c;
-      font-size: 10px;
-    }
-
-    .short-item strong {
-      display: block;
-      color: var(--text);
-      font-size: 13px;
-      line-height: 1.4;
-    }
-
-
-    /* =========================================================
-   BACK BUTTON
-   ========================================================= */
-
-    .btn-back {
+    .meta-row span {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      margin-top: 22px;
-      padding: 10px 17px;
-      border: 1px solid var(--green);
-      border-radius: 11px;
-      color: var(--green);
-      background: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      transition: .2s ease;
+      gap: 5px;
+      padding: 7px 10px;
+      border: 1px solid #dcefe9;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #f0faf7, #e7f7f1);
+      color: var(--primary);
+      font-size: 10px;
+      font-weight: 800;
     }
 
-    .btn-back:hover {
-      background: var(--green);
-      color: #fff;
-      transform: translateY(-2px);
-    }
-
-
-    /* =========================================================
-   CONTENT SECTIONS
-   ========================================================= */
-
-    .prodi-section {
-      padding: 70px 0 0;
-    }
-
-    .section-heading {
-      margin-bottom: 28px;
-    }
-
-    .section-heading .section-kicker {
-      margin-bottom: 5px;
-    }
-
-    .section-heading h2 {
-      margin: 0;
-      font-size: 28px;
-      line-height: 1.2;
-    }
-
-    .section-heading p {
-      max-width: 700px;
-      margin: 9px 0 0;
-      color: var(--text-soft);
-      font-size: 14px;
-    }
-
-
-    /* =========================================================
-   VISI
-   ========================================================= */
-
-    .visi-box {
+    .detail-btn {
       position: relative;
-      padding: 30px 34px;
       overflow: hidden;
-      border-radius: 18px;
-      background: linear-gradient(120deg, #006d5d, #00977b);
-      color: #fff;
-      box-shadow: 0 14px 35px rgba(0, 100, 80, .14);
-    }
-
-    .visi-box::after {
-      content: "";
-      position: absolute;
-      width: 180px;
-      height: 180px;
-      right: -70px;
-      top: -80px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, .09);
-    }
-
-    .visi-box p {
-      position: relative;
-      z-index: 2;
-      margin: 0;
-      font-size: 17px;
-      line-height: 1.8;
-    }
-
-
-    /* =========================================================
-   MISI
-   ========================================================= */
-
-    .misi-list {
-      display: grid;
-      gap: 12px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      counter-reset: misi;
-    }
-
-    .misi-list li {
-      position: relative;
-      display: flex;
-      gap: 15px;
-      padding: 18px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: #fff;
-    }
-
-    .misi-list li::before {
-      counter-increment: misi;
-      content: counter(misi);
-      flex: 0 0 34px;
-      width: 34px;
-      height: 34px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      background: var(--green-soft);
-      color: var(--green);
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-
-    /* =========================================================
-   CPL
-   ========================================================= */
-
-    .cpl-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .cpl-card {
-      padding: 22px;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      transition: .2s ease;
-    }
-
-    .cpl-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(0, 80, 65, .07);
-    }
-
-    .cpl-category {
-      display: inline-block;
-      margin-bottom: 10px;
-      padding: 5px 10px;
-      border-radius: 999px;
-      background: var(--green-soft);
-      color: var(--green);
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .cpl-card p {
-      margin: 0;
-      color: var(--text-soft);
-      font-size: 13px;
-    }
-
-
-    /* =========================================================
-   KURIKULUM
-   ========================================================= */
-
-    .table-wrap {
-      overflow-x: auto;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: #fff;
-    }
-
-    .kurikulum-table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 700px;
-    }
-
-    .kurikulum-table th {
-      padding: 14px 16px;
-      background: var(--green);
-      color: #fff;
-      text-align: left;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 11px;
+      background: var(--dark);
+      color: white;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
+      transition: var(--transition);
     }
 
-    .kurikulum-table td {
-      padding: 14px 16px;
-      border-bottom: 1px solid #edf3f1;
-      color: var(--text-soft);
-      font-size: 13px;
-    }
-
-    .kurikulum-table tbody tr:hover {
-      background: var(--green-light);
-    }
-
-    .kurikulum-table tbody tr:last-child td {
-      border-bottom: 0;
-    }
-
-
-    /* =========================================================
-   FASILITAS
-   ========================================================= */
-
-    .fasilitas-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 18px;
-    }
-
-    .fasilitas-card {
-      overflow: hidden;
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      transition: .2s ease;
-    }
-
-    .fasilitas-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 15px 35px rgba(0, 80, 65, .08);
-    }
-
-    .fasilitas-image {
-      height: 170px;
-      overflow: hidden;
-      background: var(--green-soft);
-    }
-
-    .fasilitas-image img {
-      width: 100%;
+    .detail-btn::before {
+      content: "";
+      position: absolute;
+      width: 0;
       height: 100%;
-      object-fit: cover;
+      left: 0;
+      top: 0;
+      background: linear-gradient(90deg, var(--primary), #13a878);
+      transition: width .35s ease;
+      z-index: 0;
     }
 
-    .fasilitas-content {
-      padding: 18px;
+    .detail-btn:hover::before {
+      width: 100%;
     }
 
-    .fasilitas-content h3 {
-      margin: 0 0 6px;
+    .detail-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(8, 127, 91, .18);
+    }
+
+    .detail-btn span {
+      position: relative;
+      z-index: 1;
       font-size: 16px;
     }
 
-    .fasilitas-content p {
-      margin: 0;
-      color: var(--text-soft);
+    .detail-btn span:first-child {
       font-size: 12px;
     }
 
 
-    /* =========================================================
-   CTA
-   ========================================================= */
+    .program-card {
+      animation: cardReveal .55s ease both;
+    }
 
-    .prodi-cta {
-      margin-top: 70px;
-      padding: 35px;
-      border-radius: 20px;
-      background: var(--green-soft);
-      border: 1px solid #d9eee8;
+    .program-card:nth-child(2) {
+      animation-delay: .06s;
+    }
+
+    .program-card:nth-child(3) {
+      animation-delay: .12s;
+    }
+
+    .program-card:nth-child(4) {
+      animation-delay: .18s;
+    }
+
+    .program-card:nth-child(5) {
+      animation-delay: .24s;
+    }
+
+    .program-card:nth-child(6) {
+      animation-delay: .30s;
+    }
+
+    @keyframes cardReveal {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-info {
+      margin: 0 0 18px;
+      color: var(--text);
+      font-size: 12px;
+    }
+
+    .empty-state {
+      padding: 55px 25px;
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+      background: var(--light);
+      text-align: center;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    /* =========================================================
+           CTA
+        ========================================================= */
+    .cta-section {
+      padding: 0 0 95px;
+    }
+
+    .cta {
+      position: relative;
+      overflow: hidden;
+      padding: 65px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, var(--dark), var(--primary-dark));
+      color: white;
       text-align: center;
     }
 
-    .prodi-cta h2 {
-      margin: 0 0 8px;
-      font-size: 24px;
+    .cta::before {
+      content: "";
+      position: absolute;
+      width: 350px;
+      height: 350px;
+      border: 70px solid rgba(255, 255, 255, 0.03);
+      border-radius: 50%;
+      left: -130px;
+      bottom: -190px;
     }
 
-    .prodi-cta p {
-      max-width: 650px;
-      margin: 0 auto 20px;
-      color: var(--text-soft);
-      font-size: 13px;
+    .cta::after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border: 45px solid rgba(244, 185, 66, 0.05);
+      border-radius: 50%;
+      right: -80px;
+      top: -100px;
     }
 
-    .btn-primary {
+    .cta-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .cta .eyebrow {
+      background: rgba(255, 255, 255, .1);
+      color: #d9eee5;
+    }
+
+    .cta h2 {
+      color: white;
+      font-size: clamp(30px, 4vw, 42px);
+      margin-bottom: 12px;
+    }
+
+    .cta p {
+      max-width: 620px;
+      margin: 0 auto 25px;
+      color: #d6e9e2;
+    }
+
+    .cta .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 11px 20px;
+      padding: 14px 23px;
       border-radius: 11px;
-      background: var(--green);
-      color: #fff;
+      background: var(--secondary);
+      color: var(--dark);
       font-size: 13px;
-      font-weight: 700;
-      transition: .2s ease;
+      font-weight: 800;
+      transition: var(--transition);
     }
 
-    .btn-primary:hover {
-      background: var(--green-dark);
+    .cta .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(244, 185, 66, 0.2);
+    }
+
+    /* =========================================================
+           FOOTER
+        ========================================================= */
+    footer {
+      background: #0d2b21;
+      color: #b7cec5;
+    }
+
+    .footer-main {
+      padding: 70px 0 45px;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: 45px;
+    }
+
+    .footer-brand p {
+      max-width: 320px;
+      font-size: 13px;
+      margin: 17px 0;
+    }
+
+    .footer-logo strong {
+      color: white;
+    }
+
+    .footer-logo .logo-text small {
+      color: var(--secondary);
+    }
+
+    .footer-title {
+      color: white;
+      font-size: 14px;
+      margin-bottom: 17px;
+    }
+
+    .footer-links {
+      display: grid;
+      gap: 10px;
+    }
+
+    .footer-links a {
+      font-size: 12px;
+      transition: var(--transition);
+    }
+
+    .footer-links a:hover {
+      color: var(--secondary);
+      transform: translateX(3px);
+    }
+
+    .footer-contact {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      margin-top: 10px;
+      font-size: 11px;
+    }
+
+    .footer-contact i {
+      color: var(--secondary);
+      min-width: 14px;
+    }
+
+    /* =========================================================
+           FOOTER LOCATION / MAP
+        ========================================================= */
+    .footer-location {
+      grid-column: 1 / -1;
+    }
+
+    .location-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .location-icon {
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border-radius: 12px;
+      color: var(--dark);
+      background: var(--secondary);
+      font-size: 16px;
+    }
+
+    .location-header h3 {
+      margin: 0 0 3px;
+      color: white;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .location-header p {
+      margin: 0;
+      color: rgba(255, 255, 255, .5);
+      font-size: 9px;
+    }
+
+    .map-card {
+      position: relative;
+      width: 100%;
+      height: 210px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .05);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, .2);
+    }
+
+    .map-card iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      filter: saturate(.85) contrast(1.02);
+    }
+
+    .map-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(180deg,
+          rgba(3, 25, 18, .05) 35%,
+          rgba(3, 25, 18, .75) 100%);
+    }
+
+    .map-overlay {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .map-info {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+      padding: 9px 11px;
+      border: 1px solid rgba(255, 255, 255, .16);
+      border-radius: 10px;
+      background: rgba(5, 35, 26, .78);
+      backdrop-filter: blur(10px);
+    }
+
+    .map-info-icon {
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border-radius: 8px;
+      color: var(--dark);
+      background: var(--secondary);
+      font-size: 11px;
+    }
+
+    .map-info strong {
+      display: block;
+      max-width: 150px;
+      overflow: hidden;
+      color: white;
+      font-size: 9px;
+      font-weight: 800;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .map-info span {
+      display: block;
+      margin-top: 2px;
+      color: rgba(255, 255, 255, .55);
+      font-size: 7px;
+    }
+
+    .map-direction {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-shrink: 0;
+      padding: 10px 12px;
+      border-radius: 9px;
+      color: var(--dark);
+      background: white;
+      font-size: 8px;
+      font-weight: 800;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, .2);
+      transition: all .3s ease;
+    }
+
+    .map-direction:hover {
+      color: white;
+      background: var(--primary);
       transform: translateY(-2px);
     }
 
+    .map-direction i {
+      font-size: 9px;
+    }
+
+    .location-contact {
+      margin-top: 5px;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, .08);
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+    }
 
     /* =========================================================
-   RESPONSIVE - TABLET
-   ========================================================= */
+           BACK TO TOP
+        ========================================================= */
+    .back-top {
+      position: fixed;
+      right: 25px;
+      bottom: 25px;
+      width: 45px;
+      height: 45px;
+      border: none;
+      border-radius: 12px;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: var(--transition);
+      z-index: 900;
+    }
 
-    @media (max-width: 1050px) {
+    .back-top.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
 
-      .prodi-profile {
-        grid-template-columns: 230px minmax(0, 1fr);
+    /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+    @media (max-width: 1100px) {
+      .nav-link {
+        padding: 0 8px;
+        font-size: 12px;
       }
 
-      .short-info {
-        grid-column: 1 / -1;
+      .nav-cta {
+        display: none;
       }
 
-      .prodi-photo {
-        height: 300px;
-      }
-
-      .fasilitas-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+      .program-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
     }
 
+    @media (max-width: 900px) {
+      .topbar {
+        display: none;
+      }
 
-    /* =========================================================
-   RESPONSIVE - MOBILE
-   ========================================================= */
+      .nav-inner {
+        min-height: 72px;
+      }
 
-    @media (max-width: 700px) {
+      .menu-toggle {
+        display: block;
+      }
 
+      .nav-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        display: none;
+        background: white;
+        border-top: 1px solid var(--border);
+        padding: 10px 20px 25px;
+        max-height: calc(100vh - 72px);
+        overflow-y: auto;
+        box-shadow: 0 20px 30px rgba(0, 0, 0, .08);
+      }
+
+      .nav-menu.active {
+        display: block;
+      }
+
+      .nav-item {
+        border-bottom: 1px solid #edf2f0;
+      }
+
+      .nav-link {
+        min-height: 48px;
+        padding: 0;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .dropdown {
+        position: static;
+        width: 100%;
+        display: none;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: 0;
+        padding: 0 0 8px 15px;
+      }
+
+      .nav-item.open>.dropdown {
+        display: block;
+      }
+
+      .dropdown-item.open>.dropdown {
+        display: block;
+      }
+
+      .dropdown-link {
+        min-height: 42px;
+      }
+
+      .page-hero {
+        padding: 80px 0 90px;
+      }
+
+      .filter-bar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+
+      .footer-main {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 650px) {
       .container {
         width: min(100% - 28px, 1180px);
       }
 
-      .prodi-hero {
-        padding: 28px 0 55px;
+      .page-hero {
+        padding: 60px 0 75px;
       }
 
-      .breadcrumb {
-        font-size: 11px;
+      .page-hero h1 {
+        font-size: 40px;
+        letter-spacing: -1px;
+      }
+
+      .page-hero p {
+        font-size: 15px;
+      }
+
+      .program-section {
+        padding: 70px 0;
+      }
+
+      .program-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .filter-tabs a {
+        width: 100%;
+      }
+
+      .program-image {
+        height: 210px;
+      }
+
+      .cta-section {
+        padding-bottom: 70px;
+      }
+
+      .cta {
+        padding: 45px 25px;
+      }
+
+      .footer-main {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
         gap: 8px;
-        margin-bottom: 20px;
       }
 
-      .prodi-hero h1 {
-        font-size: 38px;
+      .map-card {
+        height: 240px;
       }
 
-      .hero-description {
-        font-size: 13px;
+      .map-overlay {
+        flex-direction: column;
+        align-items: stretch;
       }
 
-      .prodi-main {
-        margin-top: -25px;
+      .map-info {
+        width: 100%;
       }
 
-      .prodi-profile {
-        grid-template-columns: 1fr;
-        gap: 20px;
-        padding: 15px;
-        border-radius: 18px;
-      }
-
-      .prodi-photo {
-        height: 300px;
-      }
-
-      .prodi-content {
-        padding: 8px 5px;
-      }
-
-      .prodi-content h2 {
-        font-size: 26px;
-      }
-
-      .prodi-info-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .short-info {
-        grid-column: auto;
-      }
-
-      .prodi-section {
-        padding-top: 48px;
-      }
-
-      .section-heading h2 {
-        font-size: 24px;
-      }
-
-      .cpl-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .fasilitas-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .visi-box {
-        padding: 24px;
-      }
-
-      .visi-box p {
-        font-size: 14px;
-      }
-
-      .prodi-cta {
-        padding: 28px 20px;
-        margin-top: 50px;
+      .map-direction {
+        width: 100%;
       }
     }
-    </style>
-  </head>
+  </style>
+</head>
 
-  <body>
+<body>
 
-    <header class="top-nav">
-      <div class="nav-inner">
-        <a class="brand" href="../../index.php">
-          <span class="brand-mark">F</span>
-          <span><strong>FIKES</strong><small>FAKULTAS ILMU KESEHATAN</small></span>
-        </a>
-
-        <button class="menu-toggle" id="menuToggle">☰</button>
-
-        <nav id="mainNav">
-          <div class="nav-item has-dropdown">
-            <button class="nav-link dropdown-btn">Tentang FIKES <span>⌄</span></button>
-            <div class="dropdown">
-              <a href="../tentang-fikes/visi-misi.php">Visi Misi</a>
-              <a href="../tentang-fikes/struktur-organisasi.php">Struktur Organisasi</a>
-              <a href="../tentang-fikes/sertifikat-akreditasi.php">Sertifikat Akreditasi</a>
-              <a href="../tentang-fikes/unduh-logo.php">Unduh Logo</a>
-            </div>
-          </div>
-          <div class="nav-item has-dropdown">
-            <button class="nav-link dropdown-btn">Kemahasiswaan <span>⌄</span></button>
-            <div class="dropdown">
-              <a href="../kemahasiswaan/hima.php">Unit Himpunan Mahasiswa</a>
-              <a href="../kemahasiswaan/ukm.php">UKM Kemahasiswaan</a>
-            </div>
-          </div>
-          <div class="nav-item has-dropdown">
-            <button class="nav-link dropdown-btn">Program Vokasi <span>⌄</span></button>
-            <div class="dropdown">
-              <a href="detail-prodi.php?id=6">Program Profesi Ners</a>
-            </div>
-          </div>
-          <a class="nav-link" href="../akademik.php">Akademik</a>
-          <a class="nav-link" href="../pelayanan-fikes.php">Pelayanan FIKES</a>
-          <a class="nav-link" href="../survey.php">Survey</a>
-        </nav>
-
-        <a class="nav-cta" href="#daftar-prodi">Jelajahi Program <span>→</span></a>
+  <!-- =========================================================
+     TOP BAR
+========================================================= -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-info">
+        <span>📍 Kampus FIKES</span>
+        <span>✉️ info@fikes.ac.id</span>
+        <span>📞 (021) 1234567</span>
       </div>
-    </header>
 
-    <section class="hero">
-      <div class="hero-overlay"></div>
-      <div class="container hero-content">
-        <div class="breadcrumb">⌂ <span>Beranda</span><b>›</b><span>Program Studi</span></div>
-        <h1>Program Studi</h1>
-        <p>Kenali program pendidikan FIKES dan temukan program studi yang sesuai dengan minat serta tujuan karier Anda.
+      <div class="topbar-social">
+        <a href="#" aria-label="Instagram">Instagram</a>
+        <a href="#" aria-label="Facebook">Facebook</a>
+        <a href="#" aria-label="YouTube">YouTube</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+     NAVBAR
+========================================================= -->
+  <header class="navbar" id="navbar">
+    <div class="container nav-inner">
+
+      <a href="../../index.php" class="logo">
+        <div class="logo-icon">F</div>
+        <div class="logo-text">
+          <strong>FIKES</strong>
+          <small>FAKULTAS ILMU KESEHATAN</small>
+        </div>
+      </a>
+
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Buka menu">
+        ☰
+      </button>
+
+      <nav class="nav-menu" id="navMenu">
+
+        <!-- TENTANG FIKES -->
+        <div class="nav-item has-dropdown">
+          <a href="#" class="nav-link">
+            Tentang FIKES
+            <span class="arrow">▾</span>
+          </a>
+
+          <div class="dropdown">
+            <div class="dropdown-item">
+              <a href="../tentang-fikes/visi-misi.php" class="dropdown-link">
+                Visi Misi
+              </a>
+            </div>
+
+            <div class="dropdown-item">
+              <a href="../tentang-fikes/struktur-organisasi.php" class="dropdown-link">
+                Struktur Organisasi
+              </a>
+            </div>
+
+            <div class="dropdown-item">
+              <a href="../tentang-fikes/sertifikat-akreditasi.php" class="dropdown-link">
+                Sertifikat Akreditasi
+              </a>
+            </div>
+
+            <div class="dropdown-item">
+              <a href="../tentang-fikes/unduh-logo.php" class="dropdown-link">
+                Unduh Logo
+              </a>
+            </div>
+
+            <div class="dropdown-item has-dropdown">
+              <a href="#" class="dropdown-link">
+                Daftar Dosen
+                <span>›</span>
+              </a>
+
+              <div class="dropdown">
+                <div class="dropdown-item">
+                  <a href="../dosen/dosen.php?prodi=Keperawatan" class="dropdown-link">
+                    Keperawatan
+                  </a>
+                </div>
+
+                <div class="dropdown-item">
+                  <a href="../dosen/dosen.php?prodi=Kebidanan" class="dropdown-link">
+                    Kebidanan
+                  </a>
+                </div>
+
+                <div class="dropdown-item">
+                  <a href="../dosen/dosen.php?prodi=Farmasi" class="dropdown-link">
+                    Farmasi
+                  </a>
+                </div>
+
+                <div class="dropdown-item">
+                  <a href="../dosen/dosen.php?prodi=K3" class="dropdown-link">
+                    K3
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KEMAHASISWAAN -->
+        <div class="nav-item has-dropdown">
+          <a href="#" class="nav-link">
+            Kemahasiswaan
+            <span class="arrow">▾</span>
+          </a>
+
+          <div class="dropdown">
+            <div class="dropdown-item">
+              <a href="../kemahasiswaan/hima.php" class="dropdown-link">
+                Himpunan Mahasiswa
+              </a>
+            </div>
+
+            <div class="dropdown-item">
+              <a href="../kemahasiswaan/ukm.php" class="dropdown-link">
+                Unit Kegiatan Mahasiswa
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROGRAM VOKASI -->
+        <div class="nav-item has-dropdown">
+          <a href="#" class="nav-link">
+            Program Vokasi
+            <span class="arrow">▾</span>
+          </a>
+
+          <div class="dropdown">
+            <div class="dropdown-item has-dropdown">
+              <a href="#" class="dropdown-link">
+                Program Profesi
+                <span>›</span>
+              </a>
+
+              <div class="dropdown">
+                <div class="dropdown-item">
+                  <a href="detail-prodi.php?kode=PROF-NERS" class="dropdown-link">
+                    Profesi Ners
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="dropdown-item has-dropdown">
+              <a href="#" class="dropdown-link">
+                Program Sarjana
+                <span>›</span>
+              </a>
+
+              <div class="dropdown">
+                <div class="dropdown-item">
+                  <a href="detail-prodi.php?kode=S1-KEP" class="dropdown-link">
+                    Ilmu Keperawatan
+                  </a>
+                </div>
+
+                <div class="dropdown-item">
+                  <a href="detail-prodi.php?kode=S1-FAR" class="dropdown-link">
+                    Farmasi
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="dropdown-item has-dropdown">
+              <a href="#" class="dropdown-link">
+                Program D3
+                <span>›</span>
+              </a>
+
+              <div class="dropdown">
+                <div class="dropdown-item">
+                  <a href="detail-prodi.php?kode=D3-KEP" class="dropdown-link">
+                    D3 Keperawatan
+                  </a>
+                </div>
+
+                <div class="dropdown-item">
+                  <a href="detail-prodi.php?kode=D3-KBD" class="dropdown-link">
+                    D3 Kebidanan
+                  </a>
+                </div>
+
+                <div class="dropdown-item">
+                  <a href="detail-prodi.php?kode=D3-K3" class="dropdown-link">
+                    D3 K3
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <a class="nav-link" href="../akademik.php">Akademik</a>
+        <a class="nav-link" href="../pelayanan-fikes.php">Pelayanan FIKES</a>
+        <a class="nav-link" href="../survey.php">Survey</a>
+
+      </nav>
+
+      <a class="nav-cta" href="#daftar-prodi">
+        Jelajahi Program <span>→</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- =========================================================
+     HERO
+========================================================= -->
+  <section class="page-hero">
+    <div class="container hero-content">
+
+      <div class="breadcrumb">
+        <a href="../../index.php">⌂ Beranda</a>
+        <span>›</span>
+        <span>Program Studi</span>
+      </div>
+
+      <span class="hero-label">PENDIDIKAN FIKES</span>
+
+      <h1>
+        Program <span>Studi</span>
+      </h1>
+
+      <p>
+        Kenali program pendidikan FIKES dan temukan program studi
+        yang sesuai dengan minat serta tujuan karier Anda.
+      </p>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+     DAFTAR PROGRAM STUDI
+========================================================= -->
+  <main class="program-section" id="daftar-prodi">
+    <div class="container">
+
+      <div class="section-heading">
+        <span class="eyebrow">PILIH PROGRAM ANDA</span>
+
+        <h2>Program Studi</h2>
+
+        <p>
+          Pilih program studi untuk melihat informasi lengkap mengenai
+          profil, kurikulum, capaian pembelajaran, fasilitas,
+          dan informasi akademik lainnya.
         </p>
       </div>
-    </section>
 
-    <main class="container page-content" id="daftar-prodi">
-      <div class="section-heading">
-        <span class="eyebrow">PENDIDIKAN FIKES</span>
-        <h2>Program Studi</h2>
-        <p>Pilih program studi untuk melihat informasi lengkap mengenai profil, kurikulum, capaian pembelajaran,
-          fasilitas, dan informasi akademik lainnya.</p>
-      </div>
+      <form class="filter-bar" method="get" action="program-studi.php">
 
-      <form class="filter-bar" method="get">
         <div class="filter-tabs">
-          <a class="<?= $filter === '' ? 'active' : '' ?>" href="program-studi.php">Semua</a>
+          <a class="<?= $filter === '' ? 'active' : '' ?>" href="program-studi.php#daftar-prodi">
+            Semua
+          </a>
+
           <?php foreach ($jenjangList as $j): ?>
-          <a class="<?= $filter === $j ? 'active' : '' ?>" href="?jenjang=<?= urlencode($j) ?>"><?= e($j) ?></a>
+            <a class="<?= $filter === $j ? 'active' : '' ?>" href="?jenjang=<?= urlencode($j) ?>#daftar-prodi">
+              <?= e($j) ?>
+            </a>
           <?php endforeach; ?>
         </div>
+
         <div class="search-box">
           <span>⌕</span>
-          <input type="text" name="search" value="<?= e($search) ?>" placeholder="Cari program studi...">
+
+          <input type="text" name="search" value="<?= e($search) ?>" placeholder="Cari program studi..."
+            autocomplete="off">
+
           <?php if ($filter !== ''): ?>
-          <input type="hidden" name="jenjang" value="<?= e($filter) ?>">
+            <input type="hidden" name="jenjang" value="<?= e($filter) ?>">
           <?php endif; ?>
         </div>
+
       </form>
 
+      <p class="result-info">
+        Menampilkan <strong><?= $totalProgram ?></strong> program studi
+        <?= $filter !== '' ? 'pada jenjang <strong>' . e($filter) . '</strong>' : '' ?>
+        <?= $search !== '' ? ' untuk pencarian <strong>"' . e($search) . '"</strong>' : '' ?>.
+      </p>
+
       <?php if (!$programs): ?>
-      <div class="empty-state">Program studi yang Anda cari belum tersedia.</div>
+
+        <div class="empty-state">
+          Program studi yang Anda cari belum tersedia.
+        </div>
+
       <?php else: ?>
-      <div class="program-grid">
-        <?php foreach ($programs as $p): ?>
-        <?php
-          $foto = !empty($p['gambar'])
-            ? '../../admin/uploads/program-studi/' . rawurlencode($p['gambar'])
-            : '';
-          ?>
-        <article class="program-card">
-          <div class="program-image">
-            <?php if ($foto): ?>
-            <img src="<?= e($foto) ?>" alt="<?= e($p['nama']) ?>">
-            <?php else: ?>
-            <div class="image-placeholder"><span>F</span></div>
-            <?php endif; ?>
-            <span class="jenjang-badge"><?= e($p['jenjang']) ?></span>
-          </div>
-          <div class="program-body">
-            <div class="code"><?= e($p['kode_prodi']) ?></div>
-            <h3><?= e($p['nama']) ?></h3>
-            <p><?= e($p['deskripsi']) ?></p>
-            <div class="meta-row">
-              <span>🎓 <?= e($p['gelar']) ?></span>
-              <span>✓ <?= e($p['akreditasi']) ?></span>
-            </div>
-            <a class="detail-btn" href="detail-prodi.php?kode=<?= urlencode($p['kode_prodi']) ?>">Lihat Detail
-              <span>→</span></a>
-          </div>
-        </article>
-        <?php endforeach; ?>
-      </div>
+
+        <div class="program-grid">
+
+          <?php foreach ($programs as $p): ?>
+
+            <?php
+            $foto = !empty($p['foto'])
+              ? '../../admin/uploads/program-studi/' . rawurlencode($p['foto'])
+              : '';
+            ?>
+
+            <article class="program-card">
+
+              <div class="program-image">
+
+                <?php if ($foto): ?>
+
+                  <img src="<?= e($foto) ?>" alt="Foto <?= e($p['nama']) ?>" loading="lazy">
+
+                <?php else: ?>
+
+                  <div class="image-placeholder">
+                    F
+                  </div>
+
+                <?php endif; ?>
+
+                <span class="jenjang-badge">
+                  <?= e($p['jenjang']) ?>
+                </span>
+
+              </div>
+
+              <div class="program-body">
+
+                <div class="code">
+                  <?= e($p['kode_prodi']) ?>
+                </div>
+
+                <h3>
+                  <?= e($p['nama']) ?>
+                </h3>
+
+                <p>
+                  <?= e($p['deskripsi']) ?>
+                </p>
+
+                <div class="meta-row">
+
+                  <?php if (!empty($p['gelar'])): ?>
+                    <span>🎓 <?= e($p['gelar']) ?></span>
+                  <?php endif; ?>
+
+                  <?php if (!empty($p['akreditasi'])): ?>
+                    <span>✓ <?= e($p['akreditasi']) ?></span>
+                  <?php endif; ?>
+
+                </div>
+
+                <a class="detail-btn" href="detail-prodi.php?kode=<?= urlencode($p['kode_prodi']) ?>">
+                  <span>Lihat Detail</span>
+                  <span>→</span>
+                </a>
+
+              </div>
+
+            </article>
+
+          <?php endforeach; ?>
+
+        </div>
+
       <?php endif; ?>
-    </main>
 
-    <section class="cta container">
-      <div>
-        <span class="eyebrow">BERSAMA FIKES</span>
-        <h2>Bangun Masa Depan Bersama Kami</h2>
-        <p>Temukan program studi yang mendukung perjalanan akademik dan profesional Anda.</p>
+    </div>
+  </main>
+
+  <!-- =========================================================
+     CTA
+========================================================= -->
+  <section class="cta-section">
+    <div class="container">
+
+      <div class="cta">
+        <div class="cta-content">
+
+          <span class="eyebrow">BERSAMA FIKES</span>
+
+          <h2>
+            Bangun Masa Depan Bersama Kami
+          </h2>
+
+          <p>
+            Temukan program studi yang mendukung perjalanan
+            akademik dan profesional Anda.
+          </p>
+
+          <a href="#daftar-prodi" class="btn">
+            Lihat Program Studi →
+          </a>
+
+        </div>
       </div>
-      <a href="#daftar-prodi">Lihat Program Studi →</a>
-    </section>
 
-    <footer class="footer">
-      <div class="container footer-grid">
-        <div>
-          <div class="footer-brand"><span>F</span>
-            <div><strong>FIKES</strong><small>FAKULTAS ILMU KESEHATAN</small></div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+     FOOTER
+========================================================= -->
+  <footer>
+
+    <div class="container footer-main">
+
+      <div class="footer-brand">
+
+        <div class="logo footer-logo">
+
+          <div class="logo-icon">F</div>
+
+          <div class="logo-text">
+            <strong>FIKES</strong>
+            <small>FAKULTAS ILMU KESEHATAN</small>
           </div>
-          <p>Bersama membangun generasi sehat, cerdas dan berdaya saing.</p>
+
         </div>
-        <div>
-          <h4>Link Cepat</h4><a href="../tentang-fikes/visi-misi.php">Tentang FIKES</a><a
-            href="program-studi.php">Program Studi</a><a href="../akademik.php">Akademik</a><a
-            href="../kemahasiswaan/hima.php">Kemahasiswaan</a>
-        </div>
-        <div>
-          <h4>Program Studi</h4><?php foreach (array_slice($prodiList, 0, 4) as $p): ?><a
-            href="detail-prodi.php?id=<?= (int)$p['id'] ?>"><?= e($p['nama']) ?></a><?php endforeach; ?>
-        </div>
-        <div>
-          <h4>Kontak Kami</h4>
-          <p>📍 Jl. Pendidikan No. 1, Kota Sehat Indonesia</p>
-          <p>☎ (021) 1234 5678</p>
-          <p>✉ info@fikes.ac.id</p>
+
+        <p>
+          Membangun generasi kesehatan yang profesional,
+          berintegritas, inovatif, dan berorientasi kepada masyarakat.
+        </p>
+
+      </div>
+
+      <div>
+        <h4 class="footer-title">Tentang FIKES</h4>
+
+        <div class="footer-links">
+          <a href="../tentang-fikes/visi-misi.php">Visi Misi</a>
+          <a href="../tentang-fikes/struktur-organisasi.php">Struktur Organisasi</a>
+          <a href="../tentang-fikes/sertifikat-akreditasi.php">Akreditasi</a>
+          <a href="../dosen/dosen.php">Daftar Dosen</a>
         </div>
       </div>
-      <div class="footer-bottom">© <?= date('Y') ?> FIKES - Fakultas Ilmu Kesehatan. All rights reserved.</div>
-    </footer>
 
-    <script src="prodi.js"></script>
-  </body>
+      <div>
+        <h4 class="footer-title">Program Studi</h4>
+
+        <div class="footer-links">
+          <?php foreach (array_slice($programs, 0, 5) as $p): ?>
+            <a href="detail-prodi.php?kode=<?= urlencode($p['kode_prodi']) ?>">
+              <?= e($p['nama']) ?>
+            </a>
+          <?php endforeach; ?>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="footer-title">Informasi</h4>
+
+        <div class="footer-links">
+          <a href="../akademik.php">Akademik</a>
+          <a href="../kemahasiswaan/hima.php">Kemahasiswaan</a>
+          <a href="../pelayanan-fikes.php">Pelayanan FIKES</a>
+          <a href="../survey.php">Survey</a>
+        </div>
+      </div>
+
+      <!-- =====================================================
+             LOKASI & PETA
+        ====================================================== -->
+      <div class="footer-location">
+
+        <div class="location-header">
+
+          <div class="location-icon">
+            📍
+          </div>
+
+          <div>
+            <h3>Lokasi Kampus</h3>
+            <p>Fakultas Ilmu Kesehatan</p>
+          </div>
+
+        </div>
+
+        <div class="map-card">
+
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.1515727139526!2d109.11806027499709!3d-6.991421893009626!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6fbef42471658d%3A0x883656d1325ef066!2sUniversitas%20Bhamada%20Slawi!5e0!3m2!1sid!2sid!4v1787544396003!5m2!1sid!2sid"
+            width="600" height="450" style="border:0" allowfullscreen loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin" title="Lokasi Fakultas Ilmu Kesehatan"></iframe>
+
+          <div class="map-overlay">
+
+            <div class="map-info">
+
+              <div class="map-info-icon">
+                📍
+              </div>
+
+              <div>
+                <strong>Fakultas Ilmu Kesehatan</strong>
+                <span>Lihat lokasi kampus</span>
+              </div>
+
+            </div>
+
+            <a href="https://www.google.com/maps/dir/?api=1&destination=-6.991421893009626,109.11806027499709"
+              target="_blank" rel="noopener" class="map-direction">
+              ↗ Petunjuk Arah
+            </a>
+
+          </div>
+
+        </div>
+
+        <div class="footer-contact location-contact">
+          <span>📍</span>
+          <span>Alamat Fakultas Ilmu Kesehatan, silakan sesuaikan dengan alamat kampus.</span>
+        </div>
+
+        <div class="footer-contact">
+          <span>☎</span>
+          <span>Nomor Telepon FIKES</span>
+        </div>
+
+        <div class="footer-contact">
+          <span>✉</span>
+          <span>email@fikes.ac.id</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="container footer-bottom">
+      <span>
+        © <span id="year"></span>
+        Fakultas Ilmu Kesehatan. All Rights Reserved.
+      </span>
+
+      <span>Website FIKES</span>
+    </div>
+
+  </footer>
+
+  <!-- BACK TO TOP -->
+  <button class="back-top" id="backTop" type="button" aria-label="Kembali ke atas">
+    ↑
+  </button>
+
+  <script>
+    /* =========================================================
+       NAVBAR SCROLL
+    ========================================================= */
+    const navbar = document.getElementById("navbar");
+
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 20) {
+        navbar.classList.add("scrolled");
+      } else {
+        navbar.classList.remove("scrolled");
+      }
+    });
+
+    /* =========================================================
+       MOBILE MENU
+    ========================================================= */
+    const menuToggle = document.getElementById("menuToggle");
+    const navMenu = document.getElementById("navMenu");
+
+    menuToggle.addEventListener("click", () => {
+      navMenu.classList.toggle("active");
+
+      menuToggle.innerHTML =
+        navMenu.classList.contains("active") ? "✕" : "☰";
+    });
+
+    /* =========================================================
+       MOBILE DROPDOWN
+    ========================================================= */
+    document
+      .querySelectorAll(".has-dropdown > .nav-link, .has-dropdown > .dropdown-link")
+      .forEach((link) => {
+
+        link.addEventListener("click", function(e) {
+
+          if (window.innerWidth <= 900) {
+
+            e.preventDefault();
+
+            const parent = this.parentElement;
+
+            parent.classList.toggle("open");
+          }
+
+        });
+
+      });
+
+    /* =========================================================
+       CLOSE MOBILE MENU
+    ========================================================= */
+    document.querySelectorAll(".nav-menu a").forEach((link) => {
+
+      link.addEventListener("click", function() {
+
+        if (
+          window.innerWidth <= 900 &&
+          !this.parentElement.classList.contains("has-dropdown")
+        ) {
+          navMenu.classList.remove("active");
+          menuToggle.innerHTML = "☰";
+        }
+
+      });
+
+    });
+
+    /* =========================================================
+       BACK TO TOP
+    ========================================================= */
+    const backTop = document.getElementById("backTop");
+
+    window.addEventListener("scroll", () => {
+
+      if (window.scrollY > 500) {
+        backTop.classList.add("show");
+      } else {
+        backTop.classList.remove("show");
+      }
+
+    });
+
+    backTop.addEventListener("click", () => {
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    });
+
+    /* =========================================================
+       YEAR
+    ========================================================= */
+    document.getElementById("year").textContent =
+      new Date().getFullYear();
+
+    /* =========================================================
+       CLOSE DROPDOWN
+    ========================================================= */
+    document.addEventListener("click", (event) => {
+
+      if (!event.target.closest(".navbar")) {
+
+        document
+          .querySelectorAll(".nav-item.open")
+          .forEach((item) => {
+            item.classList.remove("open");
+          });
+
+      }
+
+    });
+  </script>
+
+</body>
 
 </html>

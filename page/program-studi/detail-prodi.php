@@ -42,9 +42,14 @@ $durasi = $prodi['durasi_studi'] ?? 'Belum tersedia';
 $sks_lulus = $prodi['sks_lulus'] ?? null;
 $jumlah_tendik = $prodi['jumlah_tenaga_kependidikan'] ?? 0;
 
-$foto = !empty($prodi['gambar'])
-  ? '../../admin/uploads/program-studi/' . rawurlencode($prodi['gambar'])
+$fotoNama = !empty($prodi['foto'])
+  ? $prodi['foto']
+  : (!empty($prodi['gambar']) ? $prodi['gambar'] : '');
+
+$foto = $fotoNama !== ''
+  ? '../../admin/uploads/program-studi/' . rawurlencode(basename($fotoNama))
   : '';
+
 
 $brosur = !empty($prodi['brosur'])
   ? '../../admin/uploads/program-studi/' . rawurlencode($prodi['brosur'])
@@ -75,18 +80,18 @@ $initial = strtoupper(substr(trim($prodi['nama']), 0, 1));
 <!doctype html>
 <html lang="id">
 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= e($prodi['nama']) ?> | FIKES</title>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><?= e($prodi['nama']) ?> | FIKES</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
-      rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
 
-    <style>
+  <style>
     :root {
       --primary: #087f5b;
       --primary-dark: #056044;
@@ -4470,201 +4475,362 @@ $initial = strtoupper(substr(trim($prodi['nama']), 0, 1));
         grid-template-columns: 1fr
       }
     }
-    </style>
-  </head>
 
-  <body class="prodi-mockup">
-    <!-- TOPBAR REUSABLE -->
-    <?php require_once __DIR__ . '/../menu/topbar.php'; ?>
 
-    <!-- NAVBAR REUSABLE -->
-    <?php require_once __DIR__ . '/../menu/navbar.php'; ?>
+    /* ===============================
+       TYPOGRAPHY CONTENT - REFINED
+       Informasi singkat lebih ringkas,
+       konten pendukung lebih mudah dibaca.
+       =============================== */
+    .prodi-side .info-item {
+      padding: 7px 0 9px;
+      margin: 0;
+      border-bottom: 1px solid #d8ebe7;
+      color: #48716d;
+      line-height: 1.45;
+    }
 
-    <main>
+    .prodi-side .info-item:last-of-type {
+      border-bottom: 1px solid #d8ebe7;
+    }
 
-      <section class="prodi-hero">
-        <div class="container">
-          <div class="prodi-breadcrumb">
-            <a href="/fikes/index.php">⌂ &nbsp; Beranda</a>
-            <span>›</span>
-            <a href="program-studi.php">Program Studi</a>
-            <span>›</span>
-            <span><?= e($prodi['nama']) ?></span>
-          </div>
+    .prodi-side .info-item>span {
+      display: block;
+      margin-bottom: 2px;
+      color: #6b8984;
+      font-size: 9px;
+      line-height: 1.35;
+      font-weight: 600;
+    }
 
-          <div class="prodi-code"><?= e($prodi['jenjang']) ?> &nbsp;•&nbsp; <?= e($prodi['kode_prodi']) ?></div>
-          <h1>Program Studi <?= e($prodi['nama']) ?></h1>
-          <p>Mencetak tenaga profesional, beretika, dan berkompeten dalam memberikan pelayanan kesehatan yang
-            berkualitas.</p>
+    .prodi-side .info-item>strong {
+      display: block;
+      margin: 0;
+      color: #245f59;
+      font-size: 10.5px;
+      line-height: 1.45;
+      font-weight: 800;
+      word-break: break-word;
+    }
+
+    .prodi-side .info-item>small {
+      display: block;
+      margin-top: 2px;
+      color: #587873;
+      font-size: 9px;
+      line-height: 1.45;
+      word-break: break-word;
+    }
+
+    .prodi-side-item small {
+      font-size: 9px;
+      line-height: 1.35;
+    }
+
+    .prodi-side-item strong {
+      font-size: 10.5px;
+      line-height: 1.5;
+    }
+
+    .prodi-card-head h3 {
+      font-size: 14px;
+    }
+
+    .prodi-card-head p {
+      font-size: 10.5px;
+      line-height: 1.5;
+    }
+
+    .prodi-visi-box p,
+    .prodi-card>p {
+      font-size: 11.5px;
+      line-height: 1.7;
+    }
+
+    .prodi-label {
+      font-size: 10.5px;
+    }
+
+    .prodi-misi-title strong {
+      font-size: 11px;
+    }
+
+    .prodi-misi-row p {
+      font-size: 10.5px;
+      line-height: 1.6;
+    }
+
+    .prodi-table th {
+      padding: 9px 10px;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .prodi-table td {
+      padding: 9px 10px;
+      font-size: 10.5px;
+      line-height: 1.5;
+    }
+
+    .prodi-table td strong {
+      font-size: 10.5px;
+    }
+
+    .prodi-more {
+      font-size: 10.5px;
+    }
+
+    .prodi-kurikulum-intro {
+      margin: 0 0 12px;
+      color: #587873;
+      font-size: 11.5px;
+      line-height: 1.7;
+    }
+
+    .prodi-person small {
+      font-size: 9px;
+    }
+
+    .prodi-person strong {
+      font-size: 11px;
+    }
+
+    .prodi-list-row {
+      font-size: 10.5px;
+      line-height: 1.55;
+    }
+
+    .prodi-facility-caption {
+      font-size: 9px;
+    }
+
+    .prodi-cpl-card .prodi-card-head p {
+      font-size: 10.5px;
+    }
+
+    .prodi-cpl strong {
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .prodi-empty {
+      font-size: 10.5px;
+    }
+
+    @media (max-width: 900px) {
+
+      .prodi-side .info-item>strong,
+      .prodi-side-item strong {
+        font-size: 11px;
+      }
+
+      .prodi-side .info-item>small,
+      .prodi-side-item small {
+        font-size: 9.5px;
+      }
+
+      .prodi-card-head p,
+      .prodi-kurikulum-intro,
+      .prodi-visi-box p,
+      .prodi-card>p {
+        font-size: 11.5px;
+      }
+    }
+  </style>
+</head>
+
+<body class="prodi-mockup">
+  <!-- TOPBAR REUSABLE -->
+  <?php require_once __DIR__ . '/../menu/topbar.php'; ?>
+
+  <!-- NAVBAR REUSABLE -->
+  <?php require_once __DIR__ . '/../menu/navbar.php'; ?>
+
+  <main>
+
+    <section class="prodi-hero">
+      <div class="container">
+        <div class="prodi-breadcrumb">
+          <a href="/fikes/index.php">⌂ &nbsp; Beranda</a>
+          <span>›</span>
+          <a href="program-studi.php">Program Studi</a>
+          <span>›</span>
+          <span><?= e($prodi['nama']) ?></span>
         </div>
-      </section>
 
-      <section class="prodi-wrap">
-        <div class="container">
+        <div class="prodi-code"><?= e($prodi['jenjang']) ?> &nbsp;•&nbsp; <?= e($prodi['kode_prodi']) ?></div>
+        <h1>Program Studi <?= e($prodi['nama']) ?></h1>
+        <p>Mencetak tenaga profesional, beretika, dan berkompeten dalam memberikan pelayanan kesehatan yang
+          berkualitas.</p>
+      </div>
+    </section>
 
-          <div class="prodi-profile">
+    <section class="prodi-wrap">
+      <div class="container">
 
-            <div class="prodi-photo-box">
-              <?php if ($foto): ?>
+        <div class="prodi-profile">
+
+          <div class="prodi-photo-box">
+            <?php if ($foto): ?>
               <img src="<?= e($foto) ?>" alt="<?= e($prodi['nama']) ?>">
-              <?php else: ?>
+            <?php else: ?>
               <div class="prodi-photo-placeholder">
                 <b><?= e($initial) ?></b>
                 <span>FIKES</span>
               </div>
-              <?php endif; ?>
-              <span class="prodi-badge">● <?= $status === 'aktif' ? 'Aktif' : e($status) ?></span>
+            <?php endif; ?>
+            <span class="prodi-badge">● <?= $status === 'aktif' ? 'Aktif' : e($status) ?></span>
+          </div>
+
+          <div class="prodi-main">
+            <div class="prodi-title-row">
+              <span class="prodi-title-icon">♟</span>
+              <div>
+                <h2>Program Studi <?= e($prodi['nama']) ?></h2>
+                <div class="prodi-subtitle">Fakultas Ilmu Kesehatan - Universitas Indonesia</div>
+              </div>
             </div>
 
-            <div class="prodi-main">
-              <div class="prodi-title-row">
-                <span class="prodi-title-icon">♟</span>
-                <div>
-                  <h2>Program Studi <?= e($prodi['nama']) ?></h2>
-                  <div class="prodi-subtitle">Fakultas Ilmu Kesehatan - Universitas Indonesia</div>
-                </div>
-              </div>
-
-              <p class="prodi-desc">
-                <?= $deskripsi
+            <p class="prodi-desc">
+              <?= $deskripsi
                 ? nl2br(e($deskripsi))
                 : 'Program studi ini merupakan bagian dari Fakultas Ilmu Kesehatan yang berfokus pada pengembangan kompetensi akademik dan profesional mahasiswa.' ?>
-              </p>
+            </p>
 
-              <div class="prodi-facts">
-                <div class="prodi-fact">
-                  <span class="prodi-fact-icon">🎓</span>
-                  <div>
-                    <small>Jenjang</small><strong><?= e($prodi['jenjang']) ?><?= $gelar ? ' (' . e($gelar) . ')' : '' ?></strong>
-                  </div>
-                </div>
-                <div class="prodi-fact">
-                  <span class="prodi-fact-icon">◷</span>
-                  <div><small>Durasi Studi</small><strong><?= e($durasi) ?></strong></div>
-                </div>
-                <div class="prodi-fact">
-                  <span class="prodi-fact-icon">✓</span>
-                  <div><small>Akreditasi</small><strong><?= e($akreditasi) ?></strong></div>
+            <div class="prodi-facts">
+              <div class="prodi-fact">
+                <span class="prodi-fact-icon">🎓</span>
+                <div>
+                  <small>Jenjang</small><strong><?= e($prodi['jenjang']) ?><?= $gelar ? ' (' . e($gelar) . ')' : '' ?></strong>
                 </div>
               </div>
-
-              <div class="prodi-actions">
-                <?php if ($email !== 'Belum tersedia'): ?>
-                <a class="prodi-btn prodi-btn-primary" href="mailto:<?= e($email) ?>">Daftar Sekarang →</a>
-                <?php else: ?>
-                <a class="prodi-btn prodi-btn-primary" href="program-studi.php">Lihat Program →</a>
-                <?php endif; ?>
-
-                <?php if ($brosur): ?>
-                <a class="prodi-btn prodi-btn-outline" href="<?= e($brosur) ?>" target="_blank" rel="noopener">↓ &nbsp;
-                  Unduh Brosur</a>
-                <?php endif; ?>
+              <div class="prodi-fact">
+                <span class="prodi-fact-icon">◷</span>
+                <div><small>Durasi Studi</small><strong><?= e($durasi) ?></strong></div>
+              </div>
+              <div class="prodi-fact">
+                <span class="prodi-fact-icon">✓</span>
+                <div><small>Akreditasi</small><strong><?= e($akreditasi) ?></strong></div>
               </div>
             </div>
 
-            <aside class="prodi-side">
-              <h3><span>▣</span> Informasi Singkat</h3>
-              <div class="info-item">
-                <span>Kaprodi</span>
-                <strong>
-                  <?= e($prodi['kaprodi_nama'] ?? '-') ?>
-                </strong>
+            <div class="prodi-actions">
+              <?php if ($email !== 'Belum tersedia'): ?>
+                <a class="prodi-btn prodi-btn-primary" href="mailto:<?= e($email) ?>">Daftar Sekarang →</a>
+              <?php else: ?>
+                <a class="prodi-btn prodi-btn-primary" href="program-studi.php">Lihat Program →</a>
+              <?php endif; ?>
 
-                <?php if (!empty($prodi['kaprodi_nidn'])): ?>
+              <?php if ($brosur): ?>
+                <a class="prodi-btn prodi-btn-outline" href="<?= e($brosur) ?>" target="_blank" rel="noopener">↓ &nbsp;
+                  Unduh Brosur</a>
+              <?php endif; ?>
+            </div>
+          </div>
+
+          <aside class="prodi-side">
+            <h3><span>▣</span> Informasi Singkat</h3>
+            <div class="info-item">
+              <span>Kaprodi</span>
+              <strong>
+                <?= e($prodi['kaprodi_nama'] ?? '-') ?>
+              </strong>
+
+              <?php if (!empty($prodi['kaprodi_nidn'])): ?>
                 <small>
                   NIDN: <?= e($prodi['kaprodi_nidn']) ?>
                 </small>
-                <?php endif; ?>
+              <?php endif; ?>
 
-                <?php if (!empty($prodi['kaprodi_email'])): ?>
+              <?php if (!empty($prodi['kaprodi_email'])): ?>
                 <small>
                   <?= e($prodi['kaprodi_email']) ?>
                 </small>
-                <?php endif; ?>
-              </div>
-              <div class="info-item">
-                <span>Sekretaris Prodi</span>
+              <?php endif; ?>
+            </div>
+            <div class="info-item">
+              <span>Sekretaris Prodi</span>
 
-                <strong>
-                  <?= e($prodi['sekretaris_nama'] ?? '-') ?>
-                </strong>
+              <strong>
+                <?= e($prodi['sekretaris_nama'] ?? '-') ?>
+              </strong>
 
-                <?php if (!empty($prodi['sekretaris_nidn'])): ?>
+              <?php if (!empty($prodi['sekretaris_nidn'])): ?>
                 <small>
                   NIDN: <?= e($prodi['sekretaris_nidn']) ?>
                 </small>
-                <?php endif; ?>
+              <?php endif; ?>
+            </div>
+            <div class="prodi-side-item">
+              <div class="prodi-side-icon">🎓</div>
+              <div><small>Program Studi</small><strong><?= e($prodi['nama']) ?> (<?= e($prodi['jenjang']) ?>)</strong>
               </div>
-              <div class="prodi-side-item">
-                <div class="prodi-side-icon">🎓</div>
-                <div><small>Program Studi</small><strong><?= e($prodi['nama']) ?> (<?= e($prodi['jenjang']) ?>)</strong>
-                </div>
-              </div>
-              <div class="prodi-side-item">
-                <div class="prodi-side-icon">●</div>
-                <div><small>Kontak</small><strong><?= e($telepon) ?></strong></div>
-              </div>
-              <div class="prodi-side-item">
-                <div class="prodi-side-icon">✉</div>
-                <div><small>Email</small><strong><?= e($email) ?></strong></div>
-              </div>
-              <div class="prodi-side-item">
-                <div class="prodi-side-icon">♟</div>
-                <div><small>Dosen</small><strong><?= (int)($prodi['jumlah_dosen'] ?? 0) ?> Orang</strong></div>
-              </div>
-              <div class="prodi-side-item">
-                <div class="prodi-side-icon">▣</div>
-                <div><small>Tenaga Kependidikan</small><strong><?= (int)$jumlah_tendik ?> Orang</strong></div>
-              </div>
-            </aside>
+            </div>
+            <div class="prodi-side-item">
+              <div class="prodi-side-icon">●</div>
+              <div><small>Kontak</small><strong><?= e($telepon) ?></strong></div>
+            </div>
+            <div class="prodi-side-item">
+              <div class="prodi-side-icon">✉</div>
+              <div><small>Email</small><strong><?= e($email) ?></strong></div>
+            </div>
+            <div class="prodi-side-item">
+              <div class="prodi-side-icon">♟</div>
+              <div><small>Dosen</small><strong><?= (int)($prodi['jumlah_dosen'] ?? 0) ?> Orang</strong></div>
+            </div>
+            <div class="prodi-side-item">
+              <div class="prodi-side-icon">▣</div>
+              <div><small>Tenaga Kependidikan</small><strong><?= (int)$jumlah_tendik ?> Orang</strong></div>
+            </div>
+          </aside>
 
-          </div>
+        </div>
 
-          <div class="prodi-grid">
+        <div class="prodi-grid">
 
-            <section class="prodi-card">
-              <div class="prodi-card-head">
-                <div class="icon">✥</div>
-                <h3>Visi &amp; Misi</h3>
-              </div>
+          <section class="prodi-card">
+            <div class="prodi-card-head">
+              <div class="icon">✥</div>
+              <h3>Visi &amp; Misi</h3>
+            </div>
 
-              <div class="prodi-visi-box">
-                <span class="prodi-label">◉ &nbsp; Visi</span>
-                <p><?= !empty($prodi['visi']) ? nl2br(e($prodi['visi'])) : 'Visi program studi belum tersedia.' ?></p>
-              </div>
+            <div class="prodi-visi-box">
+              <span class="prodi-label">◉ &nbsp; Visi</span>
+              <p><?= !empty($prodi['visi']) ? nl2br(e($prodi['visi'])) : 'Visi program studi belum tersedia.' ?></p>
+            </div>
 
-              <div class="prodi-misi-title"><span class="gear">✿</span><strong>Misi</strong></div>
+            <div class="prodi-misi-title"><span class="gear">✿</span><strong>Misi</strong></div>
 
-              <?php if ($misi): ?>
+            <?php if ($misi): ?>
               <div class="prodi-misi">
                 <?php foreach ($misi as $i => $item): ?>
-                <div class="prodi-misi-row">
-                  <span class="prodi-misi-no"><?= $i + 1 ?></span>
-                  <p><?= nl2br(e($item['isi'])) ?></p>
-                </div>
+                  <div class="prodi-misi-row">
+                    <span class="prodi-misi-no"><?= $i + 1 ?></span>
+                    <p><?= nl2br(e($item['isi'])) ?></p>
+                  </div>
                 <?php endforeach; ?>
               </div>
-              <?php else: ?>
+            <?php else: ?>
               <div class="prodi-empty">Data misi belum tersedia.</div>
-              <?php endif; ?>
-            </section>
+            <?php endif; ?>
+          </section>
 
 
-            <section class="prodi-card" id="kurikulum">
-              <div class="prodi-card-head">
-                <div class="icon">▤</div>
-                <div>
-                  <h3>Kurikulum</h3>
-                  <p>Struktur mata kuliah program studi</p>
-                </div>
+          <section class="prodi-card" id="kurikulum">
+            <div class="prodi-card-head">
+              <div class="icon">▤</div>
+              <div>
+                <h3>Kurikulum</h3>
+                <p>Struktur mata kuliah program studi</p>
               </div>
+            </div>
 
-              <p class="prodi-kurikulum-intro">
-                Kurikulum program studi dirancang untuk menghasilkan lulusan dengan kompetensi sesuai bidang pelayanan
-                dan kebutuhan dunia kerja.
-              </p>
+            <p class="prodi-kurikulum-intro">
+              Kurikulum program studi dirancang untuk menghasilkan lulusan dengan kompetensi sesuai bidang pelayanan
+              dan kebutuhan dunia kerja.
+            </p>
 
-              <?php if ($kurikulum): ?>
+            <?php if ($kurikulum): ?>
               <div class="prodi-table-wrap">
                 <table class="prodi-table">
                   <thead>
@@ -4677,77 +4843,77 @@ $initial = strtoupper(substr(trim($prodi['nama']), 0, 1));
                   </thead>
                   <tbody>
                     <?php foreach (array_slice($kurikulum, 0, 5) as $i => $item): ?>
-                    <tr>
-                      <td><?= $i + 1 ?></td>
-                      <td><strong><?= e($item['nama_mk']) ?></strong></td>
-                      <td><?= e($item['semester'] ?? '-') ?></td>
-                      <td><?= e($item['sks'] ?? '-') ?></td>
-                    </tr>
+                      <tr>
+                        <td><?= $i + 1 ?></td>
+                        <td><strong><?= e($item['nama_mk']) ?></strong></td>
+                        <td><?= e($item['semester'] ?? '-') ?></td>
+                        <td><?= e($item['sks'] ?? '-') ?></td>
+                      </tr>
                     <?php endforeach; ?>
                   </tbody>
                 </table>
               </div>
               <a class="prodi-more" href="#detail-kurikulum">Lihat Semua Mata Kuliah →</a>
-              <?php else: ?>
+            <?php else: ?>
               <div class="prodi-empty">Data kurikulum belum tersedia.</div>
-              <?php endif; ?>
-            </section>
+            <?php endif; ?>
+          </section>
 
 
-            <section class="prodi-card">
-              <div class="prodi-card-head">
-                <div class="icon">♟</div>
-                <div>
-                  <h3>Dosen &amp; Tenaga Kependidikan</h3>
-                  <p>SDM pendukung program studi</p>
-                </div>
+          <section class="prodi-card">
+            <div class="prodi-card-head">
+              <div class="icon">♟</div>
+              <div>
+                <h3>Dosen &amp; Tenaga Kependidikan</h3>
+                <p>SDM pendukung program studi</p>
               </div>
+            </div>
 
-              <p>Didukung oleh dosen profesional dan tenaga kependidikan untuk menunjang kegiatan akademik dan pelayanan
-                mahasiswa.</p>
+            <p>Didukung oleh dosen profesional dan tenaga kependidikan untuk menunjang kegiatan akademik dan pelayanan
+              mahasiswa.</p>
 
-              <div class="prodi-person-grid">
-                <div class="prodi-person">
-                  <div class="ico">♙</div>
-                  <div><small>Dosen Tetap</small><strong><?= (int)($prodi['jumlah_dosen'] ?? 0) ?></strong></div>
-                </div>
-                <div class="prodi-person">
-                  <div class="ico">♟</div>
-                  <div><small>Tenaga Kependidikan</small><strong><?= (int)$jumlah_tendik ?></strong></div>
-                </div>
+            <div class="prodi-person-grid">
+              <div class="prodi-person">
+                <div class="ico">♙</div>
+                <div><small>Dosen Tetap</small><strong><?= (int)($prodi['jumlah_dosen'] ?? 0) ?></strong></div>
               </div>
-
-              <div class="prodi-actions">
-                <a class="prodi-btn prodi-btn-primary" href="../../dosen/dosen.php">Lihat Daftar Dosen →</a>
+              <div class="prodi-person">
+                <div class="ico">♟</div>
+                <div><small>Tenaga Kependidikan</small><strong><?= (int)$jumlah_tendik ?></strong></div>
               </div>
-            </section>
+            </div>
+
+            <div class="prodi-actions">
+              <a class="prodi-btn prodi-btn-primary" href="../../dosen/dosen.php">Lihat Daftar Dosen →</a>
+            </div>
+          </section>
 
 
-            <section class="prodi-card">
-              <div class="prodi-card-head">
-                <div class="icon">▥</div>
-                <div>
-                  <h3>Fasilitas</h3>
-                  <p>Fasilitas pendukung pembelajaran</p>
-                </div>
+          <section class="prodi-card">
+            <div class="prodi-card-head">
+              <div class="icon">▥</div>
+              <div>
+                <h3>Fasilitas</h3>
+                <p>Fasilitas pendukung pembelajaran</p>
               </div>
+            </div>
 
-              <div class="prodi-facility-wrap">
-                <div>
-                  <p>Didukung dengan fasilitas yang menunjang proses pembelajaran dan kegiatan akademik mahasiswa.</p>
-                  <?php if ($fasilitas): ?>
+            <div class="prodi-facility-wrap">
+              <div>
+                <p>Didukung dengan fasilitas yang menunjang proses pembelajaran dan kegiatan akademik mahasiswa.</p>
+                <?php if ($fasilitas): ?>
                   <div class="prodi-list">
                     <?php foreach (array_slice($fasilitas, 0, 5) as $item): ?>
-                    <div class="prodi-list-row"><span
-                        class="prodi-check">✓</span><span><?= e($item['nama_fasilitas']) ?></span></div>
+                      <div class="prodi-list-row"><span
+                          class="prodi-check">✓</span><span><?= e($item['nama_fasilitas']) ?></span></div>
                     <?php endforeach; ?>
                   </div>
-                  <?php else: ?>
+                <?php else: ?>
                   <div class="prodi-empty" style="margin-top:10px;">Data fasilitas belum tersedia.</div>
-                  <?php endif; ?>
-                </div>
+                <?php endif; ?>
+              </div>
 
-                <?php
+              <?php
               $facilityImage = '';
               $facilityCaption = 'Fasilitas Pembelajaran';
               if (!empty($fasilitas[0]['gambar'])) {
@@ -4756,55 +4922,55 @@ $initial = strtoupper(substr(trim($prodi['nama']), 0, 1));
               }
               ?>
 
-                <div class="prodi-facility-image">
-                  <?php if ($facilityImage): ?>
+              <div class="prodi-facility-image">
+                <?php if ($facilityImage): ?>
                   <img src="<?= e($facilityImage) ?>" alt="<?= e($facilityCaption) ?>">
-                  <?php else: ?>
+                <?php else: ?>
                   <div
                     style="height:100%;display:flex;align-items:center;justify-content:center;color:#078b72;font-weight:800;font-size:22px;">
                     F</div>
-                  <?php endif; ?>
-                  <div class="prodi-facility-caption"><?= e($facilityCaption) ?> &nbsp;⌕</div>
-                </div>
+                <?php endif; ?>
+                <div class="prodi-facility-caption"><?= e($facilityCaption) ?> &nbsp;⌕</div>
               </div>
-            </section>
+            </div>
+          </section>
 
 
-            <section class="prodi-card prodi-cpl-card">
-              <div class="prodi-card-head">
-                <div class="icon">◎</div>
-                <div>
-                  <h3>Capaian Pembelajaran</h3>
-                  <p>Lulusan program studi diharapkan memiliki kemampuan sebagai berikut:</p>
-                </div>
-              </div>
-
-              <?php if ($cpl): ?>
-              <div class="prodi-cpl-grid">
-                <?php foreach (array_slice($cpl, 0, 5) as $item): ?>
-                <div class="prodi-cpl">
-                  <div class="ico">♧</div><strong><?= e($item['isi']) ?></strong>
-                </div>
-                <?php endforeach; ?>
-              </div>
-              <?php else: ?>
-              <div class="prodi-empty">Data capaian pembelajaran belum tersedia.</div>
-              <?php endif; ?>
-            </section>
-
-          </div>
-
-
-          <section class="prodi-card" id="detail-kurikulum" style="margin-top:14px;">
+          <section class="prodi-card prodi-cpl-card">
             <div class="prodi-card-head">
-              <div class="icon">▤</div>
+              <div class="icon">◎</div>
               <div>
-                <h3>Detail Kurikulum</h3>
-                <p>Seluruh mata kuliah yang tersedia pada program studi</p>
+                <h3>Capaian Pembelajaran</h3>
+                <p>Lulusan program studi diharapkan memiliki kemampuan sebagai berikut:</p>
               </div>
             </div>
 
-            <?php if ($kurikulum): ?>
+            <?php if ($cpl): ?>
+              <div class="prodi-cpl-grid">
+                <?php foreach (array_slice($cpl, 0, 5) as $item): ?>
+                  <div class="prodi-cpl">
+                    <div class="ico">♧</div><strong><?= e($item['isi']) ?></strong>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            <?php else: ?>
+              <div class="prodi-empty">Data capaian pembelajaran belum tersedia.</div>
+            <?php endif; ?>
+          </section>
+
+        </div>
+
+
+        <section class="prodi-card" id="detail-kurikulum" style="margin-top:14px;">
+          <div class="prodi-card-head">
+            <div class="icon">▤</div>
+            <div>
+              <h3>Detail Kurikulum</h3>
+              <p>Seluruh mata kuliah yang tersedia pada program studi</p>
+            </div>
+          </div>
+
+          <?php if ($kurikulum): ?>
             <div class="prodi-table-wrap">
               <table class="prodi-table">
                 <thead>
@@ -4819,194 +4985,194 @@ $initial = strtoupper(substr(trim($prodi['nama']), 0, 1));
                 </thead>
                 <tbody>
                   <?php foreach ($kurikulum as $i => $item): ?>
-                  <tr>
-                    <td><?= $i + 1 ?></td>
-                    <td><?= e($item['kode_mk'] ?? '-') ?></td>
-                    <td><strong><?= e($item['nama_mk']) ?></strong></td>
-                    <td><?= e($item['semester'] ?? '-') ?></td>
-                    <td><?= e($item['sks'] ?? '-') ?></td>
-                    <td><?= e($item['jenis'] ?? '-') ?></td>
-                  </tr>
+                    <tr>
+                      <td><?= $i + 1 ?></td>
+                      <td><?= e($item['kode_mk'] ?? '-') ?></td>
+                      <td><strong><?= e($item['nama_mk']) ?></strong></td>
+                      <td><?= e($item['semester'] ?? '-') ?></td>
+                      <td><?= e($item['sks'] ?? '-') ?></td>
+                      <td><?= e($item['jenis'] ?? '-') ?></td>
+                    </tr>
                   <?php endforeach; ?>
                 </tbody>
               </table>
             </div>
-            <?php else: ?>
+          <?php else: ?>
             <div class="prodi-empty">Data kurikulum belum tersedia.</div>
-            <?php endif; ?>
-          </section>
+          <?php endif; ?>
+        </section>
 
 
-          <div class="prodi-cta">
-            <div class="prodi-cta-left">
-              <div class="prodi-cta-icon">♟</div>
-              <div>
-                <h3>Tertarik Bergabung?</h3>
-                <p>Jadilah bagian dari keluarga besar Program Studi <?= e($prodi['nama']) ?> FIKES</p>
-              </div>
-            </div>
-            <a href="<?= $email !== 'Belum tersedia' ? 'mailto:' . e($email) : 'program-studi.php' ?>">Daftar Sekarang
-              →</a>
-          </div>
-
-        </div>
-      </section>
-
-    </main>
-
-    <footer>
-      <div class="container footer-main">
-        <div class="footer-brand">
-          <div class="logo footer-logo">
-            <div class="logo-icon">F</div>
-
-            <div class="logo-text">
-              <strong style="color: white"> FIKES </strong>
-
-              <small> FAKULTAS ILMU KESEHATAN </small>
+        <div class="prodi-cta">
+          <div class="prodi-cta-left">
+            <div class="prodi-cta-icon">♟</div>
+            <div>
+              <h3>Tertarik Bergabung?</h3>
+              <p>Jadilah bagian dari keluarga besar Program Studi <?= e($prodi['nama']) ?> FIKES</p>
             </div>
           </div>
-
-          <p>
-            Membangun generasi kesehatan yang profesional, berintegritas,
-            inovatif, dan berorientasi kepada masyarakat.
-          </p>
+          <a href="<?= $email !== 'Belum tersedia' ? 'mailto:' . e($email) : 'program-studi.php' ?>">Daftar Sekarang
+            →</a>
         </div>
 
-        <div>
-          <h4 class="footer-title">Tentang FIKES</h4>
+      </div>
+    </section>
 
-          <div class="footer-links">
-            <a href="#"> Visi Misi </a>
+  </main>
 
-            <a href="#"> Struktur Organisasi </a>
+  <footer>
+    <div class="container footer-main">
+      <div class="footer-brand">
+        <div class="logo footer-logo">
+          <div class="logo-icon">F</div>
 
-            <a href="#"> Akreditasi </a>
+          <div class="logo-text">
+            <strong style="color: white"> FIKES </strong>
 
-            <a href="#"> Daftar Dosen </a>
+            <small> FAKULTAS ILMU KESEHATAN </small>
           </div>
         </div>
 
-        <div>
-          <h4 class="footer-title">Program Studi</h4>
+        <p>
+          Membangun generasi kesehatan yang profesional, berintegritas,
+          inovatif, dan berorientasi kepada masyarakat.
+        </p>
+      </div>
 
-          <div class="footer-links">
-            <a href="#"> Profesi Ners </a>
+      <div>
+        <h4 class="footer-title">Tentang FIKES</h4>
 
-            <a href="#"> Ilmu Keperawatan </a>
+        <div class="footer-links">
+          <a href="#"> Visi Misi </a>
 
-            <a href="#"> Farmasi </a>
+          <a href="#"> Struktur Organisasi </a>
 
-            <a href="#"> Kebidanan </a>
+          <a href="#"> Akreditasi </a>
 
-            <a href="#"> K3 </a>
-          </div>
+          <a href="#"> Daftar Dosen </a>
         </div>
+      </div>
 
-        <div>
-          <h4 class="footer-title">Informasi</h4>
+      <div>
+        <h4 class="footer-title">Program Studi</h4>
 
-          <div class="footer-links">
-            <a href="#"> Akademik </a>
+        <div class="footer-links">
+          <a href="#"> Profesi Ners </a>
 
-            <a href="#"> Kemahasiswaan </a>
+          <a href="#"> Ilmu Keperawatan </a>
 
-            <a href="#"> Pelayanan FIKES </a>
+          <a href="#"> Farmasi </a>
 
-            <a href="#"> Survey </a>
-          </div>
+          <a href="#"> Kebidanan </a>
+
+          <a href="#"> K3 </a>
         </div>
+      </div>
 
-        <!--MAP PETA-->
-        <!-- =========================================================
+      <div>
+        <h4 class="footer-title">Informasi</h4>
+
+        <div class="footer-links">
+          <a href="#"> Akademik </a>
+
+          <a href="#"> Kemahasiswaan </a>
+
+          <a href="#"> Pelayanan FIKES </a>
+
+          <a href="#"> Survey </a>
+        </div>
+      </div>
+
+      <!--MAP PETA-->
+      <!-- =========================================================
      LOKASI & PETA
 ========================================================== -->
 
-        <div class="footer-location">
-          <div class="location-header">
-            <div class="location-icon">
-              <i class="fa-solid fa-location-dot"></i>
-            </div>
-
-            <div>
-              <h3>Lokasi Kampus</h3>
-
-              <p>Fakultas Ilmu Kesehatan</p>
-            </div>
-          </div>
-
-          <!-- PETA -->
-
-          <div class="map-card">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.1515727139526!2d109.11806027499709!3d-6.991421893009626!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6fbef42471658d%3A0x883656d1325ef066!2sUniversitas%20Bhamada%20Slawi!5e0!3m2!1sid!2sid!4v1787544396003!5m2!1sid!2sid"
-              width="600" height="450" style="border: 0" allowfullscreen="" loading="lazy"
-              referrerpolicy="strict-origin-when-cross-origin" title="Lokasi Fakultas Ilmu Kesehatan" loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade" allowfullscreen>
-            </iframe>
-
-            <div class="map-overlay">
-              <div class="map-info">
-                <div class="map-info-icon">
-                  <i class="fa-solid fa-location-dot"></i>
-                </div>
-
-                <div>
-                  <strong> Fakultas Ilmu Kesehatan </strong>
-
-                  <span> Lihat lokasi kampus </span>
-                </div>
-              </div>
-
-              <a href="#" target="_blank" class="map-direction">
-                <i class="fa-solid fa-diamond-turn-right"></i>
-
-                Petunjuk Arah
-              </a>
-            </div>
-          </div>
-
-          <!-- ALAMAT -->
-
-          <div class="footer-contact location-contact">
+      <div class="footer-location">
+        <div class="location-header">
+          <div class="location-icon">
             <i class="fa-solid fa-location-dot"></i>
-
-            <span>
-              Alamat Fakultas Ilmu Kesehatan, silakan sesuaikan dengan alamat
-              kampus.
-            </span>
           </div>
 
-          <div class="footer-contact">
-            <i class="fa-solid fa-phone"></i>
+          <div>
+            <h3>Lokasi Kampus</h3>
 
-            <span> Nomor Telepon FIKES </span>
-          </div>
-
-          <div class="footer-contact">
-            <i class="fa-solid fa-envelope"></i>
-
-            <span> email@fikes.ac.id </span>
+            <p>Fakultas Ilmu Kesehatan</p>
           </div>
         </div>
-        <!--MAP PETA-->
+
+        <!-- PETA -->
+
+        <div class="map-card">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.1515727139526!2d109.11806027499709!3d-6.991421893009626!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6fbef42471658d%3A0x883656d1325ef066!2sUniversitas%20Bhamada%20Slawi!5e0!3m2!1sid!2sid!4v1787544396003!5m2!1sid!2sid"
+            width="600" height="450" style="border: 0" allowfullscreen="" loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin" title="Lokasi Fakultas Ilmu Kesehatan" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade" allowfullscreen>
+          </iframe>
+
+          <div class="map-overlay">
+            <div class="map-info">
+              <div class="map-info-icon">
+                <i class="fa-solid fa-location-dot"></i>
+              </div>
+
+              <div>
+                <strong> Fakultas Ilmu Kesehatan </strong>
+
+                <span> Lihat lokasi kampus </span>
+              </div>
+            </div>
+
+            <a href="#" target="_blank" class="map-direction">
+              <i class="fa-solid fa-diamond-turn-right"></i>
+
+              Petunjuk Arah
+            </a>
+          </div>
+        </div>
+
+        <!-- ALAMAT -->
+
+        <div class="footer-contact location-contact">
+          <i class="fa-solid fa-location-dot"></i>
+
+          <span>
+            Alamat Fakultas Ilmu Kesehatan, silakan sesuaikan dengan alamat
+            kampus.
+          </span>
+        </div>
+
+        <div class="footer-contact">
+          <i class="fa-solid fa-phone"></i>
+
+          <span> Nomor Telepon FIKES </span>
+        </div>
+
+        <div class="footer-contact">
+          <i class="fa-solid fa-envelope"></i>
+
+          <span> email@fikes.ac.id </span>
+        </div>
       </div>
+      <!--MAP PETA-->
+    </div>
 
-      <div class="container footer-bottom">
-        <span>
-          © <span id="year"></span> Fakultas Ilmu Kesehatan. All Rights
-          Reserved.
-        </span>
+    <div class="container footer-bottom">
+      <span>
+        © <span id="year"></span> Fakultas Ilmu Kesehatan. All Rights
+        Reserved.
+      </span>
 
-        <span> Website FIKES </span>
-      </div>
-    </footer>
+      <span> Website FIKES </span>
+    </div>
+  </footer>
 
-    <!-- BACK TO TOP -->
+  <!-- BACK TO TOP -->
 
-    <button class="back-top" id="backTop">↑</button>
+  <button class="back-top" id="backTop">↑</button>
 
-    <script>
+  <script>
     /* =========================================================
    NAVBAR SCROLL EFFECT
 ========================================================= */
@@ -5102,8 +5268,8 @@ $initial = strtoupper(substr(trim($prodi['nama']), 0, 1));
         });
       }
     });
-    </script>
+  </script>
 
-  </body>
+</body>
 
 </html>
