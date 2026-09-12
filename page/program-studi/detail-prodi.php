@@ -42,14 +42,10 @@ $durasi = $prodi['durasi_studi'] ?? 'Belum tersedia';
 $sks_lulus = $prodi['sks_lulus'] ?? null;
 $jumlah_tendik = $prodi['jumlah_tenaga_kependidikan'] ?? 0;
 
-$fotoNama = !empty($prodi['foto'])
-  ? $prodi['foto']
-  : (!empty($prodi['gambar']) ? $prodi['gambar'] : '');
-
+$fotoNama = !empty($prodi['foto']) ? $prodi['foto'] : (!empty($prodi['gambar']) ? $prodi['gambar'] : '');
 $foto = $fotoNama !== ''
   ? '../../admin/uploads/program-studi/' . rawurlencode(basename($fotoNama))
   : '';
-
 
 $brosur = !empty($prodi['brosur'])
   ? '../../admin/uploads/program-studi/' . rawurlencode($prodi['brosur'])
@@ -3772,6 +3768,55 @@ $initial = strtoupper(substr(trim($prodi['nama']), 0, 1));
       padding: 28px 0 65px
     }
 
+    /* Tombol kembali ke daftar Program Studi */
+    .prodi-back-wrap {
+      margin-bottom: 18px;
+    }
+
+    .prodi-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 0 15px;
+      border: 1px solid #d6ebe6;
+      border-radius: 10px;
+      background: #fff;
+      color: #087f5b;
+      font-size: 11px;
+      font-weight: 800;
+      box-shadow: 0 5px 16px rgba(18, 80, 69, .05);
+      transition: .25s ease;
+    }
+
+    .prodi-back-btn .back-icon {
+      width: 25px;
+      height: 25px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: #e7f7f3;
+      color: #078b72;
+      font-size: 14px;
+      line-height: 1;
+      transition: .25s ease;
+    }
+
+    .prodi-back-btn:hover {
+      color: #fff;
+      background: #087f5b;
+      border-color: #087f5b;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(8, 127, 91, .18);
+    }
+
+    .prodi-back-btn:hover .back-icon {
+      background: rgba(255, 255, 255, .18);
+      color: #fff;
+      transform: translateX(-2px);
+    }
+
     .prodi-profile {
       display: grid;
       grid-template-columns: 260px minmax(0, 1fr) 250px;
@@ -4667,6 +4712,13 @@ $initial = strtoupper(substr(trim($prodi['nama']), 0, 1));
 
     <section class="prodi-wrap">
       <div class="container">
+
+        <div class="prodi-back-wrap">
+          <a href="program-studi.php" class="prodi-back-btn" aria-label="Kembali ke halaman Program Studi">
+            <span class="back-icon">←</span>
+            <span>Kembali ke Program Studi</span>
+          </a>
+        </div>
 
         <div class="prodi-profile">
 

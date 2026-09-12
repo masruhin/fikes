@@ -1,0 +1,48 @@
+<?php
+require_once __DIR__.'/../../config/auth.php';
+wajib_login();
+include __DIR__.'/../../includes/header.php';
+?>
+<style>
+.mod{padding:20px}.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.head h2{margin:0;color:#123f39}.muted{color:#6b7280;font-size:13px}.btn{border:0;border-radius:9px;padding:9px 13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px}.primary{background:#078f78;color:#fff}.danger{background:#fee2e2;color:#b91c1c}.soft{background:#edf7f4;color:#087b68}.toolbar{display:flex;gap:10px;margin-bottom:15px}.toolbar input,.toolbar select,.form input,.form select,.form textarea{border:1px solid #dbe4e2;border-radius:9px;padding:10px 12px;background:#fff;box-sizing:border-box}.toolbar input{min-width:280px}.table{width:100%;border-collapse:collapse;background:#fff}.table th,.table td{padding:12px;border-bottom:1px solid #edf1f0;text-align:left;font-size:13px;vertical-align:middle}.table th{background:#f3faf8;color:#285b55}.thumb{width:120px;height:70px;object-fit:cover;border-radius:9px;border:1px solid #dbe4e2}.badge{padding:5px 9px;border-radius:99px;background:#e7f8f2;color:#087b68}.badge.draft{background:#fff7ed;color:#c2410c}.modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;z-index:9999;padding:20px}.modal.open{display:flex}.box{background:#fff;width:min(1000px,100%);max-height:94vh;overflow:auto;border-radius:16px;padding:22px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.full{grid-column:1/-1}.form label{display:block;font-size:12px;font-weight:700;margin-bottom:5px;color:#345650}.form input,.form select,.form textarea{width:100%}.form textarea{min-height:100px}.editor-wrap{border:1px solid #dbe4e2;border-radius:10px;overflow:hidden}.editor-tools{display:flex;gap:4px;flex-wrap:wrap;padding:8px;background:#f7faf9;border-bottom:1px solid #dbe4e2}.editor-tools button{border:1px solid #dbe4e2;background:#fff;border-radius:6px;padding:6px 9px;cursor:pointer}.editor{min-height:300px;padding:14px;outline:none;line-height:1.7}.editor:empty:before{content:attr(data-placeholder);color:#9ca3af}.current{margin-top:8px}.current img{width:240px;max-height:140px;object-fit:cover;border-radius:10px;border:1px solid #dbe4e2}.file-info{margin-top:6px;font-size:12px;color:#087b68;font-weight:600}.swal2-container{z-index:10050!important}@media(max-width:800px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.head{align-items:flex-start;gap:10px;flex-direction:column}.toolbar{flex-direction:column}.table{display:block;overflow:auto;white-space:nowrap}}
+</style>
+<div class="mod">
+ <div class="head"><div><h2>Berita</h2><div class="muted">Kelola berita yang tampil sebagai card di Beranda dan halaman detail berita.</div></div><button class="btn primary" onclick="baru()">+ Tambah Berita</button></div>
+ <div class="toolbar"><input id="q" placeholder="Cari judul / kategori..." oninput="load()"><select id="st" onchange="load()"><option value="">Semua status</option><option value="terbit">Terbit</option><option value="draft">Draft</option></select></div>
+ <div id="list">Memuat...</div>
+</div>
+<div class="modal" id="modal"><div class="box">
+ <div class="head"><h2 id="title">Tambah Berita</h2><button class="btn danger" onclick="tutup()">Tutup</button></div>
+ <form id="f" class="form" enctype="multipart/form-data" onsubmit="simpan(event)">
+  <input type="hidden" name="id" id="id">
+  <div class="grid">
+   <div class="full"><label>Judul Berita *</label><input name="judul" id="judul" required oninput="autoSlug()"></div>
+   <div><label>Slug *</label><input name="slug" id="slug" required><small class="muted">Dipakai untuk URL detail berita.</small></div>
+   <div><label>Kategori</label><input name="kategori" id="kategori" value="Berita"></div>
+   <div><label>Penulis</label><input name="penulis" id="penulis" value="Admin FIKES"></div>
+   <div><label>Tanggal Terbit</label><input type="datetime-local" name="tanggal_terbit" id="tanggal_terbit"></div>
+   <div><label>Status</label><select name="status" id="status"><option value="draft">Draft</option><option value="terbit">Terbit</option></select></div>
+   <div class="full"><label>Ringkasan</label><textarea name="ringkasan" id="ringkasan" placeholder="Ringkasan singkat yang tampil di card berita"></textarea></div>
+   <div class="full"><label>Isi Berita *</label><input type="hidden" name="isi" id="isi"><div class="editor-wrap"><div class="editor-tools"><button type="button" onclick="cmd('bold')"><b>B</b></button><button type="button" onclick="cmd('italic')"><i>I</i></button><button type="button" onclick="cmd('underline')"><u>U</u></button><button type="button" onclick="cmd('insertUnorderedList')">• List</button><button type="button" onclick="cmd('insertOrderedList')">1. List</button><button type="button" onclick="heading('h2')">H2</button><button type="button" onclick="heading('h3')">H3</button><button type="button" onclick="insertP()">P</button></div><div id="editor" class="editor" contenteditable="true" data-placeholder="Tulis isi berita di sini..."></div></div></div>
+   <div class="full"><label>Gambar Berita</label><input type="file" name="gambar" id="gambar" accept=".jpg,.jpeg,.png,.webp"><div class="file-info">JPG/JPEG/PNG/WEBP, maksimal 5 MB.</div><div id="current" class="current"></div></div>
+  </div>
+  <div style="text-align:right;margin-top:18px"><button class="btn primary">Simpan Berita</button></div>
+ </form>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+const api='ajax.php',$=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+function slugify(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
+function autoSlug(){if(!$('id').value)$('slug').value=slugify($('judul').value)}
+function cmd(c){$('editor').focus();document.execCommand(c,false,null)}
+function heading(tag){$('editor').focus();document.execCommand('formatBlock',false,tag)}
+function insertP(){$('editor').focus();document.execCommand('formatBlock',false,'p')}
+async function load(){try{let r=await fetch(api+'?action=list&search='+encodeURIComponent($('q').value)+'&status='+encodeURIComponent($('st').value));let d=await r.json();if(!d.success)throw Error(d.message);let h='<table class="table"><tr><th>No</th><th>Gambar</th><th>Berita</th><th>Tanggal</th><th>Status</th><th>Aksi</th></tr>';d.data.forEach((x,i)=>h+=`<tr><td>${i+1}</td><td>${x.gambar?`<img class="thumb" src="${esc(x.gambar_url)}" alt="">`:'-'}</td><td><b>${esc(x.judul)}</b><br><span class="muted">${esc(x.kategori||'Berita')}</span></td><td>${esc(x.tanggal_tampil)}</td><td><span class="badge ${x.status==='draft'?'draft':''}">${esc(x.status)}</span></td><td><button class="btn soft" onclick="edit(${x.id})">Edit</button> <button class="btn danger" onclick="hapus(${x.id})">Hapus</button> <a class="btn soft" target="_blank" rel="noopener" href="../../../detail-berita.php?slug=${encodeURIComponent(x.slug)}">Frontend</a></td></tr>`);$('list').innerHTML=h+'</table>'}catch(e){$('list').innerHTML='<div class="muted">Gagal memuat data: '+esc(e.message)+'</div>'}}
+function baru(){ $('f').reset();$('id').value='';$('title').textContent='Tambah Berita';$('kategori').value='Berita';$('penulis').value='Admin FIKES';$('status').value='draft';$('tanggal_terbit').value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);$('editor').innerHTML='';$('current').innerHTML='';$('gambar').value='';$('modal').classList.add('open') }
+function tutup(){$('modal').classList.remove('open')}
+async function edit(id){try{let d=await(await fetch(api+'?action=get&id='+id)).json();if(!d.success)throw Error(d.message);let x=d.data;$('modal').classList.add('open');$('title').textContent='Edit Berita';['id','judul','slug','kategori','penulis','tanggal_terbit','status','ringkasan'].forEach(k=>$(k).value=x[k]??'');$('editor').innerHTML=x.isi||'';$('gambar').value='';$('current').innerHTML=x.gambar?`<div class="muted">Gambar saat ini:</div><img src="${esc(x.gambar_url)}" alt="">`:''}catch(e){Swal.fire({icon:'error',title:'Gagal',text:e.message})}}
+async function simpan(e){e.preventDefault();$('isi').value=$('editor').innerHTML;let isEdit=Boolean($('id').value),fd=new FormData(e.target);fd.append('action','save');try{let d=await(await fetch(api,{method:'POST',body:fd})).json();if(!d.success){await Swal.fire({icon:'error',title:'Gagal',text:d.message});return}await Swal.fire({icon:'success',title:isEdit?'Berhasil Diperbarui':'Berhasil Ditambahkan',text:d.message,timer:1800,timerProgressBar:true,showConfirmButton:false,allowOutsideClick:false,allowEscapeKey:false});tutup();load()}catch(e){Swal.fire({icon:'error',title:'Error',text:e.message})}}
+async function hapus(id){let c=await Swal.fire({icon:'warning',title:'Hapus Berita?',text:'Data berita dan gambar akan dihapus.',showCancelButton:true,confirmButtonText:'Ya, Hapus',cancelButtonText:'Batal',confirmButtonColor:'#d33',cancelButtonColor:'#6b7280',reverseButtons:true});if(!c.isConfirmed)return;try{let fd=new FormData();fd.append('action','delete');fd.append('id',id);let d=await(await fetch(api,{method:'POST',body:fd})).json();if(!d.success){Swal.fire({icon:'error',title:'Gagal',text:d.message});return}await Swal.fire({icon:'success',title:'Berhasil Dihapus',text:d.message,timer:1500,showConfirmButton:false});load()}catch(e){Swal.fire({icon:'error',title:'Error',text:e.message})}}
+load();
+</script>
+<?php include __DIR__.'/../../includes/footer.php'; ?>

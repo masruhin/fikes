@@ -36,15 +36,6 @@ function menu_active($path)
       <nav class="sidebar-nav">
         <a href="<?= $project_url ?>/admin/index.php"
           class="menu-link <?= menu_active('/admin/index.php') ?>"><span>▦</span><b>Dashboard</b></a>
-        <button type="button" class="menu-parent" data-menu="kemahasiswaan"><span>♧</span><b>Konten
-            Website</b><i>⌄</i></button>
-        <div class="submenu" id="kemahasiswaan">
-          <a href="<?= $project_url ?>/admin/modules/slider/index.php"
-            class=" submenu-link <?= menu_active('kategori=Unit%20Himpunan') ?>">Slider Beranda</a>
-          <a href="<?= $project_url ?>/admin/modules/berita/index.php"
-            class="submenu-link <?= menu_active('kategori=UKM%20Kemahasiswaan') ?>">Berita</a>
-        </div>
-
         <button type="button" class="menu-parent" data-menu="tentang"><span>◉</span><b>Tentang
             FIKES</b><i>⌄</i></button>
         <div class="submenu" id="tentang">

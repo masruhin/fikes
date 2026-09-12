@@ -37,7 +37,8 @@ require __DIR__ . '/../../includes/header.php'; ?>
     </div>
     <div id="misiWrap"><?php foreach ($misi as $i => $m): ?><div class="mission-row">
           <div class="mission-number"><?= sprintf('%02d', $i + 1) ?></div>
-          <div><input name="judul[]" value="<?= e($m['judul']) ?>" placeholder="Judul misi"><textarea name="isi[]" rows="3" placeholder="Isi misi"><?= e($m['isi']) ?></textarea></div>
+          <div><input name="judul[]" value="<?= e($m['judul']) ?>" placeholder="Judul misi"><textarea name="isi[]"
+              rows="3" placeholder="Isi misi"><?= e($m['isi']) ?></textarea></div>
         </div><?php endforeach; ?></div>
     <button type="button" class="btn" onclick="addMission()">+ Tambah Misi</button>
   </div><button class="btn primary">Simpan Perubahan</button>
@@ -45,7 +46,9 @@ require __DIR__ . '/../../includes/header.php'; ?>
 <script>
   function addMission() {
     let n = document.querySelectorAll('.mission-row').length + 1;
-    document.getElementById('misiWrap').insertAdjacentHTML('beforeend', `<div class="mission-row"><div class="mission-number">${String(n).padStart(2,'0')}</div><div><input name="judul[]" placeholder="Judul misi"><textarea name="isi[]" rows="3" placeholder="Isi misi"></textarea></div></div>`)
+    document.getElementById('misiWrap').insertAdjacentHTML('beforeend',
+      `<div class="mission-row"><div class="mission-number">${String(n).padStart(2,'0')}</div><div><input name="judul[]" placeholder="Judul misi"><textarea name="isi[]" rows="3" placeholder="Isi misi"></textarea></div></div>`
+    )
   }
 </script>
 <?php require __DIR__ . '/../../includes/footer.php'; ?>

@@ -2,7 +2,9 @@
 // Komponen reusable Navbar FIKES.
 // Variabel $base_path dapat diatur dari halaman pemanggil.
 // Default: '..' untuk halaman yang berada di dalam folder page/.
-$base_path = $base_path ?? '..';
+// $base_path = $base_path ?? '..';
+$base_path = '/fikes/page';
+$base = '../../';
 ?>
 <!-- =========================================================
      NAVBAR
@@ -12,7 +14,7 @@ $base_path = $base_path ?? '..';
   <div class="container nav-inner">
     <!-- LOGO -->
 
-    <a href="<?= $base_path ?>/tentang-fikes/index.php" class="logo">
+    <a href="<?= $base ?>index.php" class="logo">
       <div class="logo-icon">F</div>
 
       <div class="logo-text">
@@ -31,7 +33,7 @@ $base_path = $base_path ?? '..';
       <!-- TENTANG FIKES -->
 
       <div class="nav-item has-dropdown">
-        <a href="#" class="dropdown-link">
+        <a href="index.php" class="dropdown-link">
           Tentang FIKES
           <span class="arrow">▾</span>
         </a>
@@ -113,16 +115,17 @@ $base_path = $base_path ?? '..';
       </div>
 
       <!-- PROGRAM VOKASI -->
+      <div class="nav-item">
+        <a href="<?= $base_path ?>/program-studi/program-studi.php" class="nav-link"> Program </a>
+      </div>
 
-
-      <div class="nav-item has-dropdown">
-        <a href="#" class="nav-link">
+      <!-- <div class="nav-item has-dropdown">
+        <a href="<?= $base_path ?>/program-studi/program-studi.php" class="nav-link">
           Program Vokasi
           <span class="arrow">▾</span>
         </a>
 
         <div class="dropdown">
-          <!-- PROGRAM PROFESI -->
 
           <div class="dropdown-item has-dropdown">
             <a href="#" class="dropdown-link">
@@ -139,7 +142,6 @@ $base_path = $base_path ?? '..';
             </div>
           </div>
 
-          <!-- PROGRAM SARJANA -->
 
           <div class="dropdown-item has-dropdown">
             <a href="#" class="dropdown-link">
@@ -162,7 +164,6 @@ $base_path = $base_path ?? '..';
             </div>
           </div>
 
-          <!-- PROGRAM DIPLOMA -->
 
           <div class="dropdown-item has-dropdown">
             <a href="#" class="dropdown-link">
@@ -191,7 +192,7 @@ $base_path = $base_path ?? '..';
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <!-- AKADEMIK -->
 
