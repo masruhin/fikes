@@ -1,13 +1,10 @@
 <?php
-ob_start();
 require_once __DIR__.'/../../config/auth.php';
 wajib_login();
 require_once __DIR__.'/../../config/database.php';
-ob_clean();
 header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 $uploadDir=__DIR__.'/../../uploads/berita/';$uploadWeb='../../uploads/berita/';if(!is_dir($uploadDir))@mkdir($uploadDir,0777,true);
-function out($success,$message='',$data=[]){if(ob_get_length())ob_clean();echo json_encode(['success'=>$success,'message'=>$message,'data'=>$data],JSON_UNESCAPED_UNICODE);exit;}
+function out($success,$message='',$data=[]){echo json_encode(['success'=>$success,'message'=>$message,'data'=>$data],JSON_UNESCAPED_UNICODE);exit;}
 function safeName($name){$ext=strtolower(pathinfo($name,PATHINFO_EXTENSION));return date('YmdHis').'_'.bin2hex(random_bytes(4)).'.'.$ext;}
 function uploadGambar($file,$dir){if(!$file||($file['error']??UPLOAD_ERR_NO_FILE)===UPLOAD_ERR_NO_FILE)return null;if($file['error']!==UPLOAD_ERR_OK)throw new Exception('Upload gambar gagal.');if($file['size']>5*1024*1024)throw new Exception('Ukuran gambar maksimal 5 MB.');$allowed=['jpg','jpeg','png','webp'];$ext=strtolower(pathinfo($file['name'],PATHINFO_EXTENSION));if(!in_array($ext,$allowed,true))throw new Exception('Format gambar harus JPG, JPEG, PNG, atau WEBP.');if(!@getimagesize($file['tmp_name']))throw new Exception('File bukan gambar yang valid.');$name=safeName($file['name']);if(!move_uploaded_file($file['tmp_name'],$dir.$name))throw new Exception('Gambar gagal disimpan.');return $name;}
 $action=$_GET['action']??$_POST['action']??'';
@@ -22,6 +19,6 @@ try{
   if($id){$sql='UPDATE berita SET judul=?,slug=?,kategori=?,ringkasan=?,isi=?,penulis=?,tanggal_terbit=?,status=?';$params=[$judul,$slug,$kategori,$ringkasan,$isi,$penulis,$tanggal,$status];if($new){$sql.=',gambar=?';$params[]=$new;}$sql.=' WHERE id=?';$params[]=$id;$pdo->prepare($sql)->execute($params);if($new&&$old&&is_file($uploadDir.basename($old)))@unlink($uploadDir.basename($old));out(true,'Berita berhasil diperbarui.');}
   else{ $st=$pdo->prepare('INSERT INTO berita (judul,slug,kategori,ringkasan,isi,gambar,penulis,tanggal_terbit,status) VALUES (?,?,?,?,?,?,?,?,?)');$st->execute([$judul,$slug,$kategori,$ringkasan,$isi,$new,$penulis,$tanggal,$status]);out(true,'Berita berhasil ditambahkan.');}
  }
- if($action==='delete'){$id=(int)($_POST['id']??0);if($id<=0)out(false,'ID berita tidak valid.');$q=$pdo->prepare('SELECT gambar FROM berita WHERE id=?');$q->execute([$id]);$row=$q->fetch(PDO::FETCH_ASSOC);if(!$row)out(false,'Berita tidak ditemukan.');$old=$row['gambar']??'';$del=$pdo->prepare('DELETE FROM berita WHERE id=?');$del->execute([$id]);if($del->rowCount()!==1)out(false,'Berita gagal dihapus.');if($old&&is_file($uploadDir.basename($old)))@unlink($uploadDir.basename($old));out(true,'Berita berhasil dihapus.');}
+ if($action==='delete'){$id=(int)($_POST['id']??0);$q=$pdo->prepare('SELECT gambar FROM berita WHERE id=?');$q->execute([$id]);$old=$q->fetchColumn();if(!$old&&$q->rowCount()===0)out(false,'Berita tidak ditemukan.');$pdo->prepare('DELETE FROM berita WHERE id=?')->execute([$id]);if($old&&is_file($uploadDir.basename($old)))@unlink($uploadDir.basename($old));out(true,'Berita berhasil dihapus.');}
  out(false,'Aksi tidak dikenal.');
 }catch(Throwable $e){out(false,$e->getMessage());}

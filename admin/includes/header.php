@@ -52,7 +52,9 @@ function menu_active($path)
             class="submenu-link <?= menu_active('/tentang/visi-misi.php') ?>">Visi-Misi</a>
           <a href="<?= $project_url ?>/admin/modules/tentang/struktur.php"
             class="submenu-link <?= menu_active('/tentang/struktur.php') ?>">Struktur Organisasi</a>
-          <a href="<?= $project_url ?>/admin/modules/tentang/akreditasi.php"
+          <!-- <a href="<?= $project_url ?>/admin/modules/tentang/akreditasi.php"
+            class="submenu-link <?= menu_active('/tentang/akreditasi.php') ?>">Sertifikat Akreditasi</a> -->
+          <a href="<?= $project_url ?>/admin/modules/sertifikat/index.php"
             class="submenu-link <?= menu_active('/tentang/akreditasi.php') ?>">Sertifikat Akreditasi</a>
           <a href="<?= $project_url ?>/admin/modules/tentang/logo.php"
             class="submenu-link <?= menu_active('/tentang/logo.php') ?>">Unduh Logo</a>

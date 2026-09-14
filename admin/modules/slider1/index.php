@@ -278,21 +278,11 @@ const api = 'ajax.php',
     '"': '&quot;',
     "'": '&#039;'
   } [m]));
-async function jsonRequest(url, options = {}) {
-  const response = await fetch(url, { credentials: 'same-origin', cache: 'no-store', ...options });
-  const text = await response.text();
-  if (response.redirected || /<\s*!doctype|<\s*html/i.test(text)) {
-    throw new Error('Server mengembalikan halaman HTML, bukan JSON. Kemungkinan sesi login admin sudah berakhir atau endpoint AJAX terkena redirect. Silakan login ulang.');
-  }
-  let data;
-  try { data = JSON.parse(text); } catch (err) { throw new Error('Respons server bukan JSON yang valid. HTTP ' + response.status + '.'); }
-  if (!response.ok) throw new Error(data.message || ('HTTP ' + response.status));
-  return data;
-}
 async function load() {
   try {
-    let d = await jsonRequest(api + '?action=list&search=' + encodeURIComponent($('q').value) + '&status=' +
+    let r = await fetch(api + '?action=list&search=' + encodeURIComponent($('q').value) + '&status=' +
       encodeURIComponent($('st').value));
+    let d = await r.json();
     if (!d.success) throw Error(d.message);
     let h =
       '<table class="table"><tr><th>No</th><th>Gambar</th><th>Slider</th><th>Urut</th><th>Status</th><th>Aksi</th></tr>';
@@ -323,7 +313,7 @@ function tutup() {
 }
 async function edit(id) {
   try {
-    let d = await jsonRequest(api + '?action=get&id=' + id);
+    let d = await (await fetch(api + '?action=get&id=' + id)).json();
     if (!d.success) throw Error(d.message);
     let x = d.data;
     $('modal').classList.add('open');
@@ -349,7 +339,10 @@ async function simpan(e) {
     fd = new FormData(e.target);
   fd.append('action', 'save');
   try {
-    let d = await jsonRequest(api, { method: 'POST', body: fd });
+    let d = await (await fetch(api, {
+      method: 'POST',
+      body: fd
+    })).json();
     if (!d.success) {
       await Swal.fire({
         icon: 'error',
@@ -395,7 +388,10 @@ async function hapus(id) {
     let fd = new FormData();
     fd.append('action', 'delete');
     fd.append('id', id);
-    let d = await jsonRequest(api, { method: 'POST', body: fd });
+    let d = await (await fetch(api, {
+      method: 'POST',
+      body: fd
+    })).json();
     if (!d.success) {
       Swal.fire({
         icon: 'error',

@@ -1,9 +1,62 @@
 <?php
 require_once __DIR__ . '/admin/config/database.php';
-$base_path = '/fikes/page/';
 function e($v)
 {
   return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8');
+}
+
+// Membuat URL gambar slider yang aman untuk frontend.
+// Jika database hanya menyimpan nama file, otomatis diarahkan ke admin/uploads/slider/.
+function sliderImageUrl($gambar)
+{
+  $gambar = trim((string) $gambar);
+  if ($gambar === '') {
+    return '';
+  }
+
+  // URL eksternal tetap digunakan apa adanya.
+  if (preg_match('~^(https?:)?//~i', $gambar)) {
+    return $gambar;
+  }
+
+  $gambar = str_replace('\\', '/', $gambar);
+
+  // Path yang sudah lengkap/relatif tidak ditambahkan folder lagi.
+  if (
+    str_starts_with($gambar, '/') ||
+    str_starts_with($gambar, 'admin/') ||
+    str_starts_with($gambar, 'assets/') ||
+    str_starts_with($gambar, './') ||
+    str_starts_with($gambar, '../') ||
+    str_contains($gambar, '/')
+  ) {
+    return $gambar;
+  }
+
+  return 'admin/uploads/slider/' . rawurlencode(basename($gambar));
+}
+
+function newsImageUrl($gambar)
+{
+  $gambar = trim((string) $gambar);
+  if ($gambar === '') {
+    return '';
+  }
+  if (preg_match('~^(https?:)?//~i', $gambar)) {
+    return $gambar;
+  }
+  $gambar = str_replace('\\', '/', $gambar);
+  if (
+    str_starts_with($gambar, '/') ||
+    str_starts_with($gambar, 'admin/') ||
+    str_starts_with($gambar, 'assets/') ||
+    str_starts_with($gambar, './') ||
+    str_starts_with($gambar, '../') ||
+    str_contains($gambar, '/')
+  ) {
+    return $gambar;
+  }
+  return 'admin/uploads/berita/' . rawurlencode(basename($gambar));
 }
 
 $sliders = $pdo->query("SELECT * FROM slider_beranda WHERE status='aktif' ORDER BY nomor_urut ASC, id DESC")->fetchAll();
@@ -11,29 +64,47 @@ $sliders = $pdo->query("SELECT * FROM slider_beranda WHERE status='aktif' ORDER 
 $stmt = $pdo->query("SELECT id,kode_prodi,nama,jenjang,gelar,deskripsi FROM program_studi WHERE status='aktif' ORDER BY id ASC");
 $prodiList = $stmt->fetchAll();
 
+// Statistik homepage diambil langsung dari database.
+// Helper ini mengecek tabel terlebih dahulu agar homepage tidak error
+// jika tabel mahasiswa belum tersedia.
+function tableExists(PDO $pdo, $table)
+{
+  $stmt = $pdo->prepare("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?");
+  $stmt->execute([$table]);
+  return (bool) $stmt->fetchColumn();
+}
+
+$jumlahProdi = count($prodiList);
+$jumlahDosen = tableExists($pdo, 'dosen')
+  ? (int) $pdo->query("SELECT COUNT(*) FROM dosen")->fetchColumn()
+  : 0;
+$jumlahMahasiswa = tableExists($pdo, 'mahasiswa')
+  ? (int) $pdo->query("SELECT COUNT(*) FROM mahasiswa")->fetchColumn()
+  : 0;
+
 $stmt = $pdo->query("SELECT * FROM berita WHERE status='terbit' ORDER BY tanggal_terbit DESC, id DESC LIMIT 6");
 $berita = $stmt->fetchAll();
 ?>
 <!doctype html>
 <html lang="id">
 
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>FIKES - Fakultas Ilmu Kesehatan</title>
+  <title>FIKES - Fakultas Ilmu Kesehatan</title>
 
-    <meta name="description"
-      content="Website resmi Fakultas Ilmu Kesehatan - Informasi akademik, program studi, kemahasiswaan, pelayanan dan informasi FIKES." />
+  <meta name="description"
+    content="Website resmi Fakultas Ilmu Kesehatan - Informasi akademik, program studi, kemahasiswaan, pelayanan dan informasi FIKES." />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
-      rel="stylesheet" />
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <style>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap");
 
     :root {
@@ -229,13 +300,6 @@ $berita = $stmt->fetchAll();
       justify-content: center;
     }
 
-    .hero-slider {
-      height: 540px;
-      position: relative;
-      background: #021f17;
-      overflow: hidden;
-    }
-
     .slider-container {
       height: 100%;
       position: relative;
@@ -267,18 +331,13 @@ $berita = $stmt->fetchAll();
       background: linear-gradient(90deg, rgba(5, 32, 24, .82), rgba(5, 32, 24, .38), rgba(5, 32, 24, .08))
     }
 
-    /* =========================
-       SLIDER CONTENT - CENTERED
-       Mengikuti layout referensi:
-       konten utama benar-benar berada di tengah hero.
-    ========================= */
     .slide-content {
       position: absolute;
       z-index: 2;
-      top: 50%;
       left: 50%;
+      top: 50%;
       transform: translate(-50%, -50%);
-      width: min(900px, calc(100% - 120px));
+      width: min(900px, calc(100% - 80px));
       max-width: 900px;
       color: #fff;
       text-align: center;
@@ -288,14 +347,7 @@ $berita = $stmt->fetchAll();
     }
 
     .slide-label {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 38px;
-      padding: 0 16px;
-      border: 1px solid rgba(255, 255, 255, .28);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, .08);
+      display: inline-block;
       color: var(--secondary);
       font-size: 12px;
       font-weight: 800;
@@ -304,36 +356,28 @@ $berita = $stmt->fetchAll();
     }
 
     .slide h1 {
-      width: 100%;
-      max-width: 980px;
-      font-size: clamp(42px, 5vw, 68px);
-      line-height: 1.08;
-      color: #fff;
-      text-align: center;
-      letter-spacing: -1.8px;
+      font-size: 54px;
+      color: #fff
     }
 
     .slide h1 span {
       display: block;
-      color: #8fe0c5;
+      color: var(--secondary)
     }
 
     .slide p {
-      width: 100%;
       max-width: 720px;
       margin: 18px auto 28px;
-      color: rgba(255, 255, 255, .82);
+      color: rgba(255, 255, 255, .88);
       text-align: center;
-      font-size: 14px;
-      line-height: 1.75;
     }
 
     .slide-actions {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 12px;
       flex-wrap: wrap;
+      gap: 12px;
     }
 
     .slide-btn {
@@ -540,97 +584,124 @@ $berita = $stmt->fetchAll();
 
     .program-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 22px
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+      align-items: stretch;
     }
 
     .program-card {
-      padding: 28px;
+      position: relative;
+      min-width: 0;
+      min-height: 265px;
+      padding: 28px 26px 24px;
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 20px;
       background: #fff;
-      box-shadow: 0 10px 30px rgba(18, 55, 42, .06)
+      box-shadow: 0 10px 30px rgba(18, 55, 42, .06);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+
+    .program-card::after {
+      content: "";
+      position: absolute;
+      width: 82px;
+      height: 82px;
+      right: -30px;
+      bottom: -30px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      pointer-events: none;
+    }
+
+    .program-card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(8, 127, 91, .25);
+      box-shadow: 0 18px 45px rgba(18, 55, 42, .11);
     }
 
     .program-icon {
-      font-size: 30px;
-      margin-bottom: 12px
-    }
-
-    .program-card h3 {
-      font-size: 19px
-    }
-
-    .program-card p {
-      font-size: 13px;
-      margin: 10px 0 16px
-    }
-
-    .program-link {
-      color: var(--primary);
-      font-size: 12px;
-      font-weight: 800;
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      margin-top: auto;
-    }
-
-    .program-card {
-      min-height: 285px;
-      display: flex;
-      flex-direction: column;
-      padding: 26px;
-    }
-
-    .program-card-content {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-
-    .program-icon {
-      width: 52px;
-      height: 52px;
+      width: 58px;
+      height: 58px;
+      flex: 0 0 58px;
+      margin-bottom: 18px;
+      border-radius: 16px;
+      background: var(--primary-light);
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 14px;
-      background: var(--primary-light);
-      font-size: 25px;
-      margin-bottom: 15px;
-    }
-
-    .program-meta {
-      color: var(--primary);
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: .6px;
-      text-transform: uppercase;
-      margin-bottom: 5px;
+      font-size: 29px;
+      line-height: 1;
     }
 
     .program-card h3 {
       font-size: 18px;
       line-height: 1.4;
       margin-bottom: 8px;
+      min-height: 51px;
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .program-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 10px;
+    }
+
+    .program-meta span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: #f1f7f4;
+      color: var(--primary-dark);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .15px;
     }
 
     .program-card p {
       font-size: 13px;
-      line-height: 1.7;
-      margin: 0 0 18px;
-      color: var(--text);
+      line-height: 1.65;
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
-    .program-link span {
-      font-size: 16px;
-      transition: transform .2s ease;
+    .program-link {
+      position: relative;
+      z-index: 1;
+      margin-top: auto;
+      padding-top: 18px;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      width: fit-content;
     }
 
-    .program-link:hover span {
-      transform: translateX(4px);
+    .program-link:hover {
+      color: var(--primary-dark);
     }
+
+    .program-empty {
+      grid-column: 1 / -1;
+      padding: 35px;
+      text-align: center;
+      border: 1px dashed var(--border);
+      border-radius: 18px;
+      background: var(--light);
+    }
+
 
     .about-grid,
     .student-grid {
@@ -961,10 +1032,6 @@ $berita = $stmt->fetchAll();
         grid-template-columns: 1fr 1fr
       }
 
-      .program-card {
-        min-height: 270px;
-      }
-
       .service-grid {
         grid-template-columns: 1fr 1fr
       }
@@ -1013,10 +1080,6 @@ $berita = $stmt->fetchAll();
         grid-template-columns: 1fr
       }
 
-      .program-card {
-        min-height: auto;
-      }
-
       .section-title {
         font-size: 28px
       }
@@ -1033,88 +1096,90 @@ $berita = $stmt->fetchAll();
         font-size: 28px
       }
     }
-    </style>
-  </head>
+  </style>
+</head>
 
-  <body>
-    <!-- =========================================================
+<body>
+  <!-- =========================================================
      TOP BAR
 ========================================================= -->
 
-    <div class="topbar">
-      <div class="container topbar-inner">
-        <div class="topbar-info">
-          <span>📍 Kampus FIKES</span>
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="topbar-info">
+        <span>📍 Kampus FIKES</span>
 
-          <span>✉️ info@fikes.ac.id</span>
+        <span>✉️ info@fikes.ac.id</span>
 
-          <span>📞 (021) 1234567</span>
-        </div>
+        <span>📞 (021) 1234567</span>
+      </div>
 
-        <div class="topbar-social">
-          <a href="#">Instagram</a>
-          <a href="#">Facebook</a>
-          <a href="#">YouTube</a>
-        </div>
+      <div class="topbar-social">
+        <a href="#">Instagram</a>
+        <a href="#">Facebook</a>
+        <a href="#">YouTube</a>
       </div>
     </div>
+  </div>
 
-    <!-- =========================================================
+  <!-- =========================================================
      NAVBAR
 ========================================================= -->
 
-    <header class="navbar" id="navbar">
-      <div class="container nav-inner">
-        <!-- LOGO -->
+  <header class="navbar" id="navbar">
+    <div class="container nav-inner">
+      <!-- LOGO -->
 
-        <a href="index.php" class="logo">
-          <div class="logo-icon">F</div>
+      <a href="index.php" class="logo">
+        <div class="logo-icon">F</div>
 
-          <div class="logo-text">
-            <strong>FIKES</strong>
-            <small>FAKULTAS ILMU KESEHATAN</small>
-          </div>
-        </a>
+        <div class="logo-text">
+          <strong>FIKES</strong>
+          <small>FAKULTAS ILMU KESEHATAN</small>
+        </div>
+      </a>
 
-        <!-- MOBILE BUTTON -->
+      <!-- MOBILE BUTTON -->
 
-        <button class="menu-toggle" id="menuToggle">☰</button>
+      <button class="menu-toggle" id="menuToggle">☰</button>
 
-        <!-- NAVIGATION -->
+      <!-- NAVIGATION -->
 
-        <nav class="nav-menu" id="navMenu">
-          <!-- TENTANG FIKES -->
+      <nav class="nav-menu" id="navMenu">
+        <!-- TENTANG FIKES -->
 
-          <div class="nav-item has-dropdown">
-            <a href="#" class="nav-link">
-              Tentang FIKES
-              <span class="arrow">▾</span>
-            </a>
+        <div class="nav-item has-dropdown">
+          <a href="#" class="nav-link">
+            Tentang FIKES
+            <span class="arrow">▾</span>
+          </a>
 
-            <div class="dropdown">
-              <div class="dropdown-item">
-                <a href="page/tentang-fikes/visi-misi.php" class="dropdown-link"> Visi Misi </a>
-              </div>
+          <div class="dropdown">
+            <div class="dropdown-item">
+              <a href="page/tentang-fikes/visi-misi.php" class="dropdown-link"> Visi Misi </a>
+            </div>
 
-              <div class="dropdown-item">
-                <a href="page/tentang-fikes/struktur-organisasi.php" class="dropdown-link">
-                  Struktur Organisasi
-                </a>
-              </div>
+            <div class="dropdown-item">
+              <a href="page/tentang-fikes/struktur-organisasi.php" class="dropdown-link">
+                Struktur Organisasi
+              </a>
+            </div>
 
-              <div class="dropdown-item">
-                <a href="page/tentang-fikes/sertifikat-akreditasi.php" class="dropdown-link">
-                  Sertifikat Akreditasi
-                </a>
-              </div>
+            <div class="dropdown-item">
+              <a href="page/tentang-fikes/sertifikat-akreditasi.php" class="dropdown-link">
+                Sertifikat Akreditasi
+              </a>
+            </div>
 
-              <div class="dropdown-item">
-                <a href="page/tentang-fikes/unduh-logo.php" class="dropdown-link"> Unduh Logo </a>
-              </div>
+            <div class="dropdown-item">
+              <a href="page/tentang-fikes/unduh-logo.php" class="dropdown-link"> Unduh Logo </a>
+            </div>
 
-              <!-- DAFTAR DOSEN -->
-
-              <div class="dropdown-item has-dropdown">
+            <!-- DAFTAR DOSEN -->
+            <div class="dropdown-item">
+              <a href="page/dosen/dosen.php" class="dropdown-link"> Daftar Dosen </a>
+            </div>
+            <!-- <div class="dropdown-item has-dropdown">
                 <a href="#" class="dropdown-link">
                   Daftar Dosen
                   <span>›</span>
@@ -1140,93 +1205,93 @@ $berita = $stmt->fetchAll();
                     <a href="#" class="dropdown-link"> K3 </a>
                   </div>
                 </div>
-              </div>
+              </div> -->
+          </div>
+        </div>
+
+
+
+        <div class="nav-item has-dropdown">
+          <a href="#" class="nav-link">
+            Kemahasiswaan
+            <span class="arrow">▾</span>
+          </a>
+
+          <div class="dropdown">
+            <div class="dropdown-item">
+              <a href="himpunan-mahasiswa.html" class="dropdown-link">
+                Himpunan Mahasiswa
+              </a>
+            </div>
+
+            <div class="dropdown-item">
+              <a href="unit-kegiatan-mahasiswa.html" class="dropdown-link">
+                Unit Kegiatan Mahasiswa
+              </a>
             </div>
           </div>
+        </div>
 
-          <!-- KEMAHASISWAAN -->
-
-          <div class="nav-item has-dropdown">
-            <a href="#" class="nav-link">
-              Kemahasiswaan
-              <span class="arrow">▾</span>
-            </a>
-
-            <div class="dropdown">
-              <div class="dropdown-item">
-                <a href="himpunan-mahasiswa.html" class="dropdown-link">
-                  Himpunan Mahasiswa
-                </a>
-              </div>
-
-              <div class="dropdown-item">
-                <a href="unit-kegiatan-mahasiswa.html" class="dropdown-link">
-                  Unit Kegiatan Mahasiswa
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- PROGRAM VOKASI -->
+        <!-- PROGRAM VOKASI -->
 
 
 
-          <div class="nav-item">
-            <a href="page/program-studi/program-studi.php" class="nav-link"> Program </a>
-          </div>
-          <!-- AKADEMIK -->
+        <div class="nav-item">
+          <a href="page/program-studi/program-studi.php" class="nav-link"> Program </a>
+        </div>
+        <!-- AKADEMIK -->
 
-          <div class="nav-item">
-            <a href="#akademik" class="nav-link"> Akademik </a>
-          </div>
+        <div class="nav-item">
+          <a href="#akademik" class="nav-link"> Akademik </a>
+        </div>
 
-          <!-- PELAYANAN -->
+        <!-- PELAYANAN -->
 
-          <div class="nav-item">
-            <a href="#pelayanan" class="nav-link"> Pelayanan FIKES </a>
-          </div>
+        <div class="nav-item">
+          <a href="#pelayanan" class="nav-link"> Pelayanan FIKES </a>
+        </div>
 
-          <!-- SURVEY -->
+        <!-- SURVEY -->
 
-          <div class="nav-item">
-            <a href="#survey" class="nav-link"> Survey </a>
-          </div>
-        </nav>
+        <div class="nav-item">
+          <a href="#survey" class="nav-link"> Survey </a>
+        </div>
+      </nav>
 
-        <a href="#program" class="nav-cta"> Jelajahi Program </a>
-      </div>
-    </header>
+      <a href="#program" class="nav-cta"> Jelajahi Program </a>
+    </div>
+  </header>
 
-    <!-- =========================================================
+  <!-- =========================================================
      HERO
 ========================================================= -->
 
-    <main>
-      <!-- ==========================================
+  <main>
+    <!-- ==========================================
      PREMIUM HERO SLIDER
 ========================================== -->
 
-      <section class="hero-slider">
-        <div class="slider-container">
-          <?php if ($sliders): foreach ($sliders as $i => $slide): ?>
-          <div class="slide <?= $i === 0 ? 'active' : '' ?>">
-            <img src="<?= e($slide['gambar']) ?>" alt="<?= e($slide['judul']) ?>" />
-            <div class="slide-overlay"></div>
-            <div class="slide-content">
-              <?php if (!empty($slide['label'])): ?><span
-                class="slide-label"><?= e($slide['label']) ?></span><?php endif; ?>
-              <h1>
-                <?= nl2br(e($slide['judul'])) ?><?php if (!empty($slide['highlight'])): ?><span><?= e($slide['highlight']) ?></span><?php endif; ?>
-              </h1>
-              <?php if (!empty($slide['deskripsi'])): ?><p><?= e($slide['deskripsi']) ?></p><?php endif; ?>
-              <div class="slide-actions">
-                <?php if (!empty($slide['link_utama'])): ?><a href="<?= e($slide['link_utama']) ?>"
-                  class="slide-btn slide-btn-primary"><span><?= e($slide['teks_tombol_utama'] ?: 'Lihat Selengkapnya') ?></span><i>→</i></a><?php endif; ?>
-                <?php if (!empty($slide['link_kedua'])): ?><a href="<?= e($slide['link_kedua']) ?>"
-                  class="slide-btn slide-btn-outline"><span><?= e($slide['teks_tombol_kedua'] ?: 'Selengkapnya') ?></span><i>↗</i></a><?php endif; ?>
+    <section class="hero-slider">
+      <div class="slider-container">
+        <?php if ($sliders): foreach ($sliders as $i => $slide): ?>
+            <div class="slide <?= $i === 0 ? 'active' : '' ?>">
+              <img src="<?= e(sliderImageUrl($slide['gambar'])) ?>" alt="<?= e($slide['judul']) ?>" />
+              <div class="slide-overlay"></div>
+              <div class="slide-content">
+                <?php if (!empty($slide['label'])): ?><span
+                    class="slide-label"><?= e($slide['label']) ?></span><?php endif; ?>
+                <h1>
+                  <?= nl2br(e($slide['judul'])) ?><?php if (!empty($slide['highlight'])): ?><span><?= e($slide['highlight']) ?></span><?php endif; ?>
+                </h1>
+                <?php if (!empty($slide['deskripsi'])): ?><p><?= e($slide['deskripsi']) ?></p><?php endif; ?>
+                <div class="slide-actions">
+                  <?php if (!empty($slide['link_utama'])): ?><a href="<?= e($slide['link_utama']) ?>"
+                      class="slide-btn slide-btn-primary"><span><?= e($slide['teks_tombol_utama'] ?: 'Lihat Selengkapnya') ?></span><i>→</i></a><?php endif; ?>
+                  <?php if (!empty($slide['link_kedua'])): ?><a href="<?= e($slide['link_kedua']) ?>"
+                      class="slide-btn slide-btn-outline"><span><?= e($slide['teks_tombol_kedua'] ?: 'Selengkapnya') ?></span><i>↗</i></a><?php endif; ?>
+                </div>
               </div>
             </div>
-          </div>
           <?php endforeach;
         else: ?>
           <div class="slide active">
@@ -1236,40 +1301,40 @@ $berita = $stmt->fetchAll();
               <p>Wujudkan pendidikan kesehatan yang unggul, profesional, inovatif, dan berintegritas.</p>
             </div>
           </div>
-          <?php endif; ?>
+        <?php endif; ?>
 
-          <button class="slider-btn slider-prev" onclick="changeSlide(-1)"
-            aria-label="Slide sebelumnya"><span>←</span></button>
-          <button class="slider-btn slider-next" onclick="changeSlide(1)"
-            aria-label="Slide berikutnya"><span>→</span></button>
+        <button class="slider-btn slider-prev" onclick="changeSlide(-1)"
+          aria-label="Slide sebelumnya"><span>←</span></button>
+        <button class="slider-btn slider-next" onclick="changeSlide(1)"
+          aria-label="Slide berikutnya"><span>→</span></button>
 
-          <div class="slider-bottom">
-            <div class="slider-dots">
-              <?php foreach ($sliders as $i => $slide): ?><button class="slider-dot <?= $i === 0 ? 'active' : '' ?>"
+        <div class="slider-bottom">
+          <div class="slider-dots">
+            <?php foreach ($sliders as $i => $slide): ?><button class="slider-dot <?= $i === 0 ? 'active' : '' ?>"
                 onclick="currentSlide(<?= $i + 1 ?>)" aria-label="Slide <?= $i + 1 ?>"></button><?php endforeach; ?>
-            </div>
-            <div class="scroll-indicator"><span>SCROLL UNTUK MENJELAJAHI</span>
-              <div class="scroll-line"></div>
-            </div>
+          </div>
+          <div class="scroll-indicator"><span>SCROLL UNTUK MENJELAJAHI</span>
+            <div class="scroll-line"></div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- BERITA TERBARU -->
-      <section class="section news-section" id="berita">
-        <div class="container">
-          <div class="section-header">
-            <span class="section-label">Informasi Terkini</span>
-            <h2 class="section-title">Berita & Kegiatan FIKES</h2>
-            <p class="section-description">Informasi terbaru, kegiatan, pengumuman, dan kabar seputar Fakultas Ilmu
-              Kesehatan.</p>
-          </div>
-          <div class="news-grid">
-            <?php foreach ($berita as $b): ?>
+    <!-- BERITA TERBARU -->
+    <section class="section news-section" id="berita">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Informasi Terkini</span>
+          <h2 class="section-title">Berita & Kegiatan FIKES</h2>
+          <p class="section-description">Informasi terbaru, kegiatan, pengumuman, dan kabar seputar Fakultas Ilmu
+            Kesehatan.</p>
+        </div>
+        <div class="news-grid">
+          <?php foreach ($berita as $b): ?>
             <article class="news-card">
               <a href="detail-berita.php?slug=<?= urlencode($b['slug']) ?>" class="news-image">
-                <?php if (!empty($b['gambar'])): ?><img src="<?= e($b['gambar']) ?>"
-                  alt="<?= e($b['judul']) ?>"><?php else: ?><div class="news-placeholder">FIKES</div><?php endif; ?>
+                <?php if (!empty($b['gambar'])): ?><img src="<?= e(newsImageUrl($b['gambar'])) ?>"
+                    alt="<?= e($b['judul']) ?>"><?php else: ?><div class="news-placeholder">FIKES</div><?php endif; ?>
                 <span class="news-category"><?= e($b['kategori']) ?></span>
               </a>
               <div class="news-body">
@@ -1279,500 +1344,456 @@ $berita = $stmt->fetchAll();
                 <a href="detail-berita.php?slug=<?= urlencode($b['slug']) ?>" class="news-link">Baca Selengkapnya →</a>
               </div>
             </article>
-            <?php endforeach; ?>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat">
+            <div class="stat-number"><?= $jumlahProdi ?></div>
+            <div class="stat-label">Program Studi</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-number"><?= $jumlahDosen ?></div>
+            <div class="stat-label">Dosen</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-number"><?= $jumlahMahasiswa ?></div>
+            <div class="stat-label">Mahasiswa</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-number" data-target="20">0</div>
+            <div class="stat-label">Tahun Pengalaman</div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="hero" id="home">
-        <div class="container hero-grid">
-          <div class="hero-content">
-            <div class="hero-badge">
-              <span></span>
-              Fakultas Ilmu Kesehatan
-            </div>
-
-            <h1>
-              Membangun Generasi
-              <span>Sehat & Unggul.</span>
-            </h1>
-
-            <p class="hero-description">
-              Selamat datang di Fakultas Ilmu Kesehatan. Tempat tumbuhnya insan
-              profesional di bidang kesehatan yang kompeten, berintegritas, dan
-              berdaya saing.
-            </p>
-
-            <div class="hero-buttons">
-              <a href="#program" class="btn btn-primary">
-                Lihat Program Studi →
-              </a>
-
-              <a href="#tentang" class="btn btn-outline"> Tentang FIKES </a>
-            </div>
-          </div>
-
-          <div class="hero-visual">
-            <div class="hero-card-main">
-              <div class="hero-card-icon">✚</div>
-
-              <div class="hero-card-content">
-                <h3>Pendidikan Kesehatan</h3>
-
-                <p>
-                  Profesional, inovatif, dan berorientasi pada pelayanan
-                  masyarakat.
-                </p>
-              </div>
-            </div>
-
-            <div class="floating-card one">
-              <div class="floating-icon">🎓</div>
-
-              <div>
-                <strong>Program Studi</strong>
-                <span>Pilihan pendidikan kesehatan</span>
-              </div>
-            </div>
-
-            <div class="floating-card two">
-              <div class="floating-icon">👩‍⚕️</div>
-
-              <div>
-                <strong>Tenaga Profesional</strong>
-                <span>Kompeten & berintegritas</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================================================
-     STATS
-========================================================= -->
-
-      <section class="stats">
-        <div class="container">
-          <div class="stats-grid">
-            <div class="stat">
-              <div class="stat-number" data-target="8">0</div>
-              <div class="stat-label">Program Studi</div>
-            </div>
-
-            <div class="stat">
-              <div class="stat-number" data-target="50">0</div>
-              <div class="stat-label">Dosen</div>
-            </div>
-
-            <div class="stat">
-              <div class="stat-number" data-target="1000">0</div>
-              <div class="stat-label">Mahasiswa</div>
-            </div>
-
-            <div class="stat">
-              <div class="stat-number" data-target="20">0</div>
-              <div class="stat-label">Tahun Pengalaman</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================================================
+    <!-- =========================================================
      ABOUT
 ========================================================= -->
 
-      <section class="section about" id="tentang">
-        <div class="container about-grid">
-          <div class="about-image">
-            <div class="about-image-content">
-              <div class="about-logo">FIKES</div>
+    <section class="section about" id="tentang">
+      <div class="container about-grid">
+        <div class="about-image">
+          <div class="about-image-content">
+            <div class="about-logo">FIKES</div>
 
-              <h3>Fakultas Ilmu Kesehatan</h3>
+            <h3>Fakultas Ilmu Kesehatan</h3>
 
-              <p>Pendidikan kesehatan untuk masa depan yang lebih baik.</p>
-            </div>
+            <p>Pendidikan kesehatan untuk masa depan yang lebih baik.</p>
           </div>
+        </div>
 
-          <div class="about-content">
-            <span class="section-label"> Tentang FIKES </span>
+        <div class="about-content">
+          <span class="section-label"> Tentang FIKES </span>
 
-            <h2>Menjadi bagian dari perjalanan masa depan kesehatan.</h2>
+          <h2>Menjadi bagian dari perjalanan masa depan kesehatan.</h2>
 
-            <p>
-              Fakultas Ilmu Kesehatan merupakan lingkungan pendidikan yang
-              berkomitmen menghasilkan lulusan profesional, kompeten,
-              berkarakter, dan mampu memberikan kontribusi nyata bagi
-              masyarakat.
-            </p>
+          <p>
+            Fakultas Ilmu Kesehatan merupakan lingkungan pendidikan yang
+            berkomitmen menghasilkan lulusan profesional, kompeten,
+            berkarakter, dan mampu memberikan kontribusi nyata bagi
+            masyarakat.
+          </p>
 
-            <div class="feature-list">
-              <div class="feature">
-                <div class="feature-check">✓</div>
+          <div class="feature-list">
+            <div class="feature">
+              <div class="feature-check">✓</div>
 
-                <div>
-                  <strong> Pendidikan Berkualitas </strong>
+              <div>
+                <strong> Pendidikan Berkualitas </strong>
 
-                  <span>
-                    Proses pembelajaran yang relevan dengan kebutuhan dunia
-                    kesehatan.
-                  </span>
-                </div>
+                <span>
+                  Proses pembelajaran yang relevan dengan kebutuhan dunia
+                  kesehatan.
+                </span>
               </div>
+            </div>
 
-              <div class="feature">
-                <div class="feature-check">✓</div>
+            <div class="feature">
+              <div class="feature-check">✓</div>
 
-                <div>
-                  <strong> Tenaga Pengajar Profesional </strong>
+              <div>
+                <strong> Tenaga Pengajar Profesional </strong>
 
-                  <span>
-                    Didukung dosen dan tenaga akademik yang kompeten.
-                  </span>
-                </div>
+                <span>
+                  Didukung dosen dan tenaga akademik yang kompeten.
+                </span>
               </div>
+            </div>
 
-              <div class="feature">
-                <div class="feature-check">✓</div>
+            <div class="feature">
+              <div class="feature-check">✓</div>
 
-                <div>
-                  <strong> Berorientasi Masyarakat </strong>
+              <div>
+                <strong> Berorientasi Masyarakat </strong>
 
-                  <span>
-                    Mengembangkan pendidikan yang memberikan dampak bagi
-                    masyarakat.
-                  </span>
-                </div>
+                <span>
+                  Mengembangkan pendidikan yang memberikan dampak bagi
+                  masyarakat.
+                </span>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- =========================================================
+    <!-- =========================================================
      PROGRAM STUDI
 ========================================================= -->
 
-      <section class="section" id="program">
-        <div class="container">
-          <div class="section-header">
-            <span class="section-label"> Program Pendidikan </span>
+    <section class="section" id="program">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label"> Program Pendidikan </span>
 
-            <h2 class="section-title">Program Studi FIKES</h2>
+          <h2 class="section-title">Program Studi FIKES</h2>
 
-            <p class="section-description">
-              Pilih program pendidikan yang sesuai dengan minat dan tujuan
-              karier Anda.
-            </p>
-          </div>
-
-          <div class="program-grid">
-            <?php foreach ($prodiList as $p):
-            $namaProdi = strtolower($p['nama'] ?? '');
-            $icon = '🎓';
-            if (strpos($namaProdi, 'farmasi') !== false) $icon = '💊';
-            elseif (strpos($namaProdi, 'kebidanan') !== false) $icon = '👩‍🍼';
-            elseif (strpos($namaProdi, 'keperawatan') !== false) $icon = '🩺';
-            elseif (strpos($namaProdi, 'k3') !== false || strpos($namaProdi, 'keselamatan') !== false) $icon = '🦺';
-            elseif (strpos($namaProdi, 'ners') !== false) $icon = '👨‍⚕️';
-          ?>
-            <article class="program-card">
-              <div class="program-icon" aria-hidden="true"><?= $icon ?></div>
-              <div class="program-card-content">
-                <div class="program-meta">
-                  <?= e($p['jenjang'] ?? '') ?><?= !empty($p['gelar']) ? ' · ' . e($p['gelar']) : '' ?></div>
-                <h3><?= e($p['nama']) ?></h3>
-                <p>
-                  <?= e($p['deskripsi'] ?: 'Program pendidikan kesehatan profesional dengan pembelajaran yang relevan dan berorientasi pada kompetensi.') ?>
-                </p>
-                <a href="page/program-studi/detail-prodi.php?kode=<?= urlencode($p['kode_prodi']) ?>"
-                  class="program-link">Selengkapnya <span>→</span></a>
-              </div>
-            </article>
-            <?php endforeach; ?>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================================================
-     PELAYANAN
-========================================================= -->
-
-      <section class="section services" id="pelayanan">
-        <div class="container">
-          <div class="section-header">
-            <span class="section-label"> Pelayanan FIKES </span>
-
-            <h2 class="section-title">Layanan Untuk Sivitas Akademika</h2>
-
-            <p class="section-description">
-              Akses berbagai layanan akademik dan informasi yang tersedia di
-              FIKES.
-            </p>
-          </div>
-
-          <div class="service-grid">
-            <div class="service-card">
-              <div class="service-card-icon">📚</div>
-
-              <h3>Layanan Akademik</h3>
-
-              <p>Informasi administrasi dan kebutuhan akademik mahasiswa.</p>
-            </div>
-
-            <div class="service-card">
-              <div class="service-card-icon">📝</div>
-
-              <h3>Informasi Pendaftaran</h3>
-
-              <p>Informasi penerimaan mahasiswa baru dan proses pendaftaran.</p>
-            </div>
-
-            <div class="service-card">
-              <div class="service-card-icon">👨‍🎓</div>
-
-              <h3>Kemahasiswaan</h3>
-
-              <p>Informasi organisasi dan kegiatan mahasiswa FIKES.</p>
-            </div>
-
-            <div class="service-card">
-              <div class="service-card-icon">🔎</div>
-
-              <h3>Survey</h3>
-
-              <p>
-                Berikan masukan untuk meningkatkan kualitas pelayanan FIKES.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================================================
-     KEMAHASISWAAN
-========================================================= -->
-
-      <section class="section" id="akademik">
-        <div class="container">
-          <div class="student-grid">
-            <div class="student-card">
-              <h3>Kehidupan Kemahasiswaan</h3>
-
-              <p>
-                Kembangkan potensi, kreativitas, kepemimpinan, dan pengalaman
-                organisasi selama menjadi mahasiswa FIKES.
-              </p>
-
-              <div class="student-links">
-                <a href="#"> Himpunan Mahasiswa </a>
-
-                <a href="#"> UKM </a>
-
-                <a href="#"> BEM </a>
-
-                <a href="#"> DPM </a>
-              </div>
-            </div>
-
-            <div class="student-card secondary">
-              <h3>Akademik</h3>
-
-              <p>
-                Temukan informasi akademik, kalender akademik, jadwal,
-                pengumuman, dan berbagai informasi pembelajaran.
-              </p>
-
-              <div class="student-links">
-                <a href="#"> Kalender Akademik </a>
-
-                <a href="#"> Jadwal </a>
-
-                <a href="#"> Pengumuman </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- =========================================================
-     SURVEY / CTA
-========================================================= -->
-
-      <section class="cta" id="survey">
-        <div class="container">
-          <div class="cta-box">
-            <h2>Suara Anda Penting Bagi Kami</h2>
-
-            <p>
-              Bantu FIKES meningkatkan kualitas pelayanan dengan memberikan
-              penilaian dan masukan melalui survey kepuasan.
-            </p>
-
-            <a href="#" class="btn btn-primary" style="background: #f4b942; color: #12372a">
-              Isi Survey Sekarang →
-            </a>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- =========================================================
-     FOOTER
-========================================================= -->
-
-    <footer>
-      <div class="container footer-main">
-        <div class="footer-brand">
-          <div class="logo footer-logo">
-            <div class="logo-icon">F</div>
-
-            <div class="logo-text">
-              <strong style="color: white"> FIKES </strong>
-
-              <small> FAKULTAS ILMU KESEHATAN </small>
-            </div>
-          </div>
-
-          <p>
-            Membangun generasi kesehatan yang profesional, berintegritas,
-            inovatif, dan berorientasi kepada masyarakat.
+          <p class="section-description">
+            Pilih program pendidikan yang sesuai dengan minat dan tujuan
+            karier Anda.
           </p>
         </div>
 
-        <div>
-          <h4 class="footer-title">Tentang FIKES</h4>
+        <div class="program-grid">
+          <?php if ($prodiList): ?>
+            <?php foreach ($prodiList as $p): ?>
+              <?php
+              $namaProdi = trim((string)($p['nama'] ?? ''));
+              $namaLower = strtolower($namaProdi);
+              $icon = '🎓';
 
-          <div class="footer-links">
-            <a href="#"> Visi Misi </a>
+              if (str_contains($namaLower, 'farmasi')) {
+                $icon = '💊';
+              } elseif (str_contains($namaLower, 'bidan') || str_contains($namaLower, 'kebidanan')) {
+                $icon = '👩‍🍼';
+              } elseif (str_contains($namaLower, 'k3') || str_contains($namaLower, 'keselamatan')) {
+                $icon = '🦺';
+              } elseif (str_contains($namaLower, 'keperawatan') || str_contains($namaLower, 'ners')) {
+                $icon = '🩺';
+              }
+              ?>
+              <article class="program-card">
+                <div class="program-icon" aria-hidden="true"><?= $icon ?></div>
 
-            <a href="#"> Struktur Organisasi </a>
+                <h3><?= e($namaProdi) ?></h3>
 
-            <a href="#"> Akreditasi </a>
+                <div class="program-meta">
+                  <?php if (!empty($p['jenjang'])): ?>
+                    <span><?= e($p['jenjang']) ?></span>
+                  <?php endif; ?>
 
-            <a href="#"> Daftar Dosen </a>
+                  <?php if (!empty($p['gelar'])): ?>
+                    <span><?= e($p['gelar']) ?></span>
+                  <?php endif; ?>
+                </div>
+
+                <p>
+                  <?= e($p['deskripsi'] ?: 'Informasi program studi Fakultas Ilmu Kesehatan.') ?>
+                </p>
+
+                <a href="page/program-studi/detail-prodi.php?kode=<?= urlencode($p['kode_prodi']) ?>"
+                  class="program-link">
+                  Selengkapnya <span>→</span>
+                </a>
+              </article>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <div class="program-empty">
+              Belum ada program studi aktif yang tersedia.
+            </div>
+          <?php endif; ?>
+        </div>
+    </section>
+
+    <!-- =========================================================
+     PELAYANAN
+========================================================= -->
+
+    <section class="section services" id="pelayanan">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label"> Pelayanan FIKES </span>
+
+          <h2 class="section-title">Layanan Untuk Sivitas Akademika</h2>
+
+          <p class="section-description">
+            Akses berbagai layanan akademik dan informasi yang tersedia di
+            FIKES.
+          </p>
+        </div>
+
+        <div class="service-grid">
+          <div class="service-card">
+            <div class="service-card-icon">📚</div>
+
+            <h3>Layanan Akademik</h3>
+
+            <p>Informasi administrasi dan kebutuhan akademik mahasiswa.</p>
+          </div>
+
+          <div class="service-card">
+            <div class="service-card-icon">📝</div>
+
+            <h3>Informasi Pendaftaran</h3>
+
+            <p>Informasi penerimaan mahasiswa baru dan proses pendaftaran.</p>
+          </div>
+
+          <div class="service-card">
+            <div class="service-card-icon">👨‍🎓</div>
+
+            <h3>Kemahasiswaan</h3>
+
+            <p>Informasi organisasi dan kegiatan mahasiswa FIKES.</p>
+          </div>
+
+          <div class="service-card">
+            <div class="service-card-icon">🔎</div>
+
+            <h3>Survey</h3>
+
+            <p>
+              Berikan masukan untuk meningkatkan kualitas pelayanan FIKES.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+     KEMAHASISWAAN
+========================================================= -->
+
+    <section class="section" id="akademik">
+      <div class="container">
+        <div class="student-grid">
+          <div class="student-card">
+            <h3>Kehidupan Kemahasiswaan</h3>
+
+            <p>
+              Kembangkan potensi, kreativitas, kepemimpinan, dan pengalaman
+              organisasi selama menjadi mahasiswa FIKES.
+            </p>
+
+            <div class="student-links">
+              <a href="#"> Himpunan Mahasiswa </a>
+
+              <a href="#"> UKM </a>
+
+              <a href="#"> BEM </a>
+
+              <a href="#"> DPM </a>
+            </div>
+          </div>
+
+          <div class="student-card secondary">
+            <h3>Akademik</h3>
+
+            <p>
+              Temukan informasi akademik, kalender akademik, jadwal,
+              pengumuman, dan berbagai informasi pembelajaran.
+            </p>
+
+            <div class="student-links">
+              <a href="#"> Kalender Akademik </a>
+
+              <a href="#"> Jadwal </a>
+
+              <a href="#"> Pengumuman </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+     SURVEY / CTA
+========================================================= -->
+
+    <section class="cta" id="survey">
+      <div class="container">
+        <div class="cta-box">
+          <h2>Suara Anda Penting Bagi Kami</h2>
+
+          <p>
+            Bantu FIKES meningkatkan kualitas pelayanan dengan memberikan
+            penilaian dan masukan melalui survey kepuasan.
+          </p>
+
+          <a href="#" class="btn btn-primary" style="background: #f4b942; color: #12372a">
+            Isi Survey Sekarang →
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- =========================================================
+     FOOTER
+========================================================= -->
+
+  <footer>
+    <div class="container footer-main">
+      <div class="footer-brand">
+        <div class="logo footer-logo">
+          <div class="logo-icon">F</div>
+
+          <div class="logo-text">
+            <strong style="color: white"> FIKES </strong>
+
+            <small> FAKULTAS ILMU KESEHATAN </small>
           </div>
         </div>
 
-        <div>
-          <h4 class="footer-title">Program Studi</h4>
+        <p>
+          Membangun generasi kesehatan yang profesional, berintegritas,
+          inovatif, dan berorientasi kepada masyarakat.
+        </p>
+      </div>
 
-          <div class="footer-links">
-            <a href="#"> Profesi Ners </a>
+      <div>
+        <h4 class="footer-title">Tentang FIKES</h4>
 
-            <a href="#"> Ilmu Keperawatan </a>
+        <div class="footer-links">
+          <a href="#"> Visi Misi </a>
 
-            <a href="#"> Farmasi </a>
+          <a href="#"> Struktur Organisasi </a>
 
-            <a href="#"> Kebidanan </a>
+          <a href="#"> Akreditasi </a>
 
-            <a href="#"> K3 </a>
-          </div>
+          <a href="#"> Daftar Dosen </a>
         </div>
+      </div>
 
-        <div>
-          <h4 class="footer-title">Informasi</h4>
+      <div>
+        <h4 class="footer-title">Program Studi</h4>
 
-          <div class="footer-links">
-            <a href="#"> Akademik </a>
+        <div class="footer-links">
+          <a href="#"> Profesi Ners </a>
 
-            <a href="#"> Kemahasiswaan </a>
+          <a href="#"> Ilmu Keperawatan </a>
 
-            <a href="#"> Pelayanan FIKES </a>
+          <a href="#"> Farmasi </a>
 
-            <a href="#"> Survey </a>
-          </div>
+          <a href="#"> Kebidanan </a>
+
+          <a href="#"> K3 </a>
         </div>
+      </div>
 
-        <!--MAP PETA-->
-        <!-- =========================================================
+      <div>
+        <h4 class="footer-title">Informasi</h4>
+
+        <div class="footer-links">
+          <a href="#"> Akademik </a>
+
+          <a href="#"> Kemahasiswaan </a>
+
+          <a href="#"> Pelayanan FIKES </a>
+
+          <a href="#"> Survey </a>
+        </div>
+      </div>
+
+      <!--MAP PETA-->
+      <!-- =========================================================
      LOKASI & PETA
 ========================================================== -->
 
-        <div class="footer-location">
-          <div class="location-header">
-            <div class="location-icon">
-              <i class="fa-solid fa-location-dot"></i>
-            </div>
-
-            <div>
-              <h3>Lokasi Kampus</h3>
-
-              <p>Fakultas Ilmu Kesehatan</p>
-            </div>
-          </div>
-
-          <!-- PETA -->
-
-          <div class="map-card">
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.1515727139526!2d109.11806027499709!3d-6.991421893009626!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6fbef42471658d%3A0x883656d1325ef066!2sUniversitas%20Bhamada%20Slawi!5e0!3m2!1sid!2sid!4v1787544396003!5m2!1sid!2sid"
-              width="600" height="450" style="border: 0" allowfullscreen="" loading="lazy"
-              referrerpolicy="strict-origin-when-cross-origin" title="Lokasi Fakultas Ilmu Kesehatan" loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade" allowfullscreen>
-            </iframe>
-
-            <div class="map-overlay">
-              <div class="map-info">
-                <div class="map-info-icon">
-                  <i class="fa-solid fa-location-dot"></i>
-                </div>
-
-                <div>
-                  <strong> Fakultas Ilmu Kesehatan </strong>
-
-                  <span> Lihat lokasi kampus </span>
-                </div>
-              </div>
-
-              <a href="#" target="_blank" class="map-direction">
-                <i class="fa-solid fa-diamond-turn-right"></i>
-
-                Petunjuk Arah
-              </a>
-            </div>
-          </div>
-
-          <!-- ALAMAT -->
-
-          <div class="footer-contact location-contact">
+      <div class="footer-location">
+        <div class="location-header">
+          <div class="location-icon">
             <i class="fa-solid fa-location-dot"></i>
-
-            <span>
-              Alamat Fakultas Ilmu Kesehatan, silakan sesuaikan dengan alamat
-              kampus.
-            </span>
           </div>
 
-          <div class="footer-contact">
-            <i class="fa-solid fa-phone"></i>
+          <div>
+            <h3>Lokasi Kampus</h3>
 
-            <span> Nomor Telepon FIKES </span>
-          </div>
-
-          <div class="footer-contact">
-            <i class="fa-solid fa-envelope"></i>
-
-            <span> email@fikes.ac.id </span>
+            <p>Fakultas Ilmu Kesehatan</p>
           </div>
         </div>
-        <!--MAP PETA-->
+
+        <!-- PETA -->
+
+        <div class="map-card">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.1515727139526!2d109.11806027499709!3d-6.991421893009626!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6fbef42471658d%3A0x883656d1325ef066!2sUniversitas%20Bhamada%20Slawi!5e0!3m2!1sid!2sid!4v1787544396003!5m2!1sid!2sid"
+            width="600" height="450" style="border: 0" allowfullscreen="" loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin" title="Lokasi Fakultas Ilmu Kesehatan" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade" allowfullscreen>
+          </iframe>
+
+          <div class="map-overlay">
+            <div class="map-info">
+              <div class="map-info-icon">
+                <i class="fa-solid fa-location-dot"></i>
+              </div>
+
+              <div>
+                <strong> Fakultas Ilmu Kesehatan </strong>
+
+                <span> Lihat lokasi kampus </span>
+              </div>
+            </div>
+
+            <a href="#" target="_blank" class="map-direction">
+              <i class="fa-solid fa-diamond-turn-right"></i>
+
+              Petunjuk Arah
+            </a>
+          </div>
+        </div>
+
+        <!-- ALAMAT -->
+
+        <div class="footer-contact location-contact">
+          <i class="fa-solid fa-location-dot"></i>
+
+          <span>
+            Alamat Fakultas Ilmu Kesehatan, silakan sesuaikan dengan alamat
+            kampus.
+          </span>
+        </div>
+
+        <div class="footer-contact">
+          <i class="fa-solid fa-phone"></i>
+
+          <span> Nomor Telepon FIKES </span>
+        </div>
+
+        <div class="footer-contact">
+          <i class="fa-solid fa-envelope"></i>
+
+          <span> email@fikes.ac.id </span>
+        </div>
       </div>
+      <!--MAP PETA-->
+    </div>
 
-      <div class="container footer-bottom">
-        <span>
-          © <span id="year"></span> Fakultas Ilmu Kesehatan. All Rights
-          Reserved.
-        </span>
+    <div class="container footer-bottom">
+      <span>
+        © <span id="year"></span> Fakultas Ilmu Kesehatan. All Rights
+        Reserved.
+      </span>
 
-        <span> Website FIKES </span>
-      </div>
-    </footer>
+      <span> Website FIKES </span>
+    </div>
+  </footer>
 
-    <!-- BACK TO TOP -->
+  <!-- BACK TO TOP -->
 
-    <button class="back-top" id="backTop">↑</button>
-    <!-- <script src="assets/js/main.js"></script> -->
-    <script>
+  <button class="back-top" id="backTop">↑</button>
+  <!-- <script src="assets/js/main.js"></script> -->
+  <script>
     let current = 0;
     let slides = [];
     let dots = [];
@@ -1811,7 +1832,7 @@ $berita = $stmt->fetchAll();
         behavior: "smooth"
       });
     });
-    </script>
-  </body>
+  </script>
+</body>
 
 </html>

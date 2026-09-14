@@ -1,18 +1,14 @@
 <?php
-ob_start();
 require_once __DIR__ . '/../../config/auth.php';
 wajib_login();
 require_once __DIR__ . '/../../config/database.php';
-ob_clean();
 header('Content-Type: application/json; charset=utf-8');
-header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 
 $uploadDir = __DIR__ . '/../../uploads/slider/';
 $uploadWeb = '../../uploads/slider/';
 if (!is_dir($uploadDir)) @mkdir($uploadDir, 0777, true);
 function out($success, $message = '', $data = [])
 {
-  if (ob_get_length()) ob_clean();
   echo json_encode(['success' => $success, 'message' => $message, 'data' => $data], JSON_UNESCAPED_UNICODE);
   exit;
 }
@@ -107,16 +103,12 @@ try {
   }
   if ($action === 'delete') {
     $id = (int)($_POST['id'] ?? 0);
-    if ($id <= 0) out(false, 'ID slider tidak valid.');
     $q = $pdo->prepare('SELECT gambar FROM slider_beranda WHERE id=?');
     $q->execute([$id]);
-    $row = $q->fetch(PDO::FETCH_ASSOC);
-    if (!$row) out(false, 'Slider tidak ditemukan.');
-    $old = $row['gambar'] ?? '';
-    $del = $pdo->prepare('DELETE FROM slider_beranda WHERE id=?');
-    $del->execute([$id]);
-    if ($del->rowCount() !== 1) out(false, 'Slider gagal dihapus.');
-    if ($old && is_file($uploadDir . basename($old))) @unlink($uploadDir . basename($old));
+    $old = $q->fetchColumn();
+    if (!$old) out(false, 'Slider tidak ditemukan.');
+    $pdo->prepare('DELETE FROM slider_beranda WHERE id=?')->execute([$id]);
+    if (is_file($uploadDir . basename($old))) @unlink($uploadDir . basename($old));
     out(true, 'Slider berhasil dihapus.');
   }
   out(false, 'Aksi tidak dikenal.');
