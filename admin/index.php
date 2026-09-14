@@ -53,9 +53,9 @@ require __DIR__ . '/includes/header.php';
     <div class="quick-grid">
       <a href="modules/dosen/index.php"><span>♙</span><strong>Daftar Dosen</strong><small>Tambah & edit
           dosen</small></a>
-      <a href="modules/program/index.php"><span>▤</span><strong>Program Studi</strong><small>Kelola program
+      <a href="modules/program-studi/index.php"><span>▤</span><strong>Program Studi</strong><small>Kelola program
           akademik</small></a>
-      <a href="modules/informasi/berita.php"><span>◫</span><strong>Berita</strong><small>Publikasi informasi</small></a>
+      <a href="modules/berita/index.php"><span>◫</span><strong>Berita</strong><small>Publikasi informasi</small></a>
       <a href="modules/tentang/visi-misi.php"><span>◉</span><strong>Visi & Misi</strong><small>Perbarui profil
           FIKES</small></a>
     </div>

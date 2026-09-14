@@ -1,7 +1,12 @@
 <?php
-// Komponen reusable Topbar FIKES.
-// Dipanggil dengan: require_once __DIR__ . '/topbar.php';
+// Komponen reusable Navbar FIKES.
+// Variabel $base_path dapat diatur dari halaman pemanggil.
+// Default: '..' untuk halaman yang berada di dalam folder page/.
+// $base_path = $base_path ?? '..';
+$base_path = '/fikes/page';
+$base = '../../';
 ?>
+
 <!-- =========================================================
      TOP BAR
 ========================================================= -->

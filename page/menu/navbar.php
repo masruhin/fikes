@@ -6,6 +6,7 @@
 $base_path = '/fikes/page';
 $base = '../../';
 ?>
+
 <!-- =========================================================
      NAVBAR
 ========================================================= -->
@@ -202,9 +203,9 @@ $base = '../../';
 
       <!-- PELAYANAN -->
 
-      <div class="nav-item">
+      <!-- <div class="nav-item">
         <a href="#pelayanan" class="nav-link"> Pelayanan FIKES </a>
-      </div>
+      </div> -->
 
       <!-- SURVEY -->
 

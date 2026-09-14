@@ -24,23 +24,23 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
 <!doctype html>
 <html lang="id">
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Akademik | FIKES - Fakultas Ilmu Kesehatan</title>
+    <title>Akademik | FIKES - Fakultas Ilmu Kesehatan</title>
 
-  <meta name="description"
-    content="Website resmi Fakultas Ilmu Kesehatan - Informasi akademik, program studi, kemahasiswaan, pelayanan dan informasi FIKES." />
+    <meta name="description"
+      content="Website resmi Fakultas Ilmu Kesehatan - Informasi akademik, program studi, kemahasiswaan, pelayanan dan informasi FIKES." />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
-    rel="stylesheet" />
-  <link rel="stylesheet" href="../../assets/css/style.css" />
-  <style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+      rel="stylesheet" />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
+    <style>
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap");
 
     :root {
@@ -1032,97 +1032,97 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
         font-size: 28px
       }
     }
-  </style>
-</head>
+    </style>
+  </head>
 
-<body>
-  <!-- =========================================================
+  <body>
+    <!-- =========================================================
      TOP BAR
 ========================================================= -->
 
-  <div class="topbar">
-    <div class="container topbar-inner">
-      <div class="topbar-info">
-        <span>📍 Kampus FIKES</span>
+    <div class="topbar">
+      <div class="container topbar-inner">
+        <div class="topbar-info">
+          <span>📍 Kampus FIKES</span>
 
-        <span>✉️ info@fikes.ac.id</span>
+          <span>✉️ info@fikes.ac.id</span>
 
-        <span>📞 (021) 1234567</span>
-      </div>
+          <span>📞 (021) 1234567</span>
+        </div>
 
-      <div class="topbar-social">
-        <a href="#">Instagram</a>
-        <a href="#">Facebook</a>
-        <a href="#">YouTube</a>
+        <div class="topbar-social">
+          <a href="#">Instagram</a>
+          <a href="#">Facebook</a>
+          <a href="#">YouTube</a>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- =========================================================
+    <!-- =========================================================
      NAVBAR
 ========================================================= -->
 
-  <header class="navbar" id="navbar">
-    <div class="container nav-inner">
-      <a href="/fikes/index.php" class="logo">
-        <div class="logo-icon">F</div>
-        <div class="logo-text"><strong>FIKES</strong><small>FAKULTAS ILMU KESEHATAN</small></div>
-      </a>
-      <button class="menu-toggle" id="menuToggle">☰</button>
-      <nav class="nav-menu" id="navMenu">
-        <div class="nav-item has-dropdown">
-          <a href="#" class="nav-link">Tentang FIKES <span class="arrow">▾</span></a>
-          <div class="dropdown">
-            <div class="dropdown-item"><a href="/fikes/page/tentang-fikes/visi-misi.php" class="dropdown-link">Visi
-                Misi</a></div>
-            <div class="dropdown-item"><a href="/fikes/page/tentang-fikes/struktur-organisasi.php"
-                class="dropdown-link">Struktur Organisasi</a></div>
-            <div class="dropdown-item"><a href="/fikes/page/tentang-fikes/sertifikat-akreditasi.php"
-                class="dropdown-link">Sertifikat Akreditasi</a></div>
-            <div class="dropdown-item"><a href="/fikes/page/tentang-fikes/unduh-logo.php" class="dropdown-link">Unduh
-                Logo</a></div>
+    <header class="navbar" id="navbar">
+      <div class="container nav-inner">
+        <a href="/fikes/index.php" class="logo">
+          <div class="logo-icon">F</div>
+          <div class="logo-text"><strong>FIKES</strong><small>FAKULTAS ILMU KESEHATAN</small></div>
+        </a>
+        <button class="menu-toggle" id="menuToggle">☰</button>
+        <nav class="nav-menu" id="navMenu">
+          <div class="nav-item has-dropdown">
+            <a href="#" class="nav-link">Tentang FIKES <span class="arrow">▾</span></a>
+            <div class="dropdown">
+              <div class="dropdown-item"><a href="/fikes/page/tentang-fikes/visi-misi.php" class="dropdown-link">Visi
+                  Misi</a></div>
+              <div class="dropdown-item"><a href="/fikes/page/tentang-fikes/struktur-organisasi.php"
+                  class="dropdown-link">Struktur Organisasi</a></div>
+              <div class="dropdown-item"><a href="/fikes/page/tentang-fikes/sertifikat-akreditasi.php"
+                  class="dropdown-link">Sertifikat Akreditasi</a></div>
+              <div class="dropdown-item"><a href="/fikes/page/tentang-fikes/unduh-logo.php" class="dropdown-link">Unduh
+                  Logo</a></div>
+            </div>
           </div>
-        </div>
-        <div class="nav-item has-dropdown">
-          <a href="#" class="nav-link">Kemahasiswaan <span class="arrow">▾</span></a>
-          <div class="dropdown">
-            <div class="dropdown-item"><a href="/fikes/page/kemahasiswaan/hima.php" class="dropdown-link">Unit
-                Himpunan Mahasiswa</a></div>
-            <div class="dropdown-item"><a href="/fikes/page/kemahasiswaan/ukm.php" class="dropdown-link">UKM
-                Kemahasiswaan</a></div>
+          <div class="nav-item has-dropdown">
+            <a href="#" class="nav-link">Kemahasiswaan <span class="arrow">▾</span></a>
+            <div class="dropdown">
+              <div class="dropdown-item"><a href="/fikes/page/kemahasiswaan/hima.php" class="dropdown-link">Unit
+                  Himpunan Mahasiswa</a></div>
+              <div class="dropdown-item"><a href="/fikes/page/kemahasiswaan/ukm.php" class="dropdown-link">UKM
+                  Kemahasiswaan</a></div>
+            </div>
           </div>
-        </div>
-        <div class="nav-item"><a href="/fikes/page/program-studi/program-studi.php" class="nav-link">Program</a></div>
-        <div class="nav-item has-dropdown">
-          <a href="/fikes/page/akademik/akademik.php" class="nav-link">Akademik <span class="arrow">▾</span></a>
-          <div class="dropdown">
-            <div class="dropdown-item"><a href="/fikes/page/akademik/akademik.php#kurikulum"
-                class="dropdown-link">Kurikulum &amp; Silabus</a></div>
-            <div class="dropdown-item"><a href="/fikes/page/akademik/akademik.php#kalender"
-                class="dropdown-link">Kalender Pendidikan</a></div>
-            <div class="dropdown-item"><a href="/fikes/page/akademik/akademik.php#jadwal" class="dropdown-link">Jadwal
-                Kuliah &amp; Ujian</a></div>
-            <div class="dropdown-item"><a href="/fikes/page/akademik/akademik.php#registrasi"
-                class="dropdown-link">Jadwal Registrasi</a></div>
-            <div class="dropdown-item"><a href="/fikes/page/akademik/akademik.php#dokumen"
-                class="dropdown-link">Administrasi &amp; Dokumen Mahasiswa</a></div>
-            <div class="dropdown-item"><a href="/fikes/page/akademik/akademik.php#penilaian"
-                class="dropdown-link">Sistem Penilaian</a></div>
+          <div class="nav-item"><a href="/fikes/page/program-studi/program-studi.php" class="nav-link">Program</a></div>
+          <div class="nav-item has-dropdown">
+            <a href="/fikes/page/akademik/akademik.php" class="nav-link">Akademik <span class="arrow">▾</span></a>
+            <div class="dropdown">
+              <div class="dropdown-item"><a href="/fikes/page/akademik/akademik.php#kurikulum"
+                  class="dropdown-link">Kurikulum &amp; Silabus</a></div>
+              <div class="dropdown-item"><a href="/fikes/page/akademik/akademik.php#kalender"
+                  class="dropdown-link">Kalender Pendidikan</a></div>
+              <div class="dropdown-item"><a href="/fikes/page/akademik/akademik.php#jadwal" class="dropdown-link">Jadwal
+                  Kuliah &amp; Ujian</a></div>
+              <div class="dropdown-item"><a href="/fikes/page/akademik/akademik.php#registrasi"
+                  class="dropdown-link">Jadwal Registrasi</a></div>
+              <div class="dropdown-item"><a href="/fikes/page/akademik/akademik.php#dokumen"
+                  class="dropdown-link">Administrasi &amp; Dokumen Mahasiswa</a></div>
+              <div class="dropdown-item"><a href="/fikes/page/akademik/akademik.php#penilaian"
+                  class="dropdown-link">Sistem Penilaian</a></div>
+            </div>
           </div>
-        </div>
-        <div class="nav-item"><a href="#pelayanan" class="nav-link">Pelayanan FIKES</a></div>
-        <div class="nav-item"><a href="/fikes/page/survey.php" class="nav-link">Survey</a></div>
-      </nav>
-      <a href="/fikes/page/program-studi/program-studi.php" class="nav-cta">Jelajahi Program <span>→</span></a>
-    </div>
-  </header>
+          <!-- <div class="nav-item"><a href="#pelayanan" class="nav-link">Pelayanan FIKES</a></div> -->
+          <div class="nav-item"><a href="/fikes/page/survey.php" class="nav-link">Survey</a></div>
+        </nav>
+        <a href="/fikes/page/program-studi/program-studi.php" class="nav-cta">Jelajahi Program <span>→</span></a>
+      </div>
+    </header>
 
-  <!-- =========================================================
+    <!-- =========================================================
      HERO
 ========================================================= -->
 
-  <main>
-    <style>
+    <main>
+      <style>
       .akademik-hero {
         position: relative;
         overflow: hidden;
@@ -1520,58 +1520,58 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
           font-size: 22px
         }
       }
-    </style>
-    <section class="akademik-hero">
-      <div class="container">
-        <div class="ak-breadcrumb"><a href="/fikes/index.php">⌂ Beranda</a><span>›</span><span>Akademik</span></div>
-        <div class="ak-label" style="background:rgba(255,255,255,.15);color:#fff">PUSAT INFORMASI AKADEMIK</div>
-        <h1>Akademik <span>FIKES</span></h1>
-        <p>Informasi kurikulum, kalender pendidikan, jadwal perkuliahan dan ujian, registrasi, administrasi mahasiswa,
-          dokumen akademik, hingga sistem penilaian.</p>
-      </div>
-    </section>
-    <section class="akademik-wrap">
-      <div class="container">
-        <div class="ak-layout">
-          <aside class="ak-side">
-            <div class="ak-side-title">MENU AKADEMIK</div><a href="#kurikulum"><i>📚</i>Kurikulum &amp; Silabus</a><a
-              href="#kalender"><i>🗓️</i>Kalender Akademik</a><a href="#jadwal"><i>🕘</i>Jadwal Kuliah &amp;
-              Ujian</a><a href="#registrasi"><i>📝</i>Jadwal Registrasi</a><a href="#dokumen"><i>📁</i>Administrasi
-              &amp; Dokumen</a><a href="#penilaian"><i>📊</i>Sistem Penilaian</a>
-          </aside>
-          <div>
-            <section class="ak-section" id="kurikulum">
-              <div class="ak-section-head">
-                <div><span class="ak-label">KURIKULUM &amp; SILABUS</span>
-                  <h2>Kurikulum dan Silabus</h2>
-                  <p class="ak-section-desc">Daftar mata kuliah wajib dan pilihan beserta bobot SKS yang terhubung
-                    langsung dengan Program Studi.</p>
+      </style>
+      <section class="akademik-hero">
+        <div class="container">
+          <div class="ak-breadcrumb"><a href="/fikes/index.php">⌂ Beranda</a><span>›</span><span>Akademik</span></div>
+          <div class="ak-label" style="background:rgba(255,255,255,.15);color:#fff">PUSAT INFORMASI AKADEMIK</div>
+          <h1>Akademik <span>FIKES</span></h1>
+          <p>Informasi kurikulum, kalender pendidikan, jadwal perkuliahan dan ujian, registrasi, administrasi mahasiswa,
+            dokumen akademik, hingga sistem penilaian.</p>
+        </div>
+      </section>
+      <section class="akademik-wrap">
+        <div class="container">
+          <div class="ak-layout">
+            <aside class="ak-side">
+              <div class="ak-side-title">MENU AKADEMIK</div><a href="#kurikulum"><i>📚</i>Kurikulum &amp; Silabus</a><a
+                href="#kalender"><i>🗓️</i>Kalender Akademik</a><a href="#jadwal"><i>🕘</i>Jadwal Kuliah &amp;
+                Ujian</a><a href="#registrasi"><i>📝</i>Jadwal Registrasi</a><a href="#dokumen"><i>📁</i>Administrasi
+                &amp; Dokumen</a><a href="#penilaian"><i>📊</i>Sistem Penilaian</a>
+            </aside>
+            <div>
+              <section class="ak-section" id="kurikulum">
+                <div class="ak-section-head">
+                  <div><span class="ak-label">KURIKULUM &amp; SILABUS</span>
+                    <h2>Kurikulum dan Silabus</h2>
+                    <p class="ak-section-desc">Daftar mata kuliah wajib dan pilihan beserta bobot SKS yang terhubung
+                      langsung dengan Program Studi.</p>
+                  </div>
                 </div>
-              </div>
-              <div class="ak-filter"><select id="prodiFilter">
-                  <option value="">Semua Program Studi</option><?php foreach ($prodiList as $p): ?><option
+                <div class="ak-filter"><select id="prodiFilter">
+                    <option value="">Semua Program Studi</option><?php foreach ($prodiList as $p): ?><option
                       value="<?= e($p['id']) ?>"><?= e($p['nama']) ?> — <?= e($p['jenjang']) ?></option>
-                  <?php endforeach; ?>
-                </select></div>
-              <div class="ak-stat-row">
-                <div class="ak-stat"><strong><?= count($kurikulum) ?></strong><span>Mata kuliah aktif</span></div>
-                <div class="ak-stat"><strong><?= number_format($totalSks, 1) ?></strong><span>Total SKS</span></div>
-                <div class="ak-stat"><strong><?= count($prodiList) ?></strong><span>Program Studi</span></div>
-              </div>
-              <div class="ak-table-wrap">
-                <table class="ak-table" id="kurTable">
-                  <thead>
-                    <tr>
-                      <th>Kode</th>
-                      <th>Mata Kuliah</th>
-                      <th>Program Studi</th>
-                      <th>Semester</th>
-                      <th>SKS</th>
-                      <th>Jenis</th>
-                      <th>Silabus</th>
-                    </tr>
-                  </thead>
-                  <tbody><?php foreach ($kurikulum as $k): ?><tr data-prodi="<?= e($k['prodi_id']) ?>">
+                    <?php endforeach; ?>
+                  </select></div>
+                <div class="ak-stat-row">
+                  <div class="ak-stat"><strong><?= count($kurikulum) ?></strong><span>Mata kuliah aktif</span></div>
+                  <div class="ak-stat"><strong><?= number_format($totalSks, 1) ?></strong><span>Total SKS</span></div>
+                  <div class="ak-stat"><strong><?= count($prodiList) ?></strong><span>Program Studi</span></div>
+                </div>
+                <div class="ak-table-wrap">
+                  <table class="ak-table" id="kurTable">
+                    <thead>
+                      <tr>
+                        <th>Kode</th>
+                        <th>Mata Kuliah</th>
+                        <th>Program Studi</th>
+                        <th>Semester</th>
+                        <th>SKS</th>
+                        <th>Jenis</th>
+                        <th>Silabus</th>
+                      </tr>
+                    </thead>
+                    <tbody><?php foreach ($kurikulum as $k): ?><tr data-prodi="<?= e($k['prodi_id']) ?>">
                         <td><?= e($k['kode_mk']) ?></td>
                         <td><strong><?= e($k['nama_mk']) ?></strong></td>
                         <td><?= e($k['prodi_nama']) ?></td>
@@ -1579,24 +1579,24 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
                         <td><?= number_format((float)$k['sks'], 1) ?></td>
                         <td><span class="ak-badge"><?= e($k['jenis'] ?: 'Wajib') ?></span></td>
                         <td><?php if (!empty($k['silabus_file'])): ?><a class="ak-btn outline"
-                              href="/fikes/admin/uploads/akademik/<?= rawurlencode(basename($k['silabus_file'])) ?>"
-                              target="_blank">Lihat</a><?php else: ?>- <?php endif; ?></td>
+                            href="/fikes/admin/uploads/akademik/<?= rawurlencode(basename($k['silabus_file'])) ?>"
+                            target="_blank">Lihat</a><?php else: ?>- <?php endif; ?></td>
                       </tr><?php endforeach; ?></tbody>
-                </table>
-              </div>
-              <?php if (!$kurikulum): ?><div class="ak-empty">Belum ada data kurikulum. Data akan tampil setelah
-                  dimasukkan melalui Dashboard Admin.</div><?php endif; ?>
-            </section>
-
-            <section class="ak-section" id="kalender">
-              <div class="ak-section-head">
-                <div><span class="ak-label">KALENDER PENDIDIKAN</span>
-                  <h2>Kalender Akademik</h2>
-                  <p class="ak-section-desc">Jadwal penting selama satu tahun ajaran, termasuk masuk kuliah, minggu
-                    tenang, ujian, dan masa libur.</p>
+                  </table>
                 </div>
-              </div>
-              <div class="ak-calendar"><?php foreach ($kalender as $x): ?><div class="ak-event">
+                <?php if (!$kurikulum): ?><div class="ak-empty">Belum ada data kurikulum. Data akan tampil setelah
+                  dimasukkan melalui Dashboard Admin.</div><?php endif; ?>
+              </section>
+
+              <section class="ak-section" id="kalender">
+                <div class="ak-section-head">
+                  <div><span class="ak-label">KALENDER PENDIDIKAN</span>
+                    <h2>Kalender Akademik</h2>
+                    <p class="ak-section-desc">Jadwal penting selama satu tahun ajaran, termasuk masuk kuliah, minggu
+                      tenang, ujian, dan masa libur.</p>
+                  </div>
+                </div>
+                <div class="ak-calendar"><?php foreach ($kalender as $x): ?><div class="ak-event">
                     <small><?= e($x['tahun_ajaran']) ?> ·
                       <?= e($x['kategori']) ?></small><strong><?= e($x['judul']) ?></strong>
                     <p>
@@ -1604,28 +1604,28 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
                     </p>
                   </div><?php endforeach; ?></div><?php if (!$kalender): ?><div class="ak-empty">Belum ada kalender
                   akademik.</div><?php endif; ?>
-            </section>
+              </section>
 
-            <section class="ak-section" id="jadwal">
-              <div class="ak-section-head">
-                <div><span class="ak-label">JADWAL KULIAH &amp; UJIAN</span>
-                  <h2>Jadwal Perkuliahan dan Ujian</h2>
-                  <p class="ak-section-desc">Waktu, ruang, dan pelaksanaan kuliah, UTS, serta UAS.</p>
+              <section class="ak-section" id="jadwal">
+                <div class="ak-section-head">
+                  <div><span class="ak-label">JADWAL KULIAH &amp; UJIAN</span>
+                    <h2>Jadwal Perkuliahan dan Ujian</h2>
+                    <p class="ak-section-desc">Waktu, ruang, dan pelaksanaan kuliah, UTS, serta UAS.</p>
+                  </div>
                 </div>
-              </div>
-              <div class="ak-table-wrap">
-                <table class="ak-table">
-                  <thead>
-                    <tr>
-                      <th>Jenis</th>
-                      <th>Kegiatan / Mata Kuliah</th>
-                      <th>Program Studi</th>
-                      <th>Tanggal</th>
-                      <th>Waktu</th>
-                      <th>Ruang</th>
-                    </tr>
-                  </thead>
-                  <tbody><?php foreach ($jadwal as $j): ?><tr>
+                <div class="ak-table-wrap">
+                  <table class="ak-table">
+                    <thead>
+                      <tr>
+                        <th>Jenis</th>
+                        <th>Kegiatan / Mata Kuliah</th>
+                        <th>Program Studi</th>
+                        <th>Tanggal</th>
+                        <th>Waktu</th>
+                        <th>Ruang</th>
+                      </tr>
+                    </thead>
+                    <tbody><?php foreach ($jadwal as $j): ?><tr>
                         <td><span class="ak-badge"><?= e($j['jenis']) ?></span></td>
                         <td>
                           <strong><?= e($j['nama_kegiatan']) ?></strong><?= $j['kode_mk'] ? '<br><small>' . e($j['kode_mk']) . '</small>' : '' ?>
@@ -1635,20 +1635,20 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
                         <td><?= e(substr($j['jam_mulai'], 0, 5)) ?> - <?= e(substr($j['jam_selesai'], 0, 5)) ?></td>
                         <td><?= e($j['ruang'] ?: '-') ?></td>
                       </tr><?php endforeach; ?></tbody>
-                </table>
-              </div><?php if (!$jadwal): ?><div class="ak-empty">Belum ada jadwal kuliah atau ujian.</div>
-              <?php endif; ?>
-            </section>
+                  </table>
+                </div><?php if (!$jadwal): ?><div class="ak-empty">Belum ada jadwal kuliah atau ujian.</div>
+                <?php endif; ?>
+              </section>
 
-            <section class="ak-section" id="registrasi">
-              <div class="ak-section-head">
-                <div><span class="ak-label">JADWAL REGISTRASI</span>
-                  <h2>Pembayaran &amp; Pengisian KRS</h2>
-                  <p class="ak-section-desc">Batas waktu pembayaran UKT/SPP, pengisian KRS, dan proses persetujuan
-                    akademik.</p>
+              <section class="ak-section" id="registrasi">
+                <div class="ak-section-head">
+                  <div><span class="ak-label">JADWAL REGISTRASI</span>
+                    <h2>Pembayaran &amp; Pengisian KRS</h2>
+                    <p class="ak-section-desc">Batas waktu pembayaran UKT/SPP, pengisian KRS, dan proses persetujuan
+                      akademik.</p>
+                  </div>
                 </div>
-              </div>
-              <div class="ak-calendar"><?php foreach ($registrasi as $r): ?><div class="ak-event">
+                <div class="ak-calendar"><?php foreach ($registrasi as $r): ?><div class="ak-event">
                     <small><?= e($r['tahun_ajaran']) ?> ·
                       <?= e($r['jenis']) ?></small><strong><?= e($r['judul']) ?></strong>
                     <p>
@@ -1656,217 +1656,217 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
                     </p>
                   </div><?php endforeach; ?></div><?php if (!$registrasi): ?><div class="ak-empty">Belum ada jadwal
                   registrasi.</div><?php endif; ?><div class="ak-note">Perhatikan batas waktu pembayaran UKT/SPP dan
-                pengisian KRS agar status akademik semester dapat diproses tepat waktu.</div>
-            </section>
+                  pengisian KRS agar status akademik semester dapat diproses tepat waktu.</div>
+              </section>
 
-            <section class="ak-section" id="dokumen">
-              <div class="ak-section-head">
-                <div><span class="ak-label">ADMINISTRASI &amp; DOKUMEN MAHASISWA</span>
-                  <h2>Panduan, Formulir &amp; Layanan Kelulusan</h2>
-                  <p class="ak-section-desc">Dokumen digital dan informasi layanan akademik mahasiswa.</p>
+              <section class="ak-section" id="dokumen">
+                <div class="ak-section-head">
+                  <div><span class="ak-label">ADMINISTRASI &amp; DOKUMEN MAHASISWA</span>
+                    <h2>Panduan, Formulir &amp; Layanan Kelulusan</h2>
+                    <p class="ak-section-desc">Dokumen digital dan informasi layanan akademik mahasiswa.</p>
+                  </div>
                 </div>
-              </div>
-              <div class="ak-doc-grid">
-                <?php $icons = ['panduan' => '📘', 'formulir' => '📄', 'kelulusan' => '🎓'];
+                <div class="ak-doc-grid">
+                  <?php $icons = ['panduan' => '📘', 'formulir' => '📄', 'kelulusan' => '🎓'];
                 foreach ($dokumen as $d): ?><article class="ak-doc">
                     <div class="ak-doc-icon"><?= $icons[$d['kategori']] ?? '📁' ?></div>
                     <h3><?= e($d['judul']) ?></h3>
                     <p><?= e($d['deskripsi']) ?></p><?php if ($d['kategori'] === 'kelulusan' && $d['isi']): ?><ul
-                        class="ak-list">
-                        <?php foreach (preg_split('/\r\n|\r|\n/', trim($d['isi'])) as $li): if (trim($li) !== ''): ?><li>
-                              <?= e($li) ?></li><?php endif;
+                      class="ak-list">
+                      <?php foreach (preg_split('/\r\n|\r|\n/', trim($d['isi'])) as $li): if (trim($li) !== ''): ?><li>
+                        <?= e($li) ?></li><?php endif;
                                                       endforeach; ?></ul>
-                      <?php endif; ?><?php if (!empty($d['file_dokumen'])): ?><a class="ak-btn"
-                        href="/fikes/admin/uploads/akademik/<?= rawurlencode(basename($d['file_dokumen'])) ?>"
-                        target="_blank">Unduh Dokumen</a><?php elseif (!empty($d['link_url'])): ?><a class="ak-btn"
-                        href="<?= e($d['link_url']) ?>" target="_blank">Buka Informasi</a><?php endif; ?>
+                    <?php endif; ?><?php if (!empty($d['file_dokumen'])): ?><a class="ak-btn"
+                      href="/fikes/admin/uploads/akademik/<?= rawurlencode(basename($d['file_dokumen'])) ?>"
+                      target="_blank">Unduh Dokumen</a><?php elseif (!empty($d['link_url'])): ?><a class="ak-btn"
+                      href="<?= e($d['link_url']) ?>" target="_blank">Buka Informasi</a><?php endif; ?>
                   </article><?php endforeach; ?></div><?php if (!$dokumen): ?><div class="ak-empty">Belum ada dokumen
                   atau informasi administrasi mahasiswa.</div><?php endif; ?>
-            </section>
+              </section>
 
-            <section class="ak-section" id="penilaian">
-              <div class="ak-section-head">
-                <div><span class="ak-label">SISTEM PENILAIAN</span>
-                  <h2>Komponen &amp; Skala Penilaian</h2>
-                  <p class="ak-section-desc">Informasi komponen penilaian pembelajaran yang ditetapkan dan dikelola
-                    melalui Dashboard Admin.</p>
+              <section class="ak-section" id="penilaian">
+                <div class="ak-section-head">
+                  <div><span class="ak-label">SISTEM PENILAIAN</span>
+                    <h2>Komponen &amp; Skala Penilaian</h2>
+                    <p class="ak-section-desc">Informasi komponen penilaian pembelajaran yang ditetapkan dan dikelola
+                      melalui Dashboard Admin.</p>
+                  </div>
                 </div>
-              </div>
-              <div class="ak-rating">
-                <div>Komponen</div>
-                <div>Bobot</div>
-                <div>Keterangan</div>
-              </div><?php foreach ($penilaian as $n): ?><div class="ak-rating">
+                <div class="ak-rating">
+                  <div>Komponen</div>
+                  <div>Bobot</div>
+                  <div>Keterangan</div>
+                </div><?php foreach ($penilaian as $n): ?><div class="ak-rating">
                   <div><strong><?= e($n['komponen']) ?></strong></div>
                   <div><span class="ak-badge"><?= number_format((float)$n['bobot'], 0) ?>%</span></div>
                   <div><?= e($n['keterangan']) ?></div>
                 </div><?php endforeach; ?><?php if (!$penilaian): ?><div class="ak-empty">Belum ada komponen penilaian.
                 </div><?php endif; ?><div class="ak-note">Skala nilai huruf dan konversi nilai dapat disesuaikan dengan
-                ketentuan akademik FIKES melalui Dashboard Admin.</div>
-            </section>
+                  ketentuan akademik FIKES melalui Dashboard Admin.</div>
+              </section>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
+    </main>
 
-  <!-- =========================================================
+    <!-- =========================================================
      FOOTER
 ========================================================= -->
 
-  <footer>
-    <div class="container footer-main">
-      <div class="footer-brand">
-        <div class="logo footer-logo">
-          <div class="logo-icon">F</div>
+    <footer>
+      <div class="container footer-main">
+        <div class="footer-brand">
+          <div class="logo footer-logo">
+            <div class="logo-icon">F</div>
 
-          <div class="logo-text">
-            <strong style="color: white"> FIKES </strong>
+            <div class="logo-text">
+              <strong style="color: white"> FIKES </strong>
 
-            <small> FAKULTAS ILMU KESEHATAN </small>
+              <small> FAKULTAS ILMU KESEHATAN </small>
+            </div>
+          </div>
+
+          <p>
+            Membangun generasi kesehatan yang profesional, berintegritas,
+            inovatif, dan berorientasi kepada masyarakat.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-title">Tentang FIKES</h4>
+
+          <div class="footer-links">
+            <a href="#"> Visi Misi </a>
+
+            <a href="#"> Struktur Organisasi </a>
+
+            <a href="#"> Akreditasi </a>
+
+            <a href="#"> Daftar Dosen </a>
           </div>
         </div>
 
-        <p>
-          Membangun generasi kesehatan yang profesional, berintegritas,
-          inovatif, dan berorientasi kepada masyarakat.
-        </p>
-      </div>
+        <div>
+          <h4 class="footer-title">Program Studi</h4>
 
-      <div>
-        <h4 class="footer-title">Tentang FIKES</h4>
+          <div class="footer-links">
+            <a href="#"> Profesi Ners </a>
 
-        <div class="footer-links">
-          <a href="#"> Visi Misi </a>
+            <a href="#"> Ilmu Keperawatan </a>
 
-          <a href="#"> Struktur Organisasi </a>
+            <a href="#"> Farmasi </a>
 
-          <a href="#"> Akreditasi </a>
+            <a href="#"> Kebidanan </a>
 
-          <a href="#"> Daftar Dosen </a>
+            <a href="#"> K3 </a>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <h4 class="footer-title">Program Studi</h4>
+        <div>
+          <h4 class="footer-title">Informasi</h4>
 
-        <div class="footer-links">
-          <a href="#"> Profesi Ners </a>
+          <div class="footer-links">
+            <a href="/fikes/page/akademik/akademik.php"> Akademik </a>
 
-          <a href="#"> Ilmu Keperawatan </a>
+            <a href="#"> Kemahasiswaan </a>
 
-          <a href="#"> Farmasi </a>
+            <a href="#"> Pelayanan FIKES </a>
 
-          <a href="#"> Kebidanan </a>
-
-          <a href="#"> K3 </a>
+            <a href="#"> Survey </a>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <h4 class="footer-title">Informasi</h4>
-
-        <div class="footer-links">
-          <a href="/fikes/page/akademik/akademik.php"> Akademik </a>
-
-          <a href="#"> Kemahasiswaan </a>
-
-          <a href="#"> Pelayanan FIKES </a>
-
-          <a href="#"> Survey </a>
-        </div>
-      </div>
-
-      <!--MAP PETA-->
-      <!-- =========================================================
+        <!--MAP PETA-->
+        <!-- =========================================================
      LOKASI & PETA
 ========================================================== -->
 
-      <div class="footer-location">
-        <div class="location-header">
-          <div class="location-icon">
-            <i class="fa-solid fa-location-dot"></i>
-          </div>
-
-          <div>
-            <h3>Lokasi Kampus</h3>
-
-            <p>Fakultas Ilmu Kesehatan</p>
-          </div>
-        </div>
-
-        <!-- PETA -->
-
-        <div class="map-card">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.1515727139526!2d109.11806027499709!3d-6.991421893009626!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6fbef42471658d%3A0x883656d1325ef066!2sUniversitas%20Bhamada%20Slawi!5e0!3m2!1sid!2sid!4v1787544396003!5m2!1sid!2sid"
-            width="600" height="450" style="border: 0" allowfullscreen="" loading="lazy"
-            referrerpolicy="strict-origin-when-cross-origin" title="Lokasi Fakultas Ilmu Kesehatan" loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade" allowfullscreen>
-          </iframe>
-
-          <div class="map-overlay">
-            <div class="map-info">
-              <div class="map-info-icon">
-                <i class="fa-solid fa-location-dot"></i>
-              </div>
-
-              <div>
-                <strong> Fakultas Ilmu Kesehatan </strong>
-
-                <span> Lihat lokasi kampus </span>
-              </div>
+        <div class="footer-location">
+          <div class="location-header">
+            <div class="location-icon">
+              <i class="fa-solid fa-location-dot"></i>
             </div>
 
-            <a href="#" target="_blank" class="map-direction">
-              <i class="fa-solid fa-diamond-turn-right"></i>
+            <div>
+              <h3>Lokasi Kampus</h3>
 
-              Petunjuk Arah
-            </a>
+              <p>Fakultas Ilmu Kesehatan</p>
+            </div>
+          </div>
+
+          <!-- PETA -->
+
+          <div class="map-card">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3960.1515727139526!2d109.11806027499709!3d-6.991421893009626!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e6fbef42471658d%3A0x883656d1325ef066!2sUniversitas%20Bhamada%20Slawi!5e0!3m2!1sid!2sid!4v1787544396003!5m2!1sid!2sid"
+              width="600" height="450" style="border: 0" allowfullscreen="" loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin" title="Lokasi Fakultas Ilmu Kesehatan" loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade" allowfullscreen>
+            </iframe>
+
+            <div class="map-overlay">
+              <div class="map-info">
+                <div class="map-info-icon">
+                  <i class="fa-solid fa-location-dot"></i>
+                </div>
+
+                <div>
+                  <strong> Fakultas Ilmu Kesehatan </strong>
+
+                  <span> Lihat lokasi kampus </span>
+                </div>
+              </div>
+
+              <a href="#" target="_blank" class="map-direction">
+                <i class="fa-solid fa-diamond-turn-right"></i>
+
+                Petunjuk Arah
+              </a>
+            </div>
+          </div>
+
+          <!-- ALAMAT -->
+
+          <div class="footer-contact location-contact">
+            <i class="fa-solid fa-location-dot"></i>
+
+            <span>
+              Alamat Fakultas Ilmu Kesehatan, silakan sesuaikan dengan alamat
+              kampus.
+            </span>
+          </div>
+
+          <div class="footer-contact">
+            <i class="fa-solid fa-phone"></i>
+
+            <span> Nomor Telepon FIKES </span>
+          </div>
+
+          <div class="footer-contact">
+            <i class="fa-solid fa-envelope"></i>
+
+            <span> email@fikes.ac.id </span>
           </div>
         </div>
-
-        <!-- ALAMAT -->
-
-        <div class="footer-contact location-contact">
-          <i class="fa-solid fa-location-dot"></i>
-
-          <span>
-            Alamat Fakultas Ilmu Kesehatan, silakan sesuaikan dengan alamat
-            kampus.
-          </span>
-        </div>
-
-        <div class="footer-contact">
-          <i class="fa-solid fa-phone"></i>
-
-          <span> Nomor Telepon FIKES </span>
-        </div>
-
-        <div class="footer-contact">
-          <i class="fa-solid fa-envelope"></i>
-
-          <span> email@fikes.ac.id </span>
-        </div>
+        <!--MAP PETA-->
       </div>
-      <!--MAP PETA-->
-    </div>
 
-    <div class="container footer-bottom">
-      <span>
-        © <span id="year"></span> Fakultas Ilmu Kesehatan. All Rights
-        Reserved.
-      </span>
+      <div class="container footer-bottom">
+        <span>
+          © <span id="year"></span> Fakultas Ilmu Kesehatan. All Rights
+          Reserved.
+        </span>
 
-      <span> Website FIKES </span>
-    </div>
-  </footer>
+        <span> Website FIKES </span>
+      </div>
+    </footer>
 
-  <!-- BACK TO TOP -->
+    <!-- BACK TO TOP -->
 
-  <button class="back-top" id="backTop">↑</button>
-  <!-- <script src="assets/js/main.js"></script> -->
-  <script>
+    <button class="back-top" id="backTop">↑</button>
+    <!-- <script src="assets/js/main.js"></script> -->
+    <script>
     let current = 0;
     let slides = [];
     let dots = [];
@@ -1905,8 +1905,8 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
         behavior: "smooth"
       });
     });
-  </script>
-  <script>
+    </script>
+    <script>
     document.addEventListener('DOMContentLoaded', function() {
       const f = document.getElementById('prodiFilter');
       if (f) {
@@ -1919,7 +1919,7 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
       document.querySelectorAll('.ak-side a').forEach(a => a.addEventListener('click', () => document
         .querySelectorAll('.ak-side a').forEach(x => x.classList.remove('active'))));
     });
-  </script>
-</body>
+    </script>
+  </body>
 
 </html>
