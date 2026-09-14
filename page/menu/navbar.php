@@ -197,7 +197,7 @@ $base = '../../';
       <!-- AKADEMIK -->
 
       <div class="nav-item">
-        <a href="#akademik" class="nav-link"> Akademik </a>
+        <a href="<?= $base_path ?>/akademik/akademik.php" class="nav-link"> Akademik </a>
       </div>
 
       <!-- PELAYANAN -->

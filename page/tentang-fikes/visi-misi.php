@@ -1,4 +1,7 @@
 <?php
+$base_path = '/fikes/page';
+$base = '../../';
+
 $host = 'localhost';
 $db   = 'fikes';
 $user = 'root';
@@ -237,7 +240,7 @@ function e($value)
                 tenaga pengajar, kemahasiswaan, dan berbagai layanan FIKES.
               </p>
 
-              <a href="index.html#program" class="btn">
+              <a href="<?= $base_path ?>/program-studi/program-studi.php" class="btn">
                 Lihat Program Studi →
               </a>
             </div>
