@@ -1,25 +1,26 @@
 <?php
+if(session_status()!==PHP_SESSION_ACTIVE) session_start();
 require_once __DIR__ . '/../../admin/config/database.php';
-function e($v)
-{
-  return htmlspecialchars($v ?? '', ENT_QUOTES, 'UTF-8');
+function survey_e($v){return htmlspecialchars((string)$v,ENT_QUOTES,'UTF-8');}
+function survey_defaults($tipe){if($tipe==='skala')return [['Sangat Tidak Puas',1],['Tidak Puas',2],['Cukup',3],['Puas',4],['Sangat Puas',5]];if($tipe==='ya_tidak')return [['Ya',1],['Tidak',0]];return [];}
+$slug=trim($_GET['slug']??'');
+$st=$pdo->prepare("SELECT * FROM survey WHERE slug=? AND status='aktif' AND (tanggal_mulai IS NULL OR tanggal_mulai<=CURDATE()) AND (tanggal_selesai IS NULL OR tanggal_selesai>=CURDATE()) LIMIT 1");$st->execute([$slug]);$survey=$st->fetch(PDO::FETCH_ASSOC);
+if(!$survey){http_response_code(404);exit('Survey tidak ditemukan atau sudah ditutup.');}
+$st=$pdo->prepare("SELECT * FROM survey_pertanyaan WHERE survey_id=? AND status='aktif' ORDER BY nomor_urut,id");$st->execute([$survey['id']]);$questions=$st->fetchAll(PDO::FETCH_ASSOC);
+$ids=array_column($questions,'id');$choices=[];
+if($ids){$in=implode(',',array_fill(0,count($ids),'?'));$q=$pdo->prepare("SELECT * FROM survey_pilihan WHERE pertanyaan_id IN($in) ORDER BY nomor_urut,id");$q->execute($ids);foreach($q->fetchAll(PDO::FETCH_ASSOC) as $c)$choices[$c['pertanyaan_id']][]=$c;}
+foreach($questions as $q){$qid=(int)$q['id'];if(!empty($choices[$qid]))continue;foreach(survey_defaults($q['tipe']) as $i=>$d)$choices[$qid][]= ['id'=>'default-'.$qid.'-'.$i,'pertanyaan_id'=>$qid,'label'=>$d[0],'nilai'=>$d[1],'nomor_urut'=>$i+1];}
+$success=false;$error='';
+if($_SERVER['REQUEST_METHOD']==='POST'){
+ try{
+  if(!hash_equals($_SESSION['survey_token_'.$survey['id']]??'',$_POST['token']??''))throw new Exception('Sesi survey tidak valid. Silakan muat ulang halaman.');
+  $pdo->beginTransaction();
+  $st=$pdo->prepare("INSERT INTO survey_responden(survey_id,nama,email,kategori_responden,identitas,ip_address) VALUES(?,?,?,?,?,?)");$st->execute([$survey['id'],trim($_POST['nama']??''),trim($_POST['email']??''),trim($_POST['kategori_responden']??''),trim($_POST['identitas']??''),$_SERVER['REMOTE_ADDR']??null]);$rid=(int)$pdo->lastInsertId();
+  foreach($questions as $q){$v=$_POST['q'][$q['id']]??'';if((int)$q['wajib'] && trim((string)$v)==='')throw new Exception('Semua pertanyaan wajib harus diisi.');$pid=null;$nilai=null;$text=null;if(in_array($q['tipe'],['skala','pilihan_ganda','ya_tidak'],true)&&$v!==''){$sel=$pdo->prepare('SELECT id,nilai FROM survey_pilihan WHERE id=? AND pertanyaan_id=?');$sel->execute([(int)$v,$q['id']]);$row=$sel->fetch(PDO::FETCH_ASSOC);if($row){$pid=(int)$row['id'];$nilai=$row['nilai'];}else{$defaults=survey_defaults($q['tipe']);$idx=is_numeric($v)?(int)$v:-1;if(isset($defaults[$idx])){$nilai=$defaults[$idx][1];$pid=null;}}}else{$text=trim((string)$v);} $ins=$pdo->prepare('INSERT INTO survey_jawaban(responden_id,pertanyaan_id,pilihan_id,jawaban_text,nilai) VALUES(?,?,?,?,?)');$ins->execute([$rid,$q['id'],$pid,$text,$nilai]);}
+  $pdo->commit();$success=true;unset($_SESSION['survey_token_'.$survey['id']]);
+ }catch(Throwable $ex){if($pdo->inTransaction())$pdo->rollBack();$error=$ex->getMessage();}
 }
-function tanggal_id($v)
-{
-  if (!$v) return '-';
-  $b = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-  $t = strtotime($v);
-  return $t ? date('d', $t) . ' ' . $b[(int)date('m', $t) - 1] . ' ' . date('Y', $t) : $v;
-}
-$prodiList = $pdo->query("SELECT id,nama,jenjang,gelar FROM program_studi WHERE status='aktif' ORDER BY nama ASC")->fetchAll();
-$kurikulum = $pdo->query("SELECT k.id,k.prodi_id,k.kode_mk,k.nama_mk,k.semester,k.sks,k.jenis,p.nama prodi_nama, (SELECT s.file_dokumen FROM akademik_silabus s WHERE s.kurikulum_id=k.id AND s.status='aktif' ORDER BY s.id DESC LIMIT 1) silabus_file FROM prodi_kurikulum k LEFT JOIN program_studi p ON p.id=k.prodi_id ORDER BY p.nama,k.semester,k.nomor_urut,k.id")->fetchAll();
-$totalSks = 0;
-foreach ($kurikulum as $k) $totalSks += (float)$k['sks'];
-$kalender = $pdo->query("SELECT * FROM akademik_kalender WHERE status='aktif' ORDER BY tanggal_mulai ASC,id ASC")->fetchAll();
-$jadwal = $pdo->query("SELECT j.*,p.nama prodi_nama FROM akademik_jadwal j LEFT JOIN program_studi p ON p.id=j.prodi_id WHERE j.status='aktif' ORDER BY j.tanggal ASC,j.jam_mulai ASC,j.id ASC")->fetchAll();
-$registrasi = $pdo->query("SELECT * FROM akademik_registrasi WHERE status='aktif' ORDER BY tanggal_mulai ASC,id ASC")->fetchAll();
-$dokumen = $pdo->query("SELECT * FROM akademik_dokumen WHERE status='aktif' ORDER BY kategori,nomor_urut,id DESC")->fetchAll();
-$penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' ORDER BY nomor_urut,id ASC")->fetchAll();
+if(empty($_SESSION['survey_token_'.$survey['id']]))$_SESSION['survey_token_'.$survey['id']]=bin2hex(random_bytes(24));$token=$_SESSION['survey_token_'.$survey['id']];
 ?>
 <!doctype html>
 <html lang="id">
@@ -28,7 +29,7 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Akademik | FIKES - Fakultas Ilmu Kesehatan</title>
+    <title>Isi Survey | FIKES - Fakultas Ilmu Kesehatan</title>
 
     <meta name="description"
       content="Website resmi Fakultas Ilmu Kesehatan - Informasi akademik, program studi, kemahasiswaan, pelayanan dan informasi FIKES." />
@@ -40,6 +41,7 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
       rel="stylesheet" />
     <link rel="stylesheet" href="../../assets/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
     @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap");
 
@@ -913,7 +915,444 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
       margin-bottom: 22px
     }
 
+
+    /* =========================================================
+       SURVEY FORM — TATA LETAK KHUSUS HALAMAN ISI SURVEY
+    ========================================================= */
+    .survey-hero {
+      min-height: 360px;
+      display: flex;
+      align-items: center;
+      background:
+        radial-gradient(circle at 88% 22%, rgba(19, 168, 120, .12) 0 110px, transparent 111px),
+        radial-gradient(circle at 92% 62%, rgba(19, 168, 120, .08) 0 180px, transparent 181px),
+        linear-gradient(135deg, #f7fbf9 0%, #ffffff 58%, #eef8f4 100%);
+    }
+
+    .survey-hero .container {
+      padding: 72px 0 68px;
+    }
+
+    .survey-hero .breadcrumb {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      color: #71817b;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .survey-hero .breadcrumb span {
+      color: #52635d;
+    }
+
+    .survey-hero .breadcrumb b {
+      color: #a0ada8;
+      font-weight: 500;
+    }
+
+    .survey-hero .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .14em;
+      margin-bottom: 10px;
+    }
+
+    .survey-hero .eyebrow::before {
+      content: "";
+      width: 30px;
+      height: 3px;
+      border-radius: 99px;
+      background: var(--secondary);
+    }
+
+    .survey-hero h1 {
+      max-width: 900px;
+      font-size: clamp(38px, 5vw, 64px);
+      margin-bottom: 15px;
+      letter-spacing: -.035em;
+    }
+
+    .survey-hero p {
+      max-width: 780px;
+      font-size: 17px;
+      color: #52635d;
+    }
+
+    .survey-form-section {
+      background: #f6faf8;
+      padding: 70px 0 90px;
+    }
+
+    .survey-form-card {
+      width: min(100%, 980px);
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid #e1ebe6;
+      border-radius: 24px;
+      box-shadow: 0 18px 55px rgba(18, 55, 42, .09);
+      overflow: hidden;
+    }
+
+    .survey-form-card>form,
+    .survey-form-card>h2,
+    .survey-form-card>.desc,
+    .survey-form-card>.survey-info,
+    .survey-form-card>.survey-alert,
+    .survey-form-card>.success-panel {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .survey-form-card>h2 {
+      padding: 34px 38px 0;
+      font-size: 28px;
+      letter-spacing: -.02em;
+    }
+
+    .survey-form-card>.desc {
+      padding: 0 38px;
+      margin-top: 8px;
+      color: #66756f;
+      font-size: 14px;
+    }
+
+    .survey-form-card>.desc strong {
+      color: #c2413a;
+    }
+
+    .survey-info {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      padding: 24px 38px 30px;
+    }
+
+    .survey-info-item {
+      min-width: 0;
+      padding: 16px 18px;
+      border: 1px solid #e4eee9;
+      border-radius: 14px;
+      background: #f8fbfa;
+    }
+
+    .survey-info-item span,
+    .survey-info-item strong {
+      display: block;
+    }
+
+    .survey-info-item span {
+      margin-bottom: 5px;
+      color: #788781;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .survey-info-item strong {
+      color: var(--dark);
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    #surveyForm {
+      padding: 0 38px 38px;
+    }
+
+    .respondent-box {
+      margin: 0 0 28px;
+      padding: 25px;
+      border: 1px solid #dfeae5;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #fbfdfc, #f7faf9);
+    }
+
+    .respondent-box h3 {
+      margin-bottom: 5px;
+      font-size: 20px;
+    }
+
+    .respondent-box>p {
+      margin-bottom: 20px;
+      color: #72817c;
+      font-size: 13px;
+    }
+
+    .respondent-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px 20px;
+    }
+
+    .survey-field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .survey-field label {
+      color: #344b43;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .survey-field label small {
+      color: #8a9893;
+      font-weight: 500;
+    }
+
+    .survey-field input,
+    .survey-field select,
+    .survey-field textarea {
+      width: 100%;
+      border: 1px solid #d7e3de;
+      border-radius: 11px;
+      background: #fff;
+      color: #263d35;
+      font: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    .survey-field input,
+    .survey-field select {
+      min-height: 46px;
+      padding: 10px 13px;
+    }
+
+    .survey-field textarea {
+      min-height: 125px;
+      padding: 12px 13px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .survey-field input:focus,
+    .survey-field select:focus,
+    .survey-field textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(8, 127, 91, .10);
+    }
+
+    .question-list {
+      display: grid;
+      gap: 18px;
+    }
+
+    .survey-question {
+      padding: 24px 25px;
+      border: 1px solid #e0eae5;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(18, 55, 42, .045);
+    }
+
+    .question-title {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: #213b31;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .question-number {
+      width: 32px;
+      height: 32px;
+      flex: 0 0 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .required {
+      color: #c2413a;
+      margin-left: 2px;
+    }
+
+    .survey-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 18px 0 0 44px;
+    }
+
+    .survey-opt {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 50px;
+      padding: 11px 14px;
+      border: 1px solid #dce7e2;
+      border-radius: 12px;
+      background: #fbfdfc;
+      color: #41554e;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .survey-opt:hover {
+      border-color: #a9cfc0;
+      background: #f5fbf8;
+    }
+
+    .survey-opt input {
+      width: 17px;
+      height: 17px;
+      margin: 0;
+      accent-color: var(--primary);
+      flex: 0 0 auto;
+    }
+
+    .survey-opt:has(input:checked) {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--dark);
+      box-shadow: 0 0 0 2px rgba(8, 127, 91, .06);
+    }
+
+    .survey-question>.survey-field {
+      margin: 18px 0 0 44px;
+    }
+
+    .empty-choice {
+      margin-top: 14px;
+      padding: 13px 15px;
+      border: 1px dashed #e0b56d;
+      border-radius: 10px;
+      background: #fffaf0;
+      color: #8a6728;
+      font-size: 13px;
+    }
+
+    .survey-submit-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 28px;
+      padding-top: 25px;
+      border-top: 1px solid #e7eeeb;
+    }
+
+    .survey-back {
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .survey-back:hover {
+      text-decoration: underline;
+    }
+
+    .survey-submit {
+      min-height: 48px;
+      padding: 12px 22px;
+      border: 0;
+      border-radius: 11px;
+      background: var(--primary);
+      color: #fff;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(8, 127, 91, .18);
+      transition: transform .2s, background .2s;
+    }
+
+    .survey-submit:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .survey-alert {
+      margin: 28px 38px 0;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .survey-alert.err {
+      border: 1px solid #f0c7c3;
+      background: #fff5f4;
+      color: #a3342c;
+    }
+
+    .success-panel {
+      padding: 65px 38px;
+      text-align: center;
+    }
+
+    .success-icon {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 34px;
+      font-weight: 800;
+    }
+
+    .success-panel h2 {
+      margin-bottom: 8px;
+      font-size: 28px;
+    }
+
+    .success-panel p {
+      margin-bottom: 24px;
+      color: #6d7c76;
+    }
+
+    .success-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .success-primary,
+    .success-secondary {
+      padding: 11px 17px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .success-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .success-secondary {
+      border: 1px solid #d9e4df;
+      color: var(--primary);
+      background: #fff;
+    }
+
     @media(max-width:900px) {
+
       .topbar {
         display: none
       }
@@ -982,7 +1421,98 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
       }
     }
 
+
+    @media(max-width:900px) {
+      .survey-info {
+        grid-template-columns: 1fr;
+      }
+
+      .survey-options {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media(max-width:600px) {
+      .survey-hero .container {
+        padding: 52px 0 48px;
+      }
+
+      .survey-hero h1 {
+        font-size: 36px;
+      }
+
+      .survey-hero p {
+        font-size: 15px;
+      }
+
+      .survey-form-section {
+        padding: 35px 0 55px;
+      }
+
+      .survey-form-card {
+        border-radius: 18px;
+      }
+
+      .survey-form-card>h2 {
+        padding: 26px 20px 0;
+        font-size: 23px;
+      }
+
+      .survey-form-card>.desc {
+        padding: 0 20px;
+        font-size: 13px;
+      }
+
+      .survey-info {
+        padding: 20px;
+      }
+
+      #surveyForm {
+        padding: 0 20px 25px;
+      }
+
+      .respondent-box {
+        padding: 18px;
+      }
+
+      .respondent-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .survey-question {
+        padding: 19px;
+      }
+
+      .question-title {
+        font-size: 14px;
+      }
+
+      .survey-options {
+        margin-left: 0;
+      }
+
+      .survey-question>.survey-field {
+        margin-left: 0;
+      }
+
+      .survey-submit-row {
+        flex-direction: column-reverse;
+        align-items: stretch;
+      }
+
+      .survey-submit {
+        width: 100%;
+      }
+
+      .survey-back {
+        text-align: center;
+      }
+
+      .survey-alert {
+        margin: 20px;
+      }
+
       .container {
         width: min(100% - 28px, 1180px)
       }
@@ -1036,6 +1566,7 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
   </head>
 
   <body>
+
     <!-- =========================================================
      TOP BAR
 ========================================================= -->
@@ -1116,787 +1647,105 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
         <a href="/fikes/page/program-studi/program-studi.php" class="nav-cta">Jelajahi Program <span>→</span></a>
       </div>
     </header>
-
-    <!-- =========================================================
-     HERO
-========================================================= -->
-
     <main>
-      <style>
-      .akademik-hero {
-        position: relative;
-        overflow: hidden;
-        padding: 58px 0 72px;
-        background: radial-gradient(circle at 90% 20%, rgba(255, 255, 255, .18), transparent 30%), linear-gradient(120deg, #00685a 0%, #008f78 55%, #8ad0c1 150%);
-        color: #fff
-      }
-
-      .akademik-hero:after {
-        content: "";
-        position: absolute;
-        width: 360px;
-        height: 360px;
-        right: -120px;
-        bottom: -210px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, .08)
-      }
-
-      .ak-breadcrumb {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        font-size: 13px;
-        color: rgba(255, 255, 255, .8);
-        margin-bottom: 25px
-      }
-
-      .ak-breadcrumb a:hover {
-        color: #fff
-      }
-
-      .akademik-hero h1 {
-        font-size: clamp(38px, 5vw, 60px);
-        margin: 0 0 14px;
-        color: #fff;
-        line-height: 1.05
-      }
-
-      .akademik-hero h1 span {
-        color: #a5ead7
-      }
-
-      .akademik-hero p {
-        max-width: 760px;
-        margin: 0;
-        color: rgba(255, 255, 255, .86);
-        font-size: 16px
-      }
-
-      .akademik-wrap {
-        padding: 58px 0 90px;
-        background: #f7faf9
-      }
-
-      .ak-layout {
-        display: grid;
-        grid-template-columns: 245px minmax(0, 1fr);
-        gap: 28px;
-        align-items: start
-      }
-
-      .ak-side {
-        position: sticky;
-        top: 95px;
-        background: #fff;
-        border: 1px solid #e2ece8;
-        border-radius: 18px;
-        padding: 12px;
-        box-shadow: 0 12px 35px rgba(18, 55, 42, .07)
-      }
-
-      .ak-side-title {
-        padding: 13px 12px 9px;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 1px;
-        color: #087f5b
-      }
-
-      .ak-side a {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        padding: 12px;
-        border-radius: 12px;
-        font-size: 13px;
-        font-weight: 700;
-        color: #52635d
-      }
-
-      .ak-side a:hover,
-      .ak-side a.active {
-        background: #e7f7f1;
-        color: #087f5b
-      }
-
-      .ak-side i {
-        font-style: normal;
-        width: 22px;
-        text-align: center
-      }
-
-      .ak-section {
-        scroll-margin-top: 100px;
-        background: #fff;
-        border: 1px solid #e3ece9;
-        border-radius: 20px;
-        padding: 30px;
-        margin-bottom: 24px;
-        box-shadow: 0 12px 35px rgba(18, 55, 42, .06)
-      }
-
-      .ak-section-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        align-items: flex-start;
-        margin-bottom: 22px
-      }
-
-      .ak-label {
-        display: inline-block;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 1px;
-        color: #087f5b;
-        background: #e7f7f1;
-        padding: 7px 10px;
-        border-radius: 999px;
-        margin-bottom: 9px
-      }
-
-      .ak-section h2 {
-        font-size: 25px;
-        margin: 0 0 8px
-      }
-
-      .ak-section-desc {
-        margin: 0;
-        color: #687a74;
-        font-size: 14px
-      }
-
-      .ak-stat-row {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-bottom: 20px
-      }
-
-      .ak-stat {
-        padding: 16px;
-        border: 1px solid #e3ece9;
-        border-radius: 14px;
-        background: #fbfdfc
-      }
-
-      .ak-stat strong {
-        display: block;
-        font-size: 22px;
-        color: #087f5b
-      }
-
-      .ak-stat span {
-        font-size: 12px;
-        color: #6b7c77
-      }
-
-      .ak-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px
-      }
-
-      .ak-table th,
-      .ak-table td {
-        padding: 12px 10px;
-        border-bottom: 1px solid #edf1ef;
-        text-align: left;
-        vertical-align: top
-      }
-
-      .ak-table th {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-        color: #687a74;
-        background: #f7faf9
-      }
-
-      .ak-badge {
-        display: inline-flex;
-        padding: 5px 9px;
-        border-radius: 999px;
-        background: #e7f7f1;
-        color: #087f5b;
-        font-size: 11px;
-        font-weight: 800
-      }
-
-      .ak-empty {
-        padding: 25px;
-        text-align: center;
-        border: 1px dashed #cbdad5;
-        border-radius: 14px;
-        color: #70817b
-      }
-
-      .ak-calendar {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 14px
-      }
-
-      .ak-event {
-        border-left: 4px solid #087f5b;
-        background: #f7faf9;
-        padding: 15px 16px;
-        border-radius: 12px
-      }
-
-      .ak-event strong {
-        display: block;
-        color: #12372a
-      }
-
-      .ak-event small {
-        color: #087f5b;
-        font-weight: 800
-      }
-
-      .ak-event p {
-        margin: 7px 0 0;
-        font-size: 13px
-      }
-
-      .ak-doc-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px
-      }
-
-      .ak-doc {
-        border: 1px solid #e3ece9;
-        border-radius: 15px;
-        padding: 18px;
-        background: #fff
-      }
-
-      .ak-doc-icon {
-        font-size: 27px;
-        margin-bottom: 10px
-      }
-
-      .ak-doc h3 {
-        font-size: 15px;
-        margin: 0 0 7px
-      }
-
-      .ak-doc p {
-        font-size: 12px;
-        color: #687a74;
-        margin: 0 0 13px
-      }
-
-      .ak-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        background: #087f5b;
-        color: #fff;
-        padding: 9px 13px;
-        border-radius: 9px;
-        font-size: 12px;
-        font-weight: 800
-      }
-
-      .ak-btn.outline {
-        background: #fff;
-        color: #087f5b;
-        border: 1px solid #bfe1d5
-      }
-
-      .ak-filter {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-        margin-bottom: 18px
-      }
-
-      .ak-filter select {
-        padding: 10px 12px;
-        border: 1px solid #dce8e4;
-        border-radius: 10px;
-        background: #fff
-      }
-
-      .ak-note {
-        background: #fff8e7;
-        border: 1px solid #f3dfaa;
-        border-radius: 13px;
-        padding: 14px;
-        font-size: 13px;
-        color: #765c1d;
-        margin-top: 16px
-      }
-
-      .ak-list {
-        margin: 0;
-        padding-left: 20px
-      }
-
-      .ak-list li {
-        margin: 7px 0
-      }
-
-      .ak-rating {
-        display: grid;
-        grid-template-columns: 1.2fr .7fr 2fr;
-        gap: 10px;
-        align-items: center;
-        padding: 11px 0;
-        border-bottom: 1px solid #edf1ef;
-        font-size: 13px
-      }
-
-      .ak-rating:first-child {
-        font-weight: 800;
-        color: #687a74
-      }
-
-      .ak-progress {
-        height: 8px;
-        background: #edf3f0;
-        border-radius: 999px;
-        overflow: hidden
-      }
-
-      .ak-progress span {
-        display: block;
-        height: 100%;
-        background: #087f5b
-      }
-
-
-      /* =========================================================
-         RESPONSIVE TABLE AKADEMIK
-         Semua tabel dibungkus horizontal-scroll agar tidak
-         membuat layout halaman melebar pada HP/tablet.
-      ========================================================= */
-      .ak-table-wrap {
-        width: 100%;
-        max-width: 100%;
-        min-width: 0;
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-x: contain;
-        border: 1px solid #e3ece9;
-        border-radius: 14px;
-        background: #fff;
-        scrollbar-width: thin;
-      }
-
-      .ak-table-wrap::-webkit-scrollbar {
-        height: 7px;
-      }
-
-      .ak-table-wrap::-webkit-scrollbar-track {
-        background: #eef4f1;
-        border-radius: 999px;
-      }
-
-      .ak-table-wrap::-webkit-scrollbar-thumb {
-        background: #a9c9be;
-        border-radius: 999px;
-      }
-
-      .ak-table {
-        width: 100%;
-        min-width: 820px;
-        border-collapse: separate;
-        border-spacing: 0;
-        table-layout: auto;
-      }
-
-      .ak-table th,
-      .ak-table td {
-        white-space: nowrap;
-      }
-
-      .ak-table th {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-      }
-
-      /* Kolom teks panjang tetap punya ruang yang cukup */
-      .ak-table td:nth-child(2) {
-        min-width: 210px;
-        white-space: normal;
-      }
-
-      /* Tombol/link tidak terpotong */
-      .ak-table td:last-child {
-        white-space: nowrap;
-      }
-
-      /* Penanda kecil agar pengguna HP tahu tabel dapat digeser */
-      .ak-table-wrap::after {
-        content: "Geser tabel ke samping →";
-        display: block;
-        padding: 7px 12px;
-        font-size: 10px;
-        color: #70817b;
-        background: #f7faf9;
-        border-top: 1px solid #edf1ef;
-        text-align: right;
-      }
-
-      @media(max-width:900px) {
-        .ak-table-wrap {
-          width: 100%;
-          max-width: 100%;
-          overflow-x: auto;
-        }
-
-        .ak-table {
-          min-width: 820px;
-        }
-      }
-
-      /* HP: tabel berubah menjadi kartu, bukan dipaksa melebar */
-      @media(max-width:600px) {
-        .ak-table-wrap {
-          width: 100%;
-          max-width: 100%;
-          margin: 0;
-          overflow: visible;
-          border: 0;
-          background: transparent;
-          border-radius: 0;
-        }
-
-        .ak-table-wrap::after {
-          display: none;
-        }
-
-        .ak-table {
-          width: 100%;
-          min-width: 0;
-          table-layout: auto;
-          border-collapse: separate;
-          border-spacing: 0;
-          font-size: 12px;
-        }
-
-        .ak-table thead {
-          display: none;
-        }
-
-        .ak-table tbody,
-        .ak-table tbody tr,
-        .ak-table tbody td {
-          display: block;
-          width: 100%;
-          box-sizing: border-box;
-        }
-
-        .ak-table tbody tr {
-          margin: 0 0 12px;
-          padding: 10px 12px;
-          border: 1px solid #e3ece9;
-          border-radius: 14px;
-          background: #fff;
-          box-shadow: 0 4px 14px rgba(12, 68, 52, .05);
-        }
-
-        .ak-table tbody td {
-          min-width: 0 !important;
-          padding: 8px 0;
-          border: 0;
-          white-space: normal !important;
-          overflow-wrap: anywhere;
-          display: grid;
-          grid-template-columns: 108px minmax(0, 1fr);
-          gap: 10px;
-          align-items: start;
-          line-height: 1.5;
-        }
-
-        .ak-table tbody td+td {
-          border-top: 1px dashed #e8efec;
-        }
-
-        .ak-table tbody td::before {
-          content: attr(data-label);
-          display: block;
-          font-size: 10px;
-          font-weight: 800;
-          text-transform: uppercase;
-          letter-spacing: .35px;
-          color: #71817c;
-        }
-
-        .ak-table tbody td:last-child {
-          white-space: normal !important;
-        }
-
-        .ak-table tbody td .ak-badge {
-          width: fit-content;
-        }
-
-        .ak-table tbody td a {
-          max-width: 100%;
-          overflow-wrap: anywhere;
-        }
-      }
-
-      @media(max-width:380px) {
-        .ak-table tbody tr {
-          padding: 9px 10px;
-        }
-
-        .ak-table tbody td {
-          grid-template-columns: 92px minmax(0, 1fr);
-          gap: 8px;
-          font-size: 11px;
-        }
-
-        .ak-table tbody td::before {
-          font-size: 9px;
-        }
-      }
-
-      @media(max-width:900px) {
-        .ak-layout {
-          grid-template-columns: 1fr
-        }
-
-        .ak-side {
-          position: static
-        }
-
-        .ak-doc-grid {
-          grid-template-columns: 1fr 1fr
-        }
-
-        .ak-calendar {
-          grid-template-columns: 1fr
-        }
-
-        .ak-stat-row {
-          grid-template-columns: 1fr 1fr
-        }
-      }
-
-      @media(max-width:600px) {
-        .akademik-hero {
-          padding: 42px 0 55px
-        }
-
-        .ak-section {
-          padding: 21px
-        }
-
-        .ak-doc-grid,
-        .ak-stat-row {
-          grid-template-columns: 1fr
-        }
-
-        .ak-rating {
-          grid-template-columns: 1fr 55px 1fr
-        }
-
-        .ak-section h2 {
-          font-size: 22px
-        }
-      }
-      </style>
-      <section class="akademik-hero">
+      <section class="page-hero survey-hero">
         <div class="container">
-          <div class="ak-breadcrumb"><a href="/fikes/index.php">⌂ Beranda</a><span>›</span><span>Akademik</span></div>
-          <div class="ak-label" style="background:rgba(255,255,255,.15);color:#fff">PUSAT INFORMASI AKADEMIK</div>
-          <h1>Akademik <span>FIKES</span></h1>
-          <p>Informasi kurikulum, kalender pendidikan, jadwal perkuliahan dan ujian, registrasi, administrasi mahasiswa,
-            dokumen akademik, hingga sistem penilaian.</p>
+          <div class="breadcrumb">⌂ <span>Beranda</span><b>›</b><span>Survey</span><b>›</b><span>Isi Survey</span></div>
+          <span class="eyebrow">FORMULIR SURVEY FIKES</span>
+          <h1><?=survey_e($survey['judul'])?></h1>
+          <p>
+            <?=survey_e($survey['deskripsi'] ?: 'Silakan isi survey berikut dengan jawaban yang sesuai berdasarkan pengalaman Anda.')?>
+          </p>
         </div>
       </section>
-      <section class="akademik-wrap">
+      <section class="survey-form-section">
         <div class="container">
-          <div class="ak-layout">
-            <aside class="ak-side">
-              <div class="ak-side-title">MENU AKADEMIK</div><a href="#kurikulum"><i>📚</i>Kurikulum &amp; Silabus</a><a
-                href="#kalender"><i>🗓️</i>Kalender Akademik</a><a href="#jadwal"><i>🕘</i>Jadwal Kuliah &amp;
-                Ujian</a><a href="#registrasi"><i>📝</i>Jadwal Registrasi</a><a href="#dokumen"><i>📁</i>Administrasi
-                &amp; Dokumen</a><a href="#penilaian"><i>📊</i>Sistem Penilaian</a>
-            </aside>
-            <div>
-              <section class="ak-section" id="kurikulum">
-                <div class="ak-section-head">
-                  <div><span class="ak-label">KURIKULUM &amp; SILABUS</span>
-                    <h2>Kurikulum dan Silabus</h2>
-                    <p class="ak-section-desc">Daftar mata kuliah wajib dan pilihan beserta bobot SKS yang terhubung
-                      langsung dengan Program Studi.</p>
-                  </div>
-                </div>
-                <div class="ak-filter"><select id="prodiFilter">
-                    <option value="">Semua Program Studi</option><?php foreach ($prodiList as $p): ?><option
-                      value="<?= e($p['id']) ?>"><?= e($p['nama']) ?> — <?= e($p['jenjang']) ?></option>
-                    <?php endforeach; ?>
-                  </select></div>
-                <div class="ak-stat-row">
-                  <div class="ak-stat"><strong><?= count($kurikulum) ?></strong><span>Mata kuliah aktif</span></div>
-                  <div class="ak-stat"><strong><?= number_format($totalSks, 1) ?></strong><span>Total SKS</span></div>
-                  <div class="ak-stat"><strong><?= count($prodiList) ?></strong><span>Program Studi</span></div>
-                </div>
-                <div class="ak-table-wrap">
-                  <table class="ak-table" id="kurTable">
-                    <thead>
-                      <tr>
-                        <th>Kode</th>
-                        <th>Mata Kuliah</th>
-                        <th>Program Studi</th>
-                        <th>Semester</th>
-                        <th>SKS</th>
-                        <th>Jenis</th>
-                        <th>Silabus</th>
-                      </tr>
-                    </thead>
-                    <tbody><?php foreach ($kurikulum as $k): ?><tr data-prodi="<?= e($k['prodi_id']) ?>">
-                        <td><?= e($k['kode_mk']) ?></td>
-                        <td><strong><?= e($k['nama_mk']) ?></strong></td>
-                        <td><?= e($k['prodi_nama']) ?></td>
-                        <td><?= e($k['semester']) ?></td>
-                        <td><?= number_format((float)$k['sks'], 1) ?></td>
-                        <td><span class="ak-badge"><?= e($k['jenis'] ?: 'Wajib') ?></span></td>
-                        <td><?php if (!empty($k['silabus_file'])): ?><a class="ak-btn outline"
-                            href="/fikes/admin/uploads/akademik/<?= rawurlencode(basename($k['silabus_file'])) ?>"
-                            target="_blank">Lihat</a><?php else: ?>- <?php endif; ?></td>
-                      </tr><?php endforeach; ?></tbody>
-                  </table>
-                </div>
-                <?php if (!$kurikulum): ?><div class="ak-empty">Belum ada data kurikulum. Data akan tampil setelah
-                  dimasukkan melalui Dashboard Admin.</div><?php endif; ?>
-              </section>
-
-              <section class="ak-section" id="kalender">
-                <div class="ak-section-head">
-                  <div><span class="ak-label">KALENDER PENDIDIKAN</span>
-                    <h2>Kalender Akademik</h2>
-                    <p class="ak-section-desc">Jadwal penting selama satu tahun ajaran, termasuk masuk kuliah, minggu
-                      tenang, ujian, dan masa libur.</p>
-                  </div>
-                </div>
-                <div class="ak-calendar"><?php foreach ($kalender as $x): ?><div class="ak-event">
-                    <small><?= e($x['tahun_ajaran']) ?> ·
-                      <?= e($x['kategori']) ?></small><strong><?= e($x['judul']) ?></strong>
-                    <p>
-                      <?= tanggal_id($x['tanggal_mulai']) ?><?= $x['tanggal_selesai'] ? ' — ' . tanggal_id($x['tanggal_selesai']) : '' ?><?= $x['keterangan'] ? '<br>' . e($x['keterangan']) : '' ?>
-                    </p>
-                  </div><?php endforeach; ?></div><?php if (!$kalender): ?><div class="ak-empty">Belum ada kalender
-                  akademik.</div><?php endif; ?>
-              </section>
-
-              <section class="ak-section" id="jadwal">
-                <div class="ak-section-head">
-                  <div><span class="ak-label">JADWAL KULIAH &amp; UJIAN</span>
-                    <h2>Jadwal Perkuliahan dan Ujian</h2>
-                    <p class="ak-section-desc">Waktu, ruang, dan pelaksanaan kuliah, UTS, serta UAS.</p>
-                  </div>
-                </div>
-                <div class="ak-table-wrap">
-                  <table class="ak-table">
-                    <thead>
-                      <tr>
-                        <th>Jenis</th>
-                        <th>Kegiatan / Mata Kuliah</th>
-                        <th>Program Studi</th>
-                        <th>Tanggal</th>
-                        <th>Waktu</th>
-                        <th>Ruang</th>
-                      </tr>
-                    </thead>
-                    <tbody><?php foreach ($jadwal as $j): ?><tr>
-                        <td><span class="ak-badge"><?= e($j['jenis']) ?></span></td>
-                        <td>
-                          <strong><?= e($j['nama_kegiatan']) ?></strong><?= $j['kode_mk'] ? '<br><small>' . e($j['kode_mk']) . '</small>' : '' ?>
-                        </td>
-                        <td><?= e($j['prodi_nama'] ?: 'Semua Prodi') ?></td>
-                        <td><?= tanggal_id($j['tanggal']) ?></td>
-                        <td><?= e(substr($j['jam_mulai'], 0, 5)) ?> - <?= e(substr($j['jam_selesai'], 0, 5)) ?></td>
-                        <td><?= e($j['ruang'] ?: '-') ?></td>
-                      </tr><?php endforeach; ?></tbody>
-                  </table>
-                </div><?php if (!$jadwal): ?><div class="ak-empty">Belum ada jadwal kuliah atau ujian.</div>
-                <?php endif; ?>
-              </section>
-
-              <section class="ak-section" id="registrasi">
-                <div class="ak-section-head">
-                  <div><span class="ak-label">JADWAL REGISTRASI</span>
-                    <h2>Pembayaran &amp; Pengisian KRS</h2>
-                    <p class="ak-section-desc">Batas waktu pembayaran UKT/SPP, pengisian KRS, dan proses persetujuan
-                      akademik.</p>
-                  </div>
-                </div>
-                <div class="ak-calendar"><?php foreach ($registrasi as $r): ?><div class="ak-event">
-                    <small><?= e($r['tahun_ajaran']) ?> ·
-                      <?= e($r['jenis']) ?></small><strong><?= e($r['judul']) ?></strong>
-                    <p>
-                      <?= tanggal_id($r['tanggal_mulai']) ?><?= $r['tanggal_selesai'] ? ' — ' . tanggal_id($r['tanggal_selesai']) : '' ?><?= $r['keterangan'] ? '<br>' . e($r['keterangan']) : '' ?>
-                    </p>
-                  </div><?php endforeach; ?></div><?php if (!$registrasi): ?><div class="ak-empty">Belum ada jadwal
-                  registrasi.</div><?php endif; ?><div class="ak-note">Perhatikan batas waktu pembayaran UKT/SPP dan
-                  pengisian KRS agar status akademik semester dapat diproses tepat waktu.</div>
-              </section>
-
-              <section class="ak-section" id="dokumen">
-                <div class="ak-section-head">
-                  <div><span class="ak-label">ADMINISTRASI &amp; DOKUMEN MAHASISWA</span>
-                    <h2>Panduan, Formulir &amp; Layanan Kelulusan</h2>
-                    <p class="ak-section-desc">Dokumen digital dan informasi layanan akademik mahasiswa.</p>
-                  </div>
-                </div>
-                <div class="ak-doc-grid">
-                  <?php $icons = ['panduan' => '📘', 'formulir' => '📄', 'kelulusan' => '🎓'];
-                foreach ($dokumen as $d): ?><article class="ak-doc">
-                    <div class="ak-doc-icon"><?= $icons[$d['kategori']] ?? '📁' ?></div>
-                    <h3><?= e($d['judul']) ?></h3>
-                    <p><?= e($d['deskripsi']) ?></p><?php if ($d['kategori'] === 'kelulusan' && $d['isi']): ?><ul
-                      class="ak-list">
-                      <?php foreach (preg_split('/\r\n|\r|\n/', trim($d['isi'])) as $li): if (trim($li) !== ''): ?><li>
-                        <?= e($li) ?></li><?php endif;
-                                                      endforeach; ?></ul>
-                    <?php endif; ?><?php if (!empty($d['file_dokumen'])): ?><a class="ak-btn"
-                      href="/fikes/admin/uploads/akademik/<?= rawurlencode(basename($d['file_dokumen'])) ?>"
-                      target="_blank">Unduh Dokumen</a><?php elseif (!empty($d['link_url'])): ?><a class="ak-btn"
-                      href="<?= e($d['link_url']) ?>" target="_blank">Buka Informasi</a><?php endif; ?>
-                  </article><?php endforeach; ?></div><?php if (!$dokumen): ?><div class="ak-empty">Belum ada dokumen
-                  atau informasi administrasi mahasiswa.</div><?php endif; ?>
-              </section>
-
-              <section class="ak-section" id="penilaian">
-                <div class="ak-section-head">
-                  <div><span class="ak-label">SISTEM PENILAIAN</span>
-                    <h2>Komponen &amp; Skala Penilaian</h2>
-                    <p class="ak-section-desc">Informasi komponen penilaian pembelajaran yang ditetapkan dan dikelola
-                      melalui Dashboard Admin.</p>
-                  </div>
-                </div>
-                <div class="ak-rating">
-                  <div>Komponen</div>
-                  <div>Bobot</div>
-                  <div>Keterangan</div>
-                </div><?php foreach ($penilaian as $n): ?><div class="ak-rating">
-                  <div><strong><?= e($n['komponen']) ?></strong></div>
-                  <div><span class="ak-badge"><?= number_format((float)$n['bobot'], 0) ?>%</span></div>
-                  <div><?= e($n['keterangan']) ?></div>
-                </div><?php endforeach; ?><?php if (!$penilaian): ?><div class="ak-empty">Belum ada komponen penilaian.
-                </div><?php endif; ?><div class="ak-note">Skala nilai huruf dan konversi nilai dapat disesuaikan dengan
-                  ketentuan akademik FIKES melalui Dashboard Admin.</div>
-              </section>
+          <div class="survey-form-card">
+            <?php if($success): ?>
+            <div class="success-panel">
+              <div class="success-icon">✓</div>
+              <h2>Survey Berhasil Dikirim</h2>
+              <p>Terima kasih. Jawaban survey Anda berhasil disimpan.</p>
+              <div class="success-actions"><a class="success-primary" href="/fikes/page/survey/survey.php">Kembali ke
+                  Daftar Survey</a><a class="success-secondary" href="/fikes/index.php">Kembali ke Beranda</a></div>
             </div>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Jawaban survey Anda berhasil disimpan.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#087f5b',
+                allowOutsideClick: false
+              });
+            });
+            </script>
+            <?php else: ?>
+            <?php if($error): ?><div class="survey-alert err"><?=survey_e($error)?></div><?php endif; ?>
+            <h2>Isi Formulir Survey</h2>
+            <p class="desc">Lengkapi data responden dan jawab seluruh pertanyaan sesuai pengalaman Anda. Pertanyaan
+              bertanda <strong>*</strong> wajib diisi.</p>
+            <div class="survey-info">
+              <div class="survey-info-item"><span>Target
+                  Responden</span><strong><?=survey_e($survey['target_responden'])?></strong></div>
+              <div class="survey-info-item"><span>Jumlah Pertanyaan</span><strong><?=count($questions)?>
+                  Pertanyaan</strong></div>
+              <div class="survey-info-item">
+                <span>Periode</span><strong><?=survey_e($survey['tanggal_mulai'] ?: 'Terbuka')?> —
+                  <?=survey_e($survey['tanggal_selesai'] ?: 'Tidak ditentukan')?></strong>
+              </div>
+            </div>
+            <form method="post" id="surveyForm">
+              <input type="hidden" name="token" value="<?=survey_e($token)?>">
+              <div class="respondent-box">
+                <h3>Data Responden</h3>
+                <p>Data identitas digunakan hanya untuk kebutuhan pengelolaan hasil survey.</p>
+                <div class="respondent-grid">
+                  <div class="survey-field"><label>Nama</label><input name="nama"
+                      value="<?=survey_e($_POST['nama']??'')?>" placeholder="Masukkan nama"></div>
+                  <div class="survey-field"><label>Email</label><input type="email" name="email"
+                      value="<?=survey_e($_POST['email']??'')?>" placeholder="nama@email.com"></div>
+                  <div class="survey-field"><label>Kategori Responden</label><select name="kategori_responden">
+                      <option value="">Pilih kategori</option>
+                      <?php foreach(['Mahasiswa','Karyawan/Pegawai','Dosen','Alumni','Masyarakat','Umum'] as $v): ?>
+                      <option value="<?=survey_e($v)?>" <?=($_POST['kategori_responden']??'')===$v?'selected':''?>>
+                        <?=survey_e($v)?></option><?php endforeach;?>
+                    </select></div>
+                  <div class="survey-field"><label>Identitas/NIM/NIP <small>(opsional)</small></label><input
+                      name="identitas" value="<?=survey_e($_POST['identitas']??'')?>"
+                      placeholder="Masukkan identitas bila diperlukan"></div>
+                </div>
+              </div>
+              <?php if(!$questions): ?><div class="empty-choice">Survey ini belum memiliki pertanyaan aktif.</div>
+              <?php else: ?>
+              <div class="question-list">
+                <?php foreach($questions as $i=>$q): ?><article class="survey-question">
+                  <div class="question-title"><span
+                      class="question-number"><?=($i+1)?></span><?=survey_e($q['pertanyaan'])?><?php if((int)$q['wajib']): ?><span
+                      class="required">*</span><?php endif;?></div>
+                  <?php if(in_array($q['tipe'],['skala','pilihan_ganda','ya_tidak'],true)): ?><div
+                    class="survey-options"><?php foreach(($choices[$q['id']]??[]) as $c): ?><label
+                      class="survey-opt"><input type="radio" name="q[<?=$q['id']?>]" value="<?=survey_e($c['id'])?>"
+                        <?=((string)($_POST['q'][$q['id']]??'')===(string)$c['id'])?'checked':''?>><span><?=survey_e($c['label'])?></span></label><?php endforeach; if(empty($choices[$q['id']])): ?>
+                    <div class="empty-choice">Pilihan jawaban belum dibuat untuk pertanyaan ini.</div><?php endif;?>
+                  </div>
+                  <?php elseif($q['tipe']==='isian'): ?><div class="survey-field"><input type="text"
+                      name="q[<?=$q['id']?>]" value="<?=survey_e($_POST['q'][$q['id']]??'')?>"
+                      placeholder="Tulis jawaban Anda..."></div>
+                  <?php else: ?><div class="survey-field"><textarea name="q[<?=$q['id']?>]"
+                      placeholder="Tulis jawaban Anda..."><?=survey_e($_POST['q'][$q['id']]??'')?></textarea></div>
+                  <?php endif; ?>
+                </article><?php endforeach; ?></div>
+              <div class="survey-submit-row"><a class="survey-back" href="/fikes/page/survey/survey.php">← Kembali ke
+                  Survey</a><button class="survey-submit" type="submit">Kirim Jawaban Survey</button></div>
+              <?php endif; ?>
+            </form>
+            <?php endif; ?>
           </div>
         </div>
       </section>
     </main>
-
-    <!-- =========================================================
-     FOOTER
-========================================================= -->
-
     <footer>
       <div class="container footer-main">
         <div class="footer-brand">
@@ -1956,7 +1805,7 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
 
             <a href="#"> Pelayanan FIKES </a>
 
-            <a href="#"> Survey </a>
+            <a href="/fikes/page/survey/survey.php"> Survey </a>
           </div>
         </div>
 
@@ -2115,6 +1964,7 @@ $penilaian = $pdo->query("SELECT * FROM akademik_penilaian WHERE status='aktif' 
         .querySelectorAll('.ak-side a').forEach(x => x.classList.remove('active'))));
     });
     </script>
+
   </body>
 
 </html>

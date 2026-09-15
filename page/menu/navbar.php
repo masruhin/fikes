@@ -210,7 +210,7 @@ $base = '../../';
       <!-- SURVEY -->
 
       <div class="nav-item">
-        <a href="#survey" class="nav-link"> Survey </a>
+        <a href="<?= $base_path ?>/survey/survey.php" class="nav-link"> Survey </a>
       </div>
     </nav>
 

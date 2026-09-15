@@ -128,6 +128,7 @@ if ($editId && isset($editMap[$editType])) {
 $page_title = 'Akademik';
 include __DIR__ . '/../../includes/header.php';
 ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <style>
   .ak-wrap {
     padding: 24px;
@@ -190,6 +191,11 @@ include __DIR__ . '/../../includes/header.php';
     padding: 20px;
     box-shadow: 0 8px 25px rgba(18, 55, 42, .055);
     overflow: hidden
+  }
+
+  .ak-panel.editing {
+    border-color: #0a8f68;
+    box-shadow: 0 10px 30px rgba(10, 143, 104, .12)
   }
 
   .ak-panel h2 {
@@ -531,6 +537,32 @@ include __DIR__ . '/../../includes/header.php';
       padding: 9px 8px
     }
   }
+
+  .swal2-container {
+    z-index: 20000 !important
+  }
+
+  .swal2-popup {
+    border-radius: 18px !important
+  }
+
+  .swal2-title {
+    font-size: 20px !important
+  }
+
+  .swal2-html-container {
+    font-size: 13px !important
+  }
+
+  .swal2-confirm {
+    border-radius: 10px !important;
+    font-weight: 700 !important
+  }
+
+  .swal2-cancel {
+    border-radius: 10px !important;
+    font-weight: 700 !important
+  }
 </style>
 <div class="ak-wrap">
   <div class="page-head">
@@ -545,14 +577,13 @@ include __DIR__ . '/../../includes/header.php';
       href="#kalender">Kalender</a><a href="#jadwal">Jadwal</a><a href="#registrasi">Registrasi</a><a
       href="#dokumen">Dokumen Mahasiswa</a><a href="#penilaian">Penilaian</a></div>
   <div class="ak-grid">
-    <section class="ak-panel full" id="kurikulum">
+    <section class="ak-panel full<?= ($editType === 'kurikulum' && $editId) ? ' editing' : '' ?>" id="kurikulum">
       <h2>📚 Kurikulum &amp; Silabus — Mata Kuliah</h2>
       <form class="ak-form" method="post"><input type="hidden" name="action" value="kurikulum"><input type="hidden"
           name="id" value="<?= ($editType === 'kurikulum' ? ($editRow['id'] ?? 0) : 0) ?>">
         <div><label>Program Studi *</label><select name="prodi_id" required>
             <option value="">Pilih Program Studi</option><?php foreach ($prodi as $p): ?><option value="<?= $p['id'] ?>"
-                <?= ($editType === 'kurikulum' && ($editRow['prodi_id'] ?? 0) == $p['id']) ? 'selected' : '' ?>>
-                <?= e($p['nama']) ?> —
+                <?= ($editType === 'kurikulum' && ($editRow['prodi_id'] ?? 0) == $p['id']) ? 'selected' : '' ?>><?= e($p['nama']) ?> —
                 <?= e($p['jenjang']) ?></option><?php endforeach; ?>
           </select></div>
         <div><label>Kode Mata Kuliah</label><input name="kode_mk"
@@ -560,15 +591,12 @@ include __DIR__ . '/../../includes/header.php';
         <div><label>Nama Mata Kuliah *</label><input name="nama_mk"
             value="<?= e($editType === 'kurikulum' ? ($editRow['nama_mk'] ?? '') : '') ?>" required></div>
         <div><label>Semester</label><input name="semester"
-            value="<?= e($editType === 'kurikulum' ? ($editRow['semester'] ?? '') : '') ?>" placeholder="1 / 2 / 3...">
-        </div>
+            value="<?= e($editType === 'kurikulum' ? ($editRow['semester'] ?? '') : '') ?>" placeholder="1 / 2 / 3..."></div>
         <div><label>SKS</label><input type="number" step="0.5" name="sks"
             value="<?= e($editType === 'kurikulum' ? ($editRow['sks'] ?? 2) : 2) ?>"></div>
         <div><label>Jenis</label><select name="jenis">
-            <option <?= ($editType === 'kurikulum' && ($editRow['jenis'] ?? '') === 'Wajib') ? 'selected' : '' ?>>Wajib
-            </option>
-            <option <?= ($editType === 'kurikulum' && ($editRow['jenis'] ?? '') === 'Pilihan') ? 'selected' : '' ?>>
-              Pilihan</option>
+            <option <?= ($editType === 'kurikulum' && ($editRow['jenis'] ?? '') === 'Wajib') ? 'selected' : '' ?>>Wajib</option>
+            <option <?= ($editType === 'kurikulum' && ($editRow['jenis'] ?? '') === 'Pilihan') ? 'selected' : '' ?>>Pilihan</option>
           </select></div>
         <div class="full"><button
             class="ak-btn"><?= ($editType === 'kurikulum' && $editId) ? 'Simpan Perubahan' : '+ Tambah Mata Kuliah' ?></button>
@@ -593,15 +621,15 @@ include __DIR__ . '/../../includes/header.php';
               <td><?= e($x['sks']) ?></td>
               <td><?= e($x['jenis'] ?: 'Wajib') ?></td>
               <td>
-                <form method="post" onsubmit="return confirm('Hapus mata kuliah ini?')"><input type="hidden" name="action"
-                    value="kurikulum_delete"><input type="hidden" name="id" value="<?= $x['id'] ?>"><a
+                <form method="post" class="js-delete-form" data-confirm="Hapus mata kuliah ini?"><input type="hidden"
+                    name="action" value="kurikulum_delete"><input type="hidden" name="id" value="<?= $x['id'] ?>"><a
                     class="ak-btn light" href="?edit_type=kurikulum&edit_id=<?= $x['id'] ?>#kurikulum">Edit</a></form>
               </td>
             </tr><?php endforeach; ?>
         </table>
       </div>
     </section>
-    <section class="ak-panel" id="silabus">
+    <section class="ak-panel<?= ($editType === 'silabus' && $editId) ? ' editing' : '' ?>" id="silabus">
       <h2>📘 Silabus</h2>
       <form class="ak-form" method="post" enctype="multipart/form-data"><input type="hidden" name="action"
           value="silabus"><input type="hidden" name="id"
@@ -619,8 +647,7 @@ include __DIR__ . '/../../includes/header.php';
         <div class="full"><label>Deskripsi</label><textarea
             name="deskripsi"><?= e($editType === 'silabus' ? ($editRow['deskripsi'] ?? '') : '') ?></textarea></div>
         <div class="full"><button
-            class="ak-btn"><?= ($editType === 'silabus' && $editId) ? 'Simpan Perubahan' : '+ Simpan Silabus' ?></button>
-        </div>
+            class="ak-btn"><?= ($editType === 'silabus' && $editId) ? 'Simpan Perubahan' : '+ Simpan Silabus' ?></button></div>
       </form>
       <hr>
       <div class="ak-table-wrap">
@@ -636,21 +663,20 @@ include __DIR__ . '/../../includes/header.php';
               <td><a href="../../uploads/akademik/<?= rawurlencode(basename($x['file_dokumen'])) ?>"
                   target="_blank"><?= e($x['judul']) ?></a></td>
               <td>
-                <form method="post" onsubmit="return confirm('Hapus silabus?')"><input type="hidden" name="action"
-                    value="silabus_delete"><input type="hidden" name="id" value="<?= $x['id'] ?>"><a class="ak-btn light"
-                    href="?edit_type=silabus&edit_id=<?= $x['id'] ?>#silabus">Edit</a></form>
+                <form method="post" class="js-delete-form" data-confirm="Hapus silabus?"><input type="hidden"
+                    name="action" value="silabus_delete"><input type="hidden" name="id" value="<?= $x['id'] ?>"><a
+                    class="ak-btn light" href="?edit_type=silabus&edit_id=<?= $x['id'] ?>#silabus">Edit</a></form>
               </td>
             </tr><?php endforeach; ?>
         </table>
       </div>
     </section>
-    <section class="ak-panel" id="kalender">
+    <section class="ak-panel<?= ($editType === 'kalender' && $editId) ? ' editing' : '' ?>" id="kalender">
       <h2>🗓️ Kalender Akademik</h2>
       <form class="ak-form" method="post"><input type="hidden" name="action" value="kalender"><input type="hidden"
           name="id" value="<?= ($editType === 'kalender' ? ($editRow['id'] ?? 0) : 0) ?>">
         <div><label>Tahun Ajaran</label><input name="tahun_ajaran"
-            value="<?= e($editType === 'kalender' ? ($editRow['tahun_ajaran'] ?? '') : '') ?>" placeholder="2026/2027"
-            required>
+            value="<?= e($editType === 'kalender' ? ($editRow['tahun_ajaran'] ?? '') : '') ?>" placeholder="2026/2027" required>
         </div>
         <div><label>Kategori</label><input name="kategori"
             value="<?= e($editType === 'kalender' ? ($editRow['kategori'] ?? '') : '') ?>"
@@ -666,8 +692,7 @@ include __DIR__ . '/../../includes/header.php';
         <div><label>Urutan</label><input type="number" name="nomor_urut"
             value="<?= e($editType === 'kalender' ? ($editRow['nomor_urut'] ?? 1) : 1) ?>"></div>
         <div><label>&nbsp;</label><button
-            class="ak-btn"><?= ($editType === 'kalender' && $editId) ? 'Simpan Perubahan' : '+ Tambah Kalender' ?></button>
-        </div>
+            class="ak-btn"><?= ($editType === 'kalender' && $editId) ? 'Simpan Perubahan' : '+ Tambah Kalender' ?></button></div>
       </form>
       <hr>
       <div class="ak-table-wrap">
@@ -686,9 +711,9 @@ include __DIR__ . '/../../includes/header.php';
                 <?= tanggal_id($x['tanggal_mulai']) ?><?= $x['tanggal_selesai'] ? ' - ' . tanggal_id($x['tanggal_selesai']) : '' ?>
               </td>
               <td>
-                <form method="post" onsubmit="return confirm('Hapus kalender?')"><input type="hidden" name="action"
-                    value="delete"><input type="hidden" name="jenis" value="kalender"><input type="hidden" name="id"
-                    value="<?= $x['id'] ?>"><a class="ak-btn light"
+                <form method="post" class="js-delete-form" data-confirm="Hapus kalender?"><input type="hidden"
+                    name="action" value="delete"><input type="hidden" name="jenis" value="kalender"><input type="hidden"
+                    name="id" value="<?= $x['id'] ?>"><a class="ak-btn light"
                     href="?edit_type=kalender&edit_id=<?= $x['id'] ?>#kalender">Edit</a><button
                     class="ak-btn danger">Hapus</button></form>
               </td>
@@ -696,27 +721,43 @@ include __DIR__ . '/../../includes/header.php';
         </table>
       </div>
     </section>
-    <section class="ak-panel" id="jadwal">
+    <section class="ak-panel<?= ($editType === 'jadwal' && $editId) ? ' editing' : '' ?>" id="jadwal">
       <h2>🕘 Jadwal Kuliah &amp; Ujian</h2>
-      <form class="ak-form" method="post"><input type="hidden" name="action" value="jadwal">
+      <form class="ak-form" method="post">
+        <input type="hidden" name="action" value="jadwal">
+        <input type="hidden" name="id" value="<?= ($editType === 'jadwal' ? ($editRow['id'] ?? 0) : 0) ?>">
         <div><label>Program Studi</label><select name="prodi_id">
-            <option value="0">Semua Prodi</option><?php foreach ($prodi as $p): ?><option value="<?= $p['id'] ?>">
-                <?= e($p['nama']) ?></option><?php endforeach; ?>
+            <option value="0">Semua Prodi</option><?php foreach ($prodi as $p): ?>
+              <option value="<?= $p['id'] ?>"
+                <?= ($editType === 'jadwal' && (int)($editRow['prodi_id'] ?? 0) === (int)$p['id']) ? 'selected' : '' ?>>
+                <?= e($p['nama']) ?></option>
+            <?php endforeach; ?>
           </select></div>
         <div><label>Jenis</label><select name="jenis">
-            <option>Kuliah</option>
-            <option>UTS</option>
-            <option>UAS</option>
+            <?php foreach (['Kuliah', 'UTS', 'UAS'] as $jenis): ?>
+              <option value="<?= e($jenis) ?>"
+                <?= ($editType === 'jadwal' && ($editRow['jenis'] ?? 'Kuliah') === $jenis) ? 'selected' : '' ?>><?= e($jenis) ?>
+              </option>
+            <?php endforeach; ?>
           </select></div>
-        <div><label>Kode MK</label><input name="kode_mk"></div>
-        <div><label>Nama Kegiatan *</label><input name="nama_kegiatan" required></div>
-        <div><label>Tanggal</label><input type="date" name="tanggal" required></div>
-        <div><label>Hari</label><input name="hari"></div>
-        <div><label>Jam Mulai</label><input type="time" name="jam_mulai" required></div>
-        <div><label>Jam Selesai</label><input type="time" name="jam_selesai" required></div>
-        <div><label>Ruang</label><input name="ruang"></div>
-        <div><label>Keterangan</label><input name="keterangan"></div>
-        <div class="full"><button class="ak-btn">+ Tambah Jadwal</button></div>
+        <div><label>Kode MK</label><input name="kode_mk"
+            value="<?= e($editType === 'jadwal' ? ($editRow['kode_mk'] ?? '') : '') ?>"></div>
+        <div><label>Nama Kegiatan *</label><input name="nama_kegiatan"
+            value="<?= e($editType === 'jadwal' ? ($editRow['nama_kegiatan'] ?? '') : '') ?>" required></div>
+        <div><label>Tanggal</label><input type="date" name="tanggal"
+            value="<?= e($editType === 'jadwal' ? ($editRow['tanggal'] ?? '') : '') ?>" required></div>
+        <div><label>Hari</label><input name="hari" value="<?= e($editType === 'jadwal' ? ($editRow['hari'] ?? '') : '') ?>"></div>
+        <div><label>Jam Mulai</label><input type="time" name="jam_mulai"
+            value="<?= e($editType === 'jadwal' ? substr((string)($editRow['jam_mulai'] ?? ''), 0, 5) : '') ?>" required></div>
+        <div><label>Jam Selesai</label><input type="time" name="jam_selesai"
+            value="<?= e($editType === 'jadwal' ? substr((string)($editRow['jam_selesai'] ?? ''), 0, 5) : '') ?>" required></div>
+        <div><label>Ruang</label><input name="ruang" value="<?= e($editType === 'jadwal' ? ($editRow['ruang'] ?? '') : '') ?>">
+        </div>
+        <div><label>Keterangan</label><input name="keterangan"
+            value="<?= e($editType === 'jadwal' ? ($editRow['keterangan'] ?? '') : '') ?>"></div>
+        <div class="full"><button
+            class="ak-btn"><?= ($editType === 'jadwal' && $editId) ? 'Simpan Perubahan' : '+ Tambah Jadwal' ?></button><?php if ($editType === 'jadwal' && $editId): ?><a
+              class="ak-btn light" href="index.php#jadwal">Batal Edit</a><?php endif; ?></div>
       </form>
       <hr>
       <div class="ak-table-wrap">
@@ -728,44 +769,42 @@ include __DIR__ . '/../../includes/header.php';
             <th>Tanggal</th>
             <th>Jam/Ruang</th>
             <th>Aksi</th>
-          </tr><?php foreach ($jad as $x): ?><tr>
+          </tr>
+          <?php foreach ($jad as $x): ?><tr>
               <td><?= e($x['jenis']) ?></td>
               <td><?= e($x['nama_kegiatan']) ?></td>
               <td><?= e($x['prodi_nama'] ?: 'Semua') ?></td>
               <td><?= tanggal_id($x['tanggal']) ?></td>
+              <td><?= e(substr($x['jam_mulai'], 0, 5)) ?>-<?= e(substr($x['jam_selesai'], 0, 5)) ?><br><?= e($x['ruang']) ?></td>
               <td>
-                <?= e(substr($x['jam_mulai'], 0, 5)) ?>-<?= e(substr($x['jam_selesai'], 0, 5)) ?><br><?= e($x['ruang']) ?>
-              </td>
-              <td>
-                <form method="post" onsubmit="return confirm('Hapus jadwal?')"><input type="hidden" name="action"
-                    value="delete"><input type="hidden" name="jenis" value="jadwal"><input type="hidden" name="id"
-                    value="<?= $x['id'] ?>"><a class="ak-btn light"
-                    href="?edit_type=jadwal&edit_id=<?= $x['id'] ?>#jadwal">Edit</a><button
-                    class="ak-btn danger">Hapus</button></form>
+                <a class="ak-btn light" href="?edit_type=jadwal&edit_id=<?= $x['id'] ?>#jadwal">Edit</a>
+                <form method="post" style="display:inline" class="js-delete-form" data-confirm="Hapus jadwal?"><input
+                    type="hidden" name="action" value="delete"><input type="hidden" name="jenis" value="jadwal"><input
+                    type="hidden" name="id" value="<?= $x['id'] ?>"><button class="ak-btn danger">Hapus</button></form>
               </td>
             </tr><?php endforeach; ?>
         </table>
       </div>
     </section>
-    <section class="ak-panel" id="registrasi">
+    <section class="ak-panel<?= ($editType === 'registrasi' && $editId) ? ' editing' : '' ?>" id="registrasi">
       <h2>📝 Jadwal Registrasi</h2>
       <form class="ak-form" method="post"><input type="hidden" name="action" value="registrasi"><input type="hidden"
           name="id" value="<?= ($editType === 'registrasi' ? ($editRow['id'] ?? 0) : 0) ?>">
         <div><label>Tahun Ajaran</label><input name="tahun_ajaran"
             value="<?= e($editType === 'registrasi' ? ($editRow['tahun_ajaran'] ?? '') : '') ?>" required></div>
-        <div><label>Jenis</label><select name="jenis">
-            <option>UKT/SPP</option>
-            <option>KRS</option>
-            <option>Persetujuan KRS</option>
-            <option>Registrasi</option>
-          </select></div>
+        <div><label>Jenis</label><select
+            name="jenis"><?php foreach (['UKT/SPP', 'KRS', 'Persetujuan KRS', 'Registrasi'] as $jenis): ?><option
+                value="<?= e($jenis) ?>"
+                <?= ($editType === 'registrasi' && ($editRow['jenis'] ?? 'Registrasi') === $jenis) ? 'selected' : '' ?>><?= e($jenis) ?>
+              </option><?php endforeach; ?></select></div>
         <div class="full"><label>Judul</label><input name="judul"
             value="<?= e($editType === 'registrasi' ? ($editRow['judul'] ?? '') : '') ?>" required></div>
         <div><label>Mulai</label><input type="date" name="tanggal_mulai"
             value="<?= e($editType === 'registrasi' ? ($editRow['tanggal_mulai'] ?? '') : '') ?>" required></div>
         <div><label>Selesai</label><input type="date" name="tanggal_selesai"
             value="<?= e($editType === 'registrasi' ? ($editRow['tanggal_selesai'] ?? '') : '') ?>"></div>
-        <div class="full"><label>Keterangan</label><textarea name="keterangan"></textarea></div>
+        <div class="full"><label>Keterangan</label><textarea
+            name="keterangan"><?= e($editType === 'registrasi' ? ($editRow['keterangan'] ?? '') : '') ?></textarea></div>
         <div class="full"><button
             class="ak-btn"><?= ($editType === 'registrasi' && $editId) ? 'Simpan Perubahan' : '+ Tambah Registrasi' ?></button>
         </div>
@@ -787,9 +826,9 @@ include __DIR__ . '/../../includes/header.php';
                 <?= tanggal_id($x['tanggal_mulai']) ?><?= $x['tanggal_selesai'] ? ' - ' . tanggal_id($x['tanggal_selesai']) : '' ?>
               </td>
               <td>
-                <form method="post" onsubmit="return confirm('Hapus registrasi?')"><input type="hidden" name="action"
-                    value="delete"><input type="hidden" name="jenis" value="registrasi"><input type="hidden" name="id"
-                    value="<?= $x['id'] ?>"><a class="ak-btn light"
+                <form method="post" class="js-delete-form" data-confirm="Hapus registrasi?"><input type="hidden"
+                    name="action" value="delete"><input type="hidden" name="jenis" value="registrasi"><input type="hidden"
+                    name="id" value="<?= $x['id'] ?>"><a class="ak-btn light"
                     href="?edit_type=registrasi&edit_id=<?= $x['id'] ?>#registrasi">Edit</a><button
                     class="ak-btn danger">Hapus</button></form>
               </td>
@@ -797,28 +836,44 @@ include __DIR__ . '/../../includes/header.php';
         </table>
       </div>
     </section>
-    <section class="ak-panel" id="dokumen">
+    <section class="ak-panel<?= ($editType === 'dokumen' && $editId) ? ' editing' : '' ?>" id="dokumen">
       <h2>📁 Administrasi &amp; Dokumen Mahasiswa</h2>
       <div class="ak-note">Kategori: <strong>Panduan Akademik</strong>, <strong>Unduhan Formulir</strong>, dan
         <strong>Layanan Kelulusan</strong>.
       </div>
-      <form class="ak-form" method="post" enctype="multipart/form-data"><input type="hidden" name="action"
-          value="dokumen">
+      <form class="ak-form" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="dokumen">
+        <input type="hidden" name="id" value="<?= ($editType === 'dokumen' ? ($editRow['id'] ?? 0) : 0) ?>">
+        <input type="hidden" name="old_file" value="<?= e($editType === 'dokumen' ? ($editRow['file_dokumen'] ?? '') : '') ?>">
         <div><label>Kategori</label><select name="kategori">
-            <option value="panduan">Panduan Akademik</option>
-            <option value="formulir">Unduhan Formulir</option>
-            <option value="kelulusan">Layanan Kelulusan</option>
+            <?php foreach (['panduan' => 'Panduan Akademik', 'formulir' => 'Unduhan Formulir', 'kelulusan' => 'Layanan Kelulusan'] as $k => $label): ?>
+              <option value="<?= e($k) ?>"
+                <?= ($editType === 'dokumen' && ($editRow['kategori'] ?? 'panduan') === $k) ? 'selected' : '' ?>><?= e($label) ?>
+              </option>
+            <?php endforeach; ?>
           </select></div>
-        <div><label>Urutan</label><input type="number" name="nomor_urut" value="1"></div>
-        <div class="full"><label>Judul *</label><input name="judul" required></div>
-        <div class="full"><label>Deskripsi</label><textarea name="deskripsi"></textarea></div>
+        <div><label>Urutan</label><input type="number" name="nomor_urut"
+            value="<?= e($editType === 'dokumen' ? ($editRow['nomor_urut'] ?? 1) : 1) ?>"></div>
+        <div class="full"><label>Judul *</label><input name="judul"
+            value="<?= e($editType === 'dokumen' ? ($editRow['judul'] ?? '') : '') ?>" required></div>
+        <div class="full"><label>Deskripsi</label><textarea
+            name="deskripsi"><?= e($editType === 'dokumen' ? ($editRow['deskripsi'] ?? '') : '') ?></textarea></div>
         <div class="full"><label>Isi / Persyaratan (untuk layanan kelulusan, satu poin per baris)</label><textarea
-            name="isi" placeholder="Persyaratan skripsi/tesis\nPendaftaran yudisium\nPelaksanaan wisuda"></textarea>
+            name="isi" placeholder="Persyaratan skripsi/tesis
+Pendaftaran yudisium
+Pelaksanaan wisuda"><?= e($editType === 'dokumen' ? ($editRow['isi'] ?? '') : '') ?></textarea></div>
+        <div><label>File</label><input type="file" name="file_dokumen"
+            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"><?php if ($editType === 'dokumen' && !empty($editRow['file_dokumen'])): ?>
+            <div class="mini">File saat ini: <a
+                href="../../uploads/akademik/<?= rawurlencode(basename($editRow['file_dokumen'])) ?>"
+                target="_blank"><?= e(basename($editRow['file_dokumen'])) ?></a>. Kosongkan jika tidak ingin mengganti.
+            </div><?php endif; ?>
         </div>
-        <div><label>File</label><input type="file" name="file_dokumen" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx">
-        </div>
-        <div><label>Link URL (opsional)</label><input name="link_url"></div>
-        <div class="full"><button class="ak-btn">+ Tambah Dokumen</button></div>
+        <div><label>Link URL (opsional)</label><input name="link_url"
+            value="<?= e($editType === 'dokumen' ? ($editRow['link_url'] ?? '') : '') ?>"></div>
+        <div class="full"><button
+            class="ak-btn"><?= ($editType === 'dokumen' && $editId) ? 'Simpan Perubahan' : '+ Tambah Dokumen' ?></button><?php if ($editType === 'dokumen' && $editId): ?><a
+              class="ak-btn light" href="index.php#dokumen">Batal Edit</a><?php endif; ?></div>
       </form>
       <hr>
       <div class="ak-table-wrap">
@@ -828,24 +883,24 @@ include __DIR__ . '/../../includes/header.php';
             <th>Judul</th>
             <th>File</th>
             <th>Aksi</th>
-          </tr><?php foreach ($doc as $x): ?><tr>
+          </tr>
+          <?php foreach ($doc as $x): ?><tr>
               <td><?= e($x['kategori']) ?></td>
               <td><?= e($x['judul']) ?><br><span class="mini"><?= e($x['deskripsi']) ?></span></td>
               <td><?php if ($x['file_dokumen']): ?><a
                     href="../../uploads/akademik/<?= rawurlencode(basename($x['file_dokumen'])) ?>"
                     target="_blank">Buka</a><?php else: ?>-<?php endif; ?></td>
               <td>
-                <form method="post" onsubmit="return confirm('Hapus dokumen?')"><input type="hidden" name="action"
-                    value="delete"><input type="hidden" name="jenis" value="dokumen"><input type="hidden" name="id"
-                    value="<?= $x['id'] ?>"><a class="ak-btn light"
-                    href="?edit_type=dokumen&edit_id=<?= $x['id'] ?>#dokumen">Edit</a><button
-                    class="ak-btn danger">Hapus</button></form>
+                <a class="ak-btn light" href="?edit_type=dokumen&edit_id=<?= $x['id'] ?>#dokumen">Edit</a>
+                <form method="post" style="display:inline" class="js-delete-form" data-confirm="Hapus dokumen?"><input
+                    type="hidden" name="action" value="delete"><input type="hidden" name="jenis" value="dokumen"><input
+                    type="hidden" name="id" value="<?= $x['id'] ?>"><button class="ak-btn danger">Hapus</button></form>
               </td>
             </tr><?php endforeach; ?>
         </table>
       </div>
     </section>
-    <section class="ak-panel" id="penilaian">
+    <section class="ak-panel<?= ($editType === 'penilaian' && $editId) ? ' editing' : '' ?>" id="penilaian">
       <h2>📊 Sistem Penilaian</h2>
       <form class="ak-form" method="post"><input type="hidden" name="action" value="penilaian"><input type="hidden"
           name="id" value="<?= ($editType === 'penilaian' ? ($editRow['id'] ?? 0) : 0) ?>">
@@ -858,8 +913,7 @@ include __DIR__ . '/../../includes/header.php';
         <div><label>Urutan</label><input type="number" name="nomor_urut"
             value="<?= e($editType === 'penilaian' ? ($editRow['nomor_urut'] ?? 1) : 1) ?>"></div>
         <div><label>&nbsp;</label><button
-            class="ak-btn"><?= ($editType === 'penilaian' && $editId) ? 'Simpan Perubahan' : '+ Tambah Komponen' ?></button>
-        </div>
+            class="ak-btn"><?= ($editType === 'penilaian' && $editId) ? 'Simpan Perubahan' : '+ Tambah Komponen' ?></button></div>
       </form>
       <hr>
       <div class="ak-table-wrap">
@@ -874,7 +928,7 @@ include __DIR__ . '/../../includes/header.php';
               <td><?= e($x['bobot']) ?>%</td>
               <td><?= e($x['keterangan']) ?></td>
               <td>
-                <form method="post" onsubmit="return confirm('Hapus komponen penilaian?')"><input type="hidden"
+                <form method="post" class="js-delete-form" data-confirm="Hapus komponen penilaian?"><input type="hidden"
                     name="action" value="delete"><input type="hidden" name="jenis" value="penilaian"><input type="hidden"
                     name="id" value="<?= $x['id'] ?>"><a class="ak-btn light"
                     href="?edit_type=penilaian&edit_id=<?= $x['id'] ?>#penilaian">Edit</a><button
@@ -886,4 +940,81 @@ include __DIR__ . '/../../includes/header.php';
     </section>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Toast sukses setelah proses tambah/edit/hapus selesai.
+    const params = new URLSearchParams(window.location.search);
+    const ok = params.get('ok');
+    const err = params.get('err');
+
+    if (ok) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Berhasil',
+        text: ok,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2600,
+        timerProgressBar: true
+      });
+      window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+    }
+
+    if (err) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Gagal',
+        text: err,
+        confirmButtonText: 'Tutup'
+      });
+      window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+    }
+
+    // Konfirmasi hapus yang lebih cantik dan aman.
+    document.querySelectorAll('.js-delete-form').forEach(function(form) {
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const message = form.dataset.confirm || 'Yakin ingin menghapus data ini?';
+
+        Swal.fire({
+          icon: 'warning',
+          title: 'Konfirmasi Hapus',
+          text: message,
+          showCancelButton: true,
+          confirmButtonText: 'Ya, Hapus',
+          cancelButtonText: 'Batal',
+          reverseButtons: true,
+          focusCancel: true,
+          confirmButtonColor: '#dc3545',
+          cancelButtonColor: '#6c757d'
+        }).then(function(result) {
+          if (result.isConfirmed) {
+            // Lepaskan handler agar submit benar-benar berjalan.
+            form.dataset.swalConfirmed = '1';
+            form.submit();
+          }
+        });
+      });
+    });
+
+    // Jika user sedang mengedit, beri indikator kecil pada panel.
+    const editing = document.querySelector('.ak-panel.editing');
+    if (editing) {
+      const title = editing.querySelector('h2');
+      if (title && !title.querySelector('.edit-indicator')) {
+        const badge = document.createElement('span');
+        badge.className = 'edit-indicator';
+        badge.textContent = 'Mode Edit';
+        badge.style.cssText =
+          'font-size:10px;padding:5px 9px;border-radius:999px;' +
+          'background:#e6f7f1;color:#087f5b;margin-left:auto;font-weight:800;';
+        title.appendChild(badge);
+      }
+    }
+  });
+</script>
+
 <?php include __DIR__ . '/../../includes/footer.php'; ?>
